@@ -8,7 +8,7 @@
 PRODUCT_NAME = haze_bot_app
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.hazeBotApp
+PRODUCT_BUNDLE_IDENTIFIER = com.d2vsolutions.hazeBotApp
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025 com.d2vsolutions. All rights reserved.
