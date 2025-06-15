@@ -2,6 +2,9 @@
 
 A cute robot face app inspired by LOOI with expressive emotions, customizable colors, and speech capabilities! Built with Flutter using modern state management patterns.
 
+![HazeBot Logo](assets/images/logo.png)
+
+
 ## ✨ Features
 
 ### 🎭 **Expressive Emotions**
