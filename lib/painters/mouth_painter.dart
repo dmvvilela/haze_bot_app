@@ -7,6 +7,7 @@ class MouthPainter extends CustomPainter {
   final double animationValue;
   final bool isLooiStyle;
   final bool isMinimalStyle;
+  final bool isBeanStyle;
   final bool isSpeaking;
 
   MouthPainter({
@@ -15,6 +16,7 @@ class MouthPainter extends CustomPainter {
     required this.animationValue,
     this.isLooiStyle = false,
     this.isMinimalStyle = false,
+    this.isBeanStyle = false,
     this.isSpeaking = false,
   });
 
@@ -22,7 +24,7 @@ class MouthPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
-      ..strokeWidth = isMinimalStyle ? 4 : (isLooiStyle ? 5 : 6)
+      ..strokeWidth = isMinimalStyle ? 4 : (isLooiStyle ? 5 : (isBeanStyle ? 4.5 : 6))
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
@@ -70,8 +72,8 @@ class MouthPainter extends CustomPainter {
 
   void _drawHappyMouth(Canvas canvas, Size size, Paint paint, Offset center) {
     final path = Path();
-    final width = isMinimalStyle ? 30 : (isLooiStyle ? 35 : 40);
-    final height = isMinimalStyle ? 15 : (isLooiStyle ? 18 : 20);
+    final width = isMinimalStyle ? 30 : (isLooiStyle ? 35 : (isBeanStyle ? 32 : 40));
+    final height = isMinimalStyle ? 15 : (isLooiStyle ? 18 : (isBeanStyle ? 16 : 20));
 
     path.moveTo(center.dx - width, center.dy);
     path.quadraticBezierTo(center.dx, center.dy + height, center.dx + width, center.dy);

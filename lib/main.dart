@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'cubits/robot_face_cubit.dart';
 import 'models/robot_config.dart';
 import 'widgets/robot_face_widget.dart';
+import 'i18n/strings.g.dart';
 
 void main() {
-  runApp(const HazeBotApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  LocaleSettings.useDeviceLocale(); // Initialize with device locale
+  runApp(TranslationProvider(child: const HazeBotApp()));
 }
 
 class HazeBotApp extends StatelessWidget {
@@ -15,8 +19,15 @@ class HazeBotApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'HazeBot Face',
+      title: t.app.title,
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple), useMaterial3: true),
+      locale: TranslationProvider.of(context).flutterLocale,
+      supportedLocales: AppLocale.values.map((locale) => locale.flutterLocale),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: BlocProvider(create: (context) => RobotFaceCubit()..startBlinking(), child: const RobotFaceScreen()),
       debugShowCheckedModeBanner: false,
     );
@@ -58,13 +69,13 @@ class RobotFaceScreen extends StatelessWidget {
       builder: (dialogContext) => BlocProvider.value(
         value: context.read<RobotFaceCubit>(),
         child: AlertDialog(
-          title: const Text('Choose Colors'),
+          title: Text(t.ui.choose_colors),
           content: BlocBuilder<RobotFaceCubit, RobotFaceState>(
             builder: (context, state) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Eye Color'),
+                  Text(t.ui.eye_color),
                   Wrap(
                     children: [Colors.cyan, Colors.blue, Colors.green, Colors.purple, Colors.orange, Colors.red, Colors.yellow, Colors.pink]
                         .map(
@@ -85,7 +96,7 @@ class RobotFaceScreen extends StatelessWidget {
                         .toList(),
                   ),
                   const SizedBox(height: 20),
-                  const Text('Mouth Color'),
+                  Text(t.ui.mouth_color),
                   Wrap(
                     children: [Colors.pink, Colors.red, Colors.orange, Colors.purple, Colors.blue, Colors.green, Colors.yellow, Colors.cyan]
                         .map(
@@ -121,7 +132,7 @@ class RobotFaceScreen extends StatelessWidget {
       builder: (dialogContext) => BlocProvider.value(
         value: context.read<RobotFaceCubit>(),
         child: AlertDialog(
-          title: const Text('Choose Face Type'),
+          title: Text(t.ui.choose_face_type),
           content: BlocBuilder<RobotFaceCubit, RobotFaceState>(
             builder: (context, state) {
               return Column(
@@ -154,21 +165,43 @@ class RobotFaceScreen extends StatelessWidget {
       builder: (dialogContext) => BlocProvider.value(
         value: context.read<RobotFaceCubit>(),
         child: AlertDialog(
-          title: const Text('Settings'),
+          title: Text(t.ui.settings),
           content: BlocBuilder<RobotFaceCubit, RobotFaceState>(
             builder: (context, state) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  ListTile(
+                    title: Text(t.ui.language),
+                    subtitle: Text(state.config.language == 'en-US' ? 'English' : 'Português'),
+                    trailing: DropdownButton<String>(
+                      value: state.config.language,
+                      items: const [
+                        DropdownMenuItem(value: 'en-US', child: Text('English')),
+                        DropdownMenuItem(value: 'pt-BR', child: Text('Português')),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          context.read<RobotFaceCubit>().updateLanguage(value);
+                          // Update app locale
+                          if (value == 'pt-BR') {
+                            LocaleSettings.setLocale(AppLocale.pt);
+                          } else {
+                            LocaleSettings.setLocale(AppLocale.en);
+                          }
+                        }
+                      },
+                    ),
+                  ),
                   SwitchListTile(
-                    title: const Text('Speech Enabled'),
-                    subtitle: const Text('Robot will speak when expressions change'),
+                    title: Text(t.ui.speech_enabled),
+                    subtitle: Text(t.ui.speech_description),
                     value: state.config.speechEnabled,
                     onChanged: (_) => context.read<RobotFaceCubit>().toggleSpeech(),
                   ),
                   if (state.config.speechEnabled) ...[
                     const SizedBox(height: 16),
-                    Text('Speech Rate: ${state.config.speechRate.toStringAsFixed(1)}'),
+                    Text('${t.ui.speech_rate}: ${state.config.speechRate.toStringAsFixed(1)}'),
                     Slider(
                       value: state.config.speechRate,
                       min: 0.1,
@@ -177,7 +210,7 @@ class RobotFaceScreen extends StatelessWidget {
                       onChanged: (value) => context.read<RobotFaceCubit>().updateSpeechRate(value),
                     ),
                     const SizedBox(height: 8),
-                    Text('Speech Pitch: ${state.config.speechPitch.toStringAsFixed(1)}'),
+                    Text('${t.ui.speech_pitch}: ${state.config.speechPitch.toStringAsFixed(1)}'),
                     Slider(
                       value: state.config.speechPitch,
                       min: 0.5,

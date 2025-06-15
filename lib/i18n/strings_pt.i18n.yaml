@@ -1,0 +1,39 @@
+app:
+  title: HazeBot Rosto
+
+expressions:
+  happy: Estou muito feliz!
+  surprised: Nossa! Isso me surpreendeu!
+  sleepy: Estou com sono...
+  excited: Isso é muito emocionante!
+  confused: Hmm, estou confuso...
+  love: Eu te amo!
+  angry: Não estou feliz com isso!
+  winking: Piscadinha!
+
+face_types:
+  classic:
+    name: Clássico
+    description: Olhos circulares completos com pupilas expressivas
+  looi:
+    name: Estilo LOOI
+    description: Olhos inspirados no LOOI com sobrancelhas
+  minimal:
+    name: Minimalista
+    description: Design simples e limpo
+  bean:
+    name: Rosto Feijão
+    description: Olhos verticais inspirados no Fall Guys
+
+ui:
+  choose_colors: Escolher Cores
+  choose_face_type: Escolher Tipo de Rosto
+  settings: Configurações
+  eye_color: Cor dos Olhos
+  mouth_color: Cor da Boca
+  done: Pronto
+  speech_enabled: Fala Ativada
+  speech_description: O robô falará quando as expressões mudarem
+  speech_rate: Velocidade da Fala
+  speech_pitch: Tom da Fala
+  language: Idioma 

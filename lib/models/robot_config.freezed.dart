@@ -30,6 +30,7 @@ mixin _$RobotConfig {
   bool get speechEnabled => throw _privateConstructorUsedError;
   double get speechRate => throw _privateConstructorUsedError;
   double get speechPitch => throw _privateConstructorUsedError;
+  String get language => throw _privateConstructorUsedError;
 
   /// Serializes this RobotConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -56,6 +57,7 @@ abstract class $RobotConfigCopyWith<$Res> {
     bool speechEnabled,
     double speechRate,
     double speechPitch,
+    String language,
   });
 }
 
@@ -81,6 +83,7 @@ class _$RobotConfigCopyWithImpl<$Res, $Val extends RobotConfig>
     Object? speechEnabled = null,
     Object? speechRate = null,
     Object? speechPitch = null,
+    Object? language = null,
   }) {
     return _then(
       _value.copyWith(
@@ -112,6 +115,10 @@ class _$RobotConfigCopyWithImpl<$Res, $Val extends RobotConfig>
                 ? _value.speechPitch
                 : speechPitch // ignore: cast_nullable_to_non_nullable
                       as double,
+            language: null == language
+                ? _value.language
+                : language // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -135,6 +142,7 @@ abstract class _$$RobotConfigImplCopyWith<$Res>
     bool speechEnabled,
     double speechRate,
     double speechPitch,
+    String language,
   });
 }
 
@@ -159,6 +167,7 @@ class __$$RobotConfigImplCopyWithImpl<$Res>
     Object? speechEnabled = null,
     Object? speechRate = null,
     Object? speechPitch = null,
+    Object? language = null,
   }) {
     return _then(
       _$RobotConfigImpl(
@@ -190,6 +199,10 @@ class __$$RobotConfigImplCopyWithImpl<$Res>
             ? _value.speechPitch
             : speechPitch // ignore: cast_nullable_to_non_nullable
                   as double,
+        language: null == language
+            ? _value.language
+            : language // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -206,6 +219,7 @@ class _$RobotConfigImpl implements _RobotConfig {
     this.speechEnabled = false,
     this.speechRate = 1.0,
     this.speechPitch = 1.0,
+    this.language = 'en-US',
   });
 
   factory _$RobotConfigImpl.fromJson(Map<String, dynamic> json) =>
@@ -234,10 +248,13 @@ class _$RobotConfigImpl implements _RobotConfig {
   @override
   @JsonKey()
   final double speechPitch;
+  @override
+  @JsonKey()
+  final String language;
 
   @override
   String toString() {
-    return 'RobotConfig(expression: $expression, eyeColor: $eyeColor, mouthColor: $mouthColor, faceType: $faceType, speechEnabled: $speechEnabled, speechRate: $speechRate, speechPitch: $speechPitch)';
+    return 'RobotConfig(expression: $expression, eyeColor: $eyeColor, mouthColor: $mouthColor, faceType: $faceType, speechEnabled: $speechEnabled, speechRate: $speechRate, speechPitch: $speechPitch, language: $language)';
   }
 
   @override
@@ -258,7 +275,9 @@ class _$RobotConfigImpl implements _RobotConfig {
             (identical(other.speechRate, speechRate) ||
                 other.speechRate == speechRate) &&
             (identical(other.speechPitch, speechPitch) ||
-                other.speechPitch == speechPitch));
+                other.speechPitch == speechPitch) &&
+            (identical(other.language, language) ||
+                other.language == language));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -272,6 +291,7 @@ class _$RobotConfigImpl implements _RobotConfig {
     speechEnabled,
     speechRate,
     speechPitch,
+    language,
   );
 
   /// Create a copy of RobotConfig
@@ -297,6 +317,7 @@ abstract class _RobotConfig implements RobotConfig {
     final bool speechEnabled,
     final double speechRate,
     final double speechPitch,
+    final String language,
   }) = _$RobotConfigImpl;
 
   factory _RobotConfig.fromJson(Map<String, dynamic> json) =
@@ -318,6 +339,8 @@ abstract class _RobotConfig implements RobotConfig {
   double get speechRate;
   @override
   double get speechPitch;
+  @override
+  String get language;
 
   /// Create a copy of RobotConfig
   /// with the given fields replaced by the non-null parameter values.

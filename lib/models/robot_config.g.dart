@@ -25,6 +25,7 @@ _$RobotConfigImpl _$$RobotConfigImplFromJson(Map<String, dynamic> json) =>
       speechEnabled: json['speechEnabled'] as bool? ?? false,
       speechRate: (json['speechRate'] as num?)?.toDouble() ?? 1.0,
       speechPitch: (json['speechPitch'] as num?)?.toDouble() ?? 1.0,
+      language: json['language'] as String? ?? 'en-US',
     );
 
 Map<String, dynamic> _$$RobotConfigImplToJson(_$RobotConfigImpl instance) =>
@@ -36,6 +37,7 @@ Map<String, dynamic> _$$RobotConfigImplToJson(_$RobotConfigImpl instance) =>
       'speechEnabled': instance.speechEnabled,
       'speechRate': instance.speechRate,
       'speechPitch': instance.speechPitch,
+      'language': instance.language,
     };
 
 const _$RobotExpressionEnumMap = {
@@ -53,4 +55,5 @@ const _$FaceTypeEnumMap = {
   FaceType.classic: 'classic',
   FaceType.looi: 'looi',
   FaceType.minimal: 'minimal',
+  FaceType.bean: 'bean',
 };

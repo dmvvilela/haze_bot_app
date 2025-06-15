@@ -14,6 +14,7 @@ class RobotConfig with _$RobotConfig {
     @Default(false) bool speechEnabled,
     @Default(1.0) double speechRate,
     @Default(1.0) double speechPitch,
+    @Default('en-US') String language,
   }) = _RobotConfig;
 
   factory RobotConfig.fromJson(Map<String, dynamic> json) => _$RobotConfigFromJson(json);
@@ -21,7 +22,7 @@ class RobotConfig with _$RobotConfig {
 
 enum RobotExpression { happy, surprised, sleepy, excited, confused, love, angry, winking }
 
-enum FaceType { classic, looi, minimal }
+enum FaceType { classic, looi, minimal, bean }
 
 // Custom color converter for Freezed
 class ColorConverter implements JsonConverter<Color, int> {
@@ -57,6 +58,7 @@ extension RobotExpressionExtension on RobotExpression {
   }
 
   String get speechText {
+    // This will be replaced with proper translations in the UI layer
     switch (this) {
       case RobotExpression.happy:
         return 'I am so happy!';
@@ -87,6 +89,8 @@ extension FaceTypeExtension on FaceType {
         return 'LOOI Style';
       case FaceType.minimal:
         return 'Minimal';
+      case FaceType.bean:
+        return 'Bean Face';
     }
   }
 
@@ -98,6 +102,8 @@ extension FaceTypeExtension on FaceType {
         return 'LOOI-inspired eyes with eyebrows';
       case FaceType.minimal:
         return 'Simple and clean design';
+      case FaceType.bean:
+        return 'Fall Guys inspired vertical bean eyes';
     }
   }
 }

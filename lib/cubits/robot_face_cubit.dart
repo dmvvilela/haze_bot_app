@@ -5,6 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:math' as math;
 
 import '../models/robot_config.dart';
+import '../i18n/strings.g.dart';
 
 part 'robot_face_state.dart';
 part 'robot_face_cubit.freezed.dart';
@@ -17,7 +18,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   Future<void> _initializeTts() async {
-    await _flutterTts.setLanguage('en-US');
+    await _flutterTts.setLanguage(state.config.language);
     await _flutterTts.setSpeechRate(state.config.speechRate);
     await _flutterTts.setPitch(state.config.speechPitch);
   }
@@ -27,7 +28,29 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     emit(state.copyWith(config: newConfig));
 
     if (state.config.speechEnabled) {
-      _speak(expression.speechText);
+      _speak(_getSpeechText(expression));
+    }
+  }
+
+  String _getSpeechText(RobotExpression expression) {
+    // Use current locale translations
+    switch (expression) {
+      case RobotExpression.happy:
+        return t.expressions.happy;
+      case RobotExpression.surprised:
+        return t.expressions.surprised;
+      case RobotExpression.sleepy:
+        return t.expressions.sleepy;
+      case RobotExpression.excited:
+        return t.expressions.excited;
+      case RobotExpression.confused:
+        return t.expressions.confused;
+      case RobotExpression.love:
+        return t.expressions.love;
+      case RobotExpression.angry:
+        return t.expressions.angry;
+      case RobotExpression.winking:
+        return t.expressions.winking;
     }
   }
 
@@ -68,6 +91,12 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     final newConfig = state.config.copyWith(speechPitch: pitch);
     emit(state.copyWith(config: newConfig));
     _flutterTts.setPitch(pitch);
+  }
+
+  void updateLanguage(String language) {
+    final newConfig = state.config.copyWith(language: language);
+    emit(state.copyWith(config: newConfig));
+    _flutterTts.setLanguage(language);
   }
 
   void onTap() {

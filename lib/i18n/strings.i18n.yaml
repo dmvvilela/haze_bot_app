@@ -1,0 +1,39 @@
+app:
+  title: HazeBot Face
+
+expressions:
+  happy: I am so happy!
+  surprised: Oh wow! That surprised me!
+  sleepy: I am feeling sleepy...
+  excited: This is so exciting!
+  confused: Hmm, I am confused...
+  love: I love you!
+  angry: I am not happy about this!
+  winking: Wink wink!
+
+face_types:
+  classic:
+    name: Classic
+    description: Full circular eyes with expressive pupils
+  looi:
+    name: LOOI Style
+    description: LOOI-inspired eyes with eyebrows
+  minimal:
+    name: Minimal
+    description: Simple and clean design
+  bean:
+    name: Bean Face
+    description: Fall Guys inspired vertical bean eyes
+
+ui:
+  choose_colors: Choose Colors
+  choose_face_type: Choose Face Type
+  settings: Settings
+  eye_color: Eye Color
+  mouth_color: Mouth Color
+  done: Done
+  speech_enabled: Speech Enabled
+  speech_description: Robot will speak when expressions change
+  speech_rate: Speech Rate
+  speech_pitch: Speech Pitch
+  language: Language 

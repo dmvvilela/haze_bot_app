@@ -6,6 +6,7 @@ import '../models/robot_config.dart';
 import 'classic_face.dart';
 import 'looi_face.dart';
 import 'minimal_face.dart';
+import 'bean_face.dart';
 
 class RobotFaceWidget extends StatelessWidget {
   const RobotFaceWidget({super.key});
@@ -46,6 +47,8 @@ class RobotFaceWidget extends StatelessWidget {
         return LooiFace(state: state);
       case FaceType.minimal:
         return MinimalFace(state: state);
+      case FaceType.bean:
+        return BeanFace(state: state);
     }
   }
 }
