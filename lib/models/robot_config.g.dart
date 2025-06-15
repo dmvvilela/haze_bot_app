@@ -23,8 +23,8 @@ _$RobotConfigImpl _$$RobotConfigImplFromJson(Map<String, dynamic> json) =>
           $enumDecodeNullable(_$FaceTypeEnumMap, json['faceType']) ??
           FaceType.classic,
       speechEnabled: json['speechEnabled'] as bool? ?? false,
-      speechRate: (json['speechRate'] as num?)?.toDouble() ?? 1.0,
-      speechPitch: (json['speechPitch'] as num?)?.toDouble() ?? 1.0,
+      speechRate: (json['speechRate'] as num?)?.toDouble() ?? 0.7,
+      speechPitch: (json['speechPitch'] as num?)?.toDouble() ?? 1.2,
       language: json['language'] as String? ?? 'en-US',
       isDarkTheme: json['isDarkTheme'] as bool? ?? true,
     );

@@ -12,8 +12,8 @@ class RobotConfig with _$RobotConfig {
     @Default(Colors.pink) @ColorConverter() Color mouthColor,
     @Default(FaceType.classic) FaceType faceType,
     @Default(false) bool speechEnabled,
-    @Default(1.0) double speechRate,
-    @Default(1.0) double speechPitch,
+    @Default(0.7) double speechRate,
+    @Default(1.2) double speechPitch,
     @Default('en-US') String language,
     @Default(true) bool isDarkTheme,
   }) = _RobotConfig;

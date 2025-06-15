@@ -11,7 +11,7 @@ import 'i18n/strings.g.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  LocaleSettings.useDeviceLocale(); // Initialize with device locale
+  LocaleSettings.setLocale(AppLocale.en); // Start with English to match robot config default
   runApp(TranslationProvider(child: const HazeBotApp()));
 }
 
