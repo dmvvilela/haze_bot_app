@@ -23,12 +23,9 @@ class HazeBotApp extends StatelessWidget {
     return MaterialApp(
       title: t.app.title,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.light,
-        ).copyWith(surface: Colors.grey[50], onSurface: Colors.grey[900]),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.light),
         useMaterial3: true,
-        scaffoldBackgroundColor: Colors.grey[50],
+        scaffoldBackgroundColor: Colors.grey[100],
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark),
@@ -58,33 +55,53 @@ class RobotFaceScreen extends StatelessWidget {
         return Theme(
           data: state.config.isDarkTheme ? ThemeData.dark() : ThemeData.light(),
           child: Scaffold(
-            backgroundColor: state.config.isDarkTheme ? Colors.black : Colors.grey[50],
-            appBar: state.showControls
-                ? AppBar(
-                    backgroundColor: state.config.isDarkTheme ? Colors.black : Colors.grey[50],
-                    elevation: 0,
-                    actions: [
-                      IconButton(icon: Icon(Icons.palette), onPressed: () => _showColorPicker(context)),
-                      IconButton(icon: Icon(Icons.face), onPressed: () => _showFaceTypePicker(context)),
-                      IconButton(icon: Icon(Icons.settings), onPressed: () => _showSettings(context)),
+            backgroundColor: state.config.isDarkTheme ? Colors.black : Colors.grey[100],
+            appBar: AppBar(
+              backgroundColor: state.config.isDarkTheme ? Colors.black : Colors.grey[100],
+              elevation: 0,
+              toolbarHeight: state.showControls ? kToolbarHeight : 0,
+              actions: [
+                AnimatedOpacity(
+                  opacity: state.showControls ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(icon: Icon(Icons.palette), onPressed: state.showControls ? () => _showColorPicker(context) : null),
+                      IconButton(icon: Icon(Icons.face), onPressed: state.showControls ? () => _showFaceTypePicker(context) : null),
+                      IconButton(icon: Icon(Icons.settings), onPressed: state.showControls ? () => _showSettings(context) : null),
                       IconButton(
                         icon: Icon(state.config.isDarkTheme ? Icons.light_mode : Icons.dark_mode),
-                        onPressed: () => context.read<RobotFaceCubit>().toggleTheme(),
+                        onPressed: state.showControls ? () => context.read<RobotFaceCubit>().toggleTheme() : null,
                       ),
-                      IconButton(icon: Icon(Icons.visibility_off), onPressed: () => context.read<RobotFaceCubit>().toggleControls()),
+                      IconButton(
+                        icon: Icon(Icons.visibility_off),
+                        onPressed: state.showControls ? () => context.read<RobotFaceCubit>().toggleControls() : null,
+                      ),
                     ],
-                  )
-                : null,
-            body: GestureDetector(
-              onTap: () {
-                if (!state.showControls) {
-                  context.read<RobotFaceCubit>().toggleControls();
-                }
-              },
-              child: Padding(
-                padding: EdgeInsets.only(bottom: state.showControls ? AppBar().preferredSize.height : 0),
-                child: Center(child: const RobotFaceWidget()),
-              ),
+                  ),
+                ),
+              ],
+            ),
+            body: Stack(
+              children: [
+                // Robot face always centered
+                Padding(
+                  padding: EdgeInsets.only(bottom: state.showControls ? AppBar().preferredSize.height : 0),
+                  child: Center(child: const RobotFaceWidget()),
+                ),
+                // Full screen gesture detector only when controls are hidden
+                if (!state.showControls)
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: () {
+                        context.read<RobotFaceCubit>().toggleControls();
+                      },
+                      child: Container(color: Colors.transparent),
+                    ),
+                  ),
+              ],
             ),
           ),
         );
