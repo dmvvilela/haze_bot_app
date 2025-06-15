@@ -18,9 +18,9 @@ class RobotFaceWidget extends StatelessWidget {
         return GestureDetector(
           onTap: () => context.read<RobotFaceCubit>().onTap(),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.elasticOut,
-            transform: Matrix4.identity()..scale(state.isPressed ? 1.1 : 1.0),
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeOut,
+            transform: Matrix4.identity()..scale(state.isPressed ? 1.05 : 1.0),
             child: Container(
               width: 300,
               height: 400,
@@ -28,13 +28,9 @@ class RobotFaceWidget extends StatelessWidget {
                 color: state.config.isDarkTheme ? Colors.grey[900] : Colors.white,
                 borderRadius: BorderRadius.circular(40),
                 boxShadow: [
-                  // Subtle glow when pressed
-                  if (state.isPressed)
-                    BoxShadow(
-                      color: state.config.isDarkTheme ? Colors.white.withOpacity(0.1) : Colors.blue.withOpacity(0.2),
-                      blurRadius: 10,
-                      spreadRadius: 2,
-                    ),
+                  // Subtle glow when pressed (dark mode only)
+                  if (state.isPressed && state.config.isDarkTheme)
+                    BoxShadow(color: Colors.white.withOpacity(0.1), blurRadius: 10, spreadRadius: 2),
                   // Normal shadow for depth
                   BoxShadow(
                     color: state.config.isDarkTheme ? Colors.black.withOpacity(0.5) : Colors.grey.withOpacity(0.2),

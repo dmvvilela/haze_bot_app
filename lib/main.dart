@@ -59,7 +59,7 @@ class RobotFaceScreen extends StatelessWidget {
             appBar: AppBar(
               backgroundColor: state.config.isDarkTheme ? Colors.black : Colors.grey[100],
               elevation: 0,
-              toolbarHeight: state.showControls ? kToolbarHeight : 0,
+              toolbarHeight: kToolbarHeight,
               actions: [
                 AnimatedOpacity(
                   opacity: state.showControls ? 1.0 : 0.0,
@@ -88,7 +88,7 @@ class RobotFaceScreen extends StatelessWidget {
               children: [
                 // Robot face always centered
                 Padding(
-                  padding: EdgeInsets.only(bottom: state.showControls ? AppBar().preferredSize.height : 0),
+                  padding: EdgeInsets.only(bottom: AppBar().preferredSize.height),
                   child: Center(child: const RobotFaceWidget()),
                 ),
                 // Full screen gesture detector only when controls are hidden
