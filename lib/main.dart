@@ -65,21 +65,21 @@ class RobotFaceScreen extends StatelessWidget {
                   opacity: state.showControls ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(icon: Icon(Icons.palette), onPressed: state.showControls ? () => _showColorPicker(context) : null),
-                      IconButton(icon: Icon(Icons.face), onPressed: state.showControls ? () => _showFaceTypePicker(context) : null),
-                      IconButton(icon: Icon(Icons.settings), onPressed: state.showControls ? () => _showSettings(context) : null),
-                      IconButton(
-                        icon: Icon(state.config.isDarkTheme ? Icons.light_mode : Icons.dark_mode),
-                        onPressed: state.showControls ? () => context.read<RobotFaceCubit>().toggleTheme() : null,
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.visibility_off),
-                        onPressed: state.showControls ? () => context.read<RobotFaceCubit>().toggleControls() : null,
-                      ),
-                    ],
+                  child: IgnorePointer(
+                    ignoring: !state.showControls,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(icon: Icon(Icons.palette), onPressed: () => _showColorPicker(context)),
+                        IconButton(icon: Icon(Icons.face), onPressed: () => _showFaceTypePicker(context)),
+                        IconButton(icon: Icon(Icons.settings), onPressed: () => _showSettings(context)),
+                        IconButton(
+                          icon: Icon(state.config.isDarkTheme ? Icons.light_mode : Icons.dark_mode),
+                          onPressed: () => context.read<RobotFaceCubit>().toggleTheme(),
+                        ),
+                        IconButton(icon: Icon(Icons.visibility_off), onPressed: () => context.read<RobotFaceCubit>().toggleControls()),
+                      ],
+                    ),
                   ),
                 ),
               ],
