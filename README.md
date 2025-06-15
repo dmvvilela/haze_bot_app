@@ -27,11 +27,14 @@ A cute robot face app inspired by LOOI with expressive emotions, customizable co
 - **Sleepy** - Droopy pupils with straight line mouth
 - **Excited** - Big pupils with rectangular grin
 - **Confused** - Cross-eyed with wavy mouth
+- **Love** - Heart-shaped pupils with loving expression
+- **Angry** - Frowning with intense eyes
+- **Winking** - One eye closed with playful expression
 
 ### 🎨 **Customization**
 - **Eye Colors**: 8 different colors (cyan, blue, green, purple, orange, red, yellow, pink)
 - **Mouth Colors**: 8 different colors with real-time preview
-- **Face Types**: Multiple face styles including classic and LOOI-inspired designs
+- **Face Types**: 4 different styles (Classic, LOOI, Minimal, Bean Face)
 
 ### ✨ **Animations & Interactions**
 - **Automatic Blinking**: Natural blinking every 2-5 seconds
@@ -42,7 +45,13 @@ A cute robot face app inspired by LOOI with expressive emotions, customizable co
 ### 🗣️ **Speech Capabilities**
 - Text-to-speech functionality
 - Voice responses to interactions
-- Customizable speech settings
+- Customizable speech rate and pitch settings
+
+### 🌍 **Internationalization (i18n)**
+- Multi-language support with Flutter Slang
+- English and Portuguese translations
+- Localized speech synthesis
+- Easy language switching in settings
 
 ### 🏗️ **Architecture**
 - **State Management**: Flutter Bloc (Cubit) pattern
@@ -109,6 +118,7 @@ lib/
 - **Flutter Bloc**: State management
 - **Freezed**: Code generation for immutable classes
 - **Flutter TTS**: Text-to-speech functionality
+- **Flutter Slang**: Type-safe internationalization (i18n)
 
 ## 🎨 Design Inspiration
 
