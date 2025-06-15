@@ -25,10 +25,23 @@ class RobotFaceWidget extends StatelessWidget {
               width: 300,
               height: 400,
               decoration: BoxDecoration(
-                color: Colors.grey[900],
+                color: state.config.isDarkTheme ? Colors.grey[900] : Colors.grey[100],
                 borderRadius: BorderRadius.circular(40),
                 boxShadow: [
-                  BoxShadow(color: state.isPressed ? Colors.white.withOpacity(0.3) : Colors.transparent, blurRadius: 20, spreadRadius: 5),
+                  BoxShadow(
+                    color: state.isPressed
+                        ? (state.config.isDarkTheme ? Colors.white.withOpacity(0.3) : Colors.black.withOpacity(0.3))
+                        : Colors.transparent,
+                    blurRadius: 20,
+                    spreadRadius: 5,
+                  ),
+                  // Add subtle shadow for depth
+                  BoxShadow(
+                    color: state.config.isDarkTheme ? Colors.black.withOpacity(0.5) : Colors.grey.withOpacity(0.3),
+                    blurRadius: 15,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 8),
+                  ),
                 ],
               ),
               child: _buildFaceType(state.config.faceType, state),

@@ -36,4 +36,7 @@ ui:
   speech_description: O robô falará quando as expressões mudarem
   speech_rate: Velocidade da Fala
   speech_pitch: Tom da Fala
-  language: Idioma 
+  language: Idioma
+  theme: Tema
+  dark_theme: Tema Escuro
+  light_theme: Tema Claro 

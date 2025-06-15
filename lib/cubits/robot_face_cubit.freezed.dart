@@ -20,6 +20,7 @@ mixin _$RobotFaceState {
   RobotConfig get config => throw _privateConstructorUsedError;
   bool get isPressed => throw _privateConstructorUsedError;
   bool get isBlinking => throw _privateConstructorUsedError;
+  bool get showControls => throw _privateConstructorUsedError;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
@@ -35,7 +36,12 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     $Res Function(RobotFaceState) then,
   ) = _$RobotFaceStateCopyWithImpl<$Res, RobotFaceState>;
   @useResult
-  $Res call({RobotConfig config, bool isPressed, bool isBlinking});
+  $Res call({
+    RobotConfig config,
+    bool isPressed,
+    bool isBlinking,
+    bool showControls,
+  });
 
   $RobotConfigCopyWith<$Res> get config;
 }
@@ -58,6 +64,7 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? config = null,
     Object? isPressed = null,
     Object? isBlinking = null,
+    Object? showControls = null,
   }) {
     return _then(
       _value.copyWith(
@@ -72,6 +79,10 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
             isBlinking: null == isBlinking
                 ? _value.isBlinking
                 : isBlinking // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            showControls: null == showControls
+                ? _value.showControls
+                : showControls // ignore: cast_nullable_to_non_nullable
                       as bool,
           )
           as $Val,
@@ -98,7 +109,12 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
   ) = __$$RobotFaceStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({RobotConfig config, bool isPressed, bool isBlinking});
+  $Res call({
+    RobotConfig config,
+    bool isPressed,
+    bool isBlinking,
+    bool showControls,
+  });
 
   @override
   $RobotConfigCopyWith<$Res> get config;
@@ -121,6 +137,7 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? config = null,
     Object? isPressed = null,
     Object? isBlinking = null,
+    Object? showControls = null,
   }) {
     return _then(
       _$RobotFaceStateImpl(
@@ -136,6 +153,10 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
             ? _value.isBlinking
             : isBlinking // ignore: cast_nullable_to_non_nullable
                   as bool,
+        showControls: null == showControls
+            ? _value.showControls
+            : showControls // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -148,6 +169,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.config = const RobotConfig(),
     this.isPressed = false,
     this.isBlinking = false,
+    this.showControls = true,
   });
 
   @override
@@ -159,10 +181,13 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   @override
   @JsonKey()
   final bool isBlinking;
+  @override
+  @JsonKey()
+  final bool showControls;
 
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls)';
   }
 
   @override
@@ -174,11 +199,14 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
             (identical(other.isPressed, isPressed) ||
                 other.isPressed == isPressed) &&
             (identical(other.isBlinking, isBlinking) ||
-                other.isBlinking == isBlinking));
+                other.isBlinking == isBlinking) &&
+            (identical(other.showControls, showControls) ||
+                other.showControls == showControls));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, config, isPressed, isBlinking);
+  int get hashCode =>
+      Object.hash(runtimeType, config, isPressed, isBlinking, showControls);
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
@@ -197,6 +225,7 @@ abstract class _RobotFaceState implements RobotFaceState {
     final RobotConfig config,
     final bool isPressed,
     final bool isBlinking,
+    final bool showControls,
   }) = _$RobotFaceStateImpl;
 
   @override
@@ -205,6 +234,8 @@ abstract class _RobotFaceState implements RobotFaceState {
   bool get isPressed;
   @override
   bool get isBlinking;
+  @override
+  bool get showControls;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.

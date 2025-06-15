@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 56 (28 per locale)
+/// Strings: 62 (31 per locale)
 ///
-/// Built on 2025-06-15 at 05:23 UTC
+/// Built on 2025-06-15 at 05:35 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -212,6 +212,9 @@ class _StringsUiEn {
 	String get speech_rate => 'Speech Rate';
 	String get speech_pitch => 'Speech Pitch';
 	String get language => 'Language';
+	String get theme => 'Theme';
+	String get dark_theme => 'Dark Theme';
+	String get light_theme => 'Light Theme';
 }
 
 // Path: face_types.classic
@@ -348,6 +351,9 @@ class _StringsUiPt extends _StringsUiEn {
 	@override String get speech_rate => 'Velocidade da Fala';
 	@override String get speech_pitch => 'Tom da Fala';
 	@override String get language => 'Idioma';
+	@override String get theme => 'Tema';
+	@override String get dark_theme => 'Tema Escuro';
+	@override String get light_theme => 'Tema Claro';
 }
 
 // Path: face_types.classic
@@ -428,6 +434,9 @@ extension on Translations {
 			case 'ui.speech_rate': return 'Speech Rate';
 			case 'ui.speech_pitch': return 'Speech Pitch';
 			case 'ui.language': return 'Language';
+			case 'ui.theme': return 'Theme';
+			case 'ui.dark_theme': return 'Dark Theme';
+			case 'ui.light_theme': return 'Light Theme';
 			default: return null;
 		}
 	}
@@ -464,6 +473,9 @@ extension on _StringsPt {
 			case 'ui.speech_rate': return 'Velocidade da Fala';
 			case 'ui.speech_pitch': return 'Tom da Fala';
 			case 'ui.language': return 'Idioma';
+			case 'ui.theme': return 'Tema';
+			case 'ui.dark_theme': return 'Tema Escuro';
+			case 'ui.light_theme': return 'Tema Claro';
 			default: return null;
 		}
 	}

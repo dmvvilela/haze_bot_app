@@ -39,27 +39,67 @@ class RobotFaceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.palette, color: Colors.white),
-            onPressed: () => _showColorPicker(context),
+    return BlocBuilder<RobotFaceCubit, RobotFaceState>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: state.config.isDarkTheme ? Colors.black : Colors.white,
+          body: Stack(
+            children: [
+              // Robot face centered on full screen
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    if (!state.showControls) {
+                      context.read<RobotFaceCubit>().toggleControls();
+                    } else {
+                      context.read<RobotFaceCubit>().onTap();
+                    }
+                  },
+                  child: const RobotFaceWidget(),
+                ),
+              ),
+              // Controls with opacity animation
+              AnimatedOpacity(
+                opacity: state.showControls ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: IgnorePointer(
+                  ignoring: !state.showControls,
+                  child: AppBar(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    actions: [
+                      IconButton(
+                        icon: Icon(Icons.palette, color: state.config.isDarkTheme ? Colors.white : Colors.black),
+                        onPressed: () => _showColorPicker(context),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.face, color: state.config.isDarkTheme ? Colors.white : Colors.black),
+                        onPressed: () => _showFaceTypePicker(context),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.settings, color: state.config.isDarkTheme ? Colors.white : Colors.black),
+                        onPressed: () => _showSettings(context),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          state.config.isDarkTheme ? Icons.light_mode : Icons.dark_mode,
+                          color: state.config.isDarkTheme ? Colors.white : Colors.black,
+                        ),
+                        onPressed: () => context.read<RobotFaceCubit>().toggleTheme(),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.visibility_off, color: state.config.isDarkTheme ? Colors.white : Colors.black),
+                        onPressed: () => context.read<RobotFaceCubit>().toggleControls(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.face, color: Colors.white),
-            onPressed: () => _showFaceTypePicker(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () => _showSettings(context),
-          ),
-        ],
-      ),
-      body: const Center(child: RobotFaceWidget()),
+        );
+      },
     );
   }
 

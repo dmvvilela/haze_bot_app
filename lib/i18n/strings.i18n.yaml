@@ -36,4 +36,7 @@ ui:
   speech_description: Robot will speak when expressions change
   speech_rate: Speech Rate
   speech_pitch: Speech Pitch
-  language: Language 
+  language: Language
+  theme: Theme
+  dark_theme: Dark Theme
+  light_theme: Light Theme 

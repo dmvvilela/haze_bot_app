@@ -26,6 +26,7 @@ _$RobotConfigImpl _$$RobotConfigImplFromJson(Map<String, dynamic> json) =>
       speechRate: (json['speechRate'] as num?)?.toDouble() ?? 1.0,
       speechPitch: (json['speechPitch'] as num?)?.toDouble() ?? 1.0,
       language: json['language'] as String? ?? 'en-US',
+      isDarkTheme: json['isDarkTheme'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$$RobotConfigImplToJson(_$RobotConfigImpl instance) =>
@@ -38,6 +39,7 @@ Map<String, dynamic> _$$RobotConfigImplToJson(_$RobotConfigImpl instance) =>
       'speechRate': instance.speechRate,
       'speechPitch': instance.speechPitch,
       'language': instance.language,
+      'isDarkTheme': instance.isDarkTheme,
     };
 
 const _$RobotExpressionEnumMap = {

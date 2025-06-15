@@ -99,6 +99,15 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     _flutterTts.setLanguage(language);
   }
 
+  void toggleTheme() {
+    final newConfig = state.config.copyWith(isDarkTheme: !state.config.isDarkTheme);
+    emit(state.copyWith(config: newConfig));
+  }
+
+  void toggleControls() {
+    emit(state.copyWith(showControls: !state.showControls));
+  }
+
   void onTap() {
     emit(state.copyWith(isPressed: true));
     cycleExpression();
