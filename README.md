@@ -9,13 +9,12 @@ A cute robot face app inspired by LOOI with expressive emotions, customizable co
 <div align="center">
 
 ### Different Face Types & Expressions
-<img src="docs/Simulator Screenshot - iPhone 16 Plus - 2025-06-15 at 03.17.41.png" width="200" alt="Dark mode"/>
+<img src="docs/Simulator Screenshot - iPhone 16 Plus - 2025-06-15 at 03.17.41.png" width="200" alt="Dark mode"/> &nbsp;&nbsp;&nbsp;
 <img src="docs/Simulator Screenshot - iPhone 16 Plus - 2025-06-15 at 03.20.14.png" width="200" alt="Light mode"/>
 
 ### Customization Options
-<img src="docs/Simulator Screenshot - iPhone 16 Plus - 2025-06-15 at 03.19.57.png" width="200" alt="Settings"/>
+<img src="docs/Simulator Screenshot - iPhone 16 Plus - 2025-06-15 at 03.19.57.png" width="200" alt="Settings"/> &nbsp;&nbsp;&nbsp;
 <img src="docs/Simulator Screenshot - iPhone 16 Plus - 2025-06-15 at 03.18.29.png" width="200" alt="Color Picker"/>
-
 
 </div>
 
