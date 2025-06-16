@@ -2,25 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'dart:math' as math;
+import 'dart:async';
 
 import '../models/robot_config.dart';
 import '../i18n/strings.g.dart';
+import '../services/gemini_service.dart';
+import '../services/timer_service.dart';
 
 part 'robot_face_state.dart';
 part 'robot_face_cubit.freezed.dart';
 
 class RobotFaceCubit extends Cubit<RobotFaceState> {
   final FlutterTts _flutterTts = FlutterTts();
+  final GeminiService _geminiService = GeminiService();
+  final TimerService _timerService = TimerService();
+  StreamSubscription? _timerSubscription;
+  StreamSubscription? _timerStatusSubscription;
+  StreamSubscription? _timerCompleteSubscription;
 
   RobotFaceCubit() : super(const RobotFaceState()) {
     _initializeTts();
+    _initializeTimer();
   }
 
   Future<void> _initializeTts() async {
     await _flutterTts.setLanguage(state.config.language);
     await _flutterTts.setSpeechRate(state.config.speechRate);
     await _flutterTts.setPitch(state.config.speechPitch);
+  }
+
+  void _initializeTimer() {
+    _timerSubscription = _timerService.timerStream.listen((seconds) {
+      emit(state.copyWith(timerSeconds: seconds));
+    });
+
+    _timerStatusSubscription = _timerService.statusStream.listen((isRunning) {
+      emit(state.copyWith(isTimerRunning: isRunning));
+    });
+
+    _timerCompleteSubscription = _timerService.completeStream.listen((_) {
+      _onTimerComplete();
+    });
   }
 
   void updateExpression(RobotExpression expression) {
@@ -106,6 +130,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
 
   void toggleControls() {
     emit(state.copyWith(showControls: !state.showControls));
+    updateScreenAwakeBasedOnControls();
   }
 
   void onTap() {
@@ -149,9 +174,102 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     }
   }
 
+  // Timer functionality
+  void startTimer(int minutes) {
+    _timerService.startTimer(minutes);
+    _getTimerMotivation(minutes);
+  }
+
+  void stopTimer() {
+    _timerService.stopTimer();
+  }
+
+  void pauseTimer() {
+    _timerService.pauseTimer();
+  }
+
+  void resumeTimer() {
+    _timerService.resumeTimer();
+  }
+
+  void _onTimerComplete() {
+    updateExpression(RobotExpression.excited);
+    _getTimerCompleteMessage();
+  }
+
+  // AI functionality
+  Future<void> getAIResponse() async {
+    emit(state.copyWith(isLoadingAI: true));
+
+    try {
+      final emotion = state.config.expression.name;
+      final response = await _geminiService.getEmotionResponse(emotion);
+      emit(state.copyWith(aiMessage: response, isLoadingAI: false));
+
+      if (state.config.speechEnabled) {
+        await _speak(response);
+      }
+    } catch (e) {
+      emit(state.copyWith(isLoadingAI: false));
+    }
+  }
+
+  Future<void> _getTimerMotivation(int minutes) async {
+    try {
+      final message = await _geminiService.getTimerMotivation(minutes);
+      emit(state.copyWith(aiMessage: message));
+
+      if (state.config.speechEnabled) {
+        await _speak(message);
+      }
+    } catch (e) {
+      // Fallback handled by service
+    }
+  }
+
+  Future<void> _getTimerCompleteMessage() async {
+    try {
+      final message = await _geminiService.getTimerComplete();
+      emit(state.copyWith(aiMessage: message));
+
+      if (state.config.speechEnabled) {
+        await _speak(message);
+      }
+    } catch (e) {
+      // Fallback handled by service
+    }
+  }
+
+  // Screen wake functionality
+  void toggleScreenAwake() {
+    final newValue = !state.keepScreenAwake;
+    emit(state.copyWith(keepScreenAwake: newValue));
+
+    if (newValue) {
+      WakelockPlus.enable();
+    } else {
+      WakelockPlus.disable();
+    }
+  }
+
+  void updateScreenAwakeBasedOnControls() {
+    if (!state.showControls && !state.keepScreenAwake) {
+      WakelockPlus.enable();
+      emit(state.copyWith(keepScreenAwake: true));
+    } else if (state.showControls && state.keepScreenAwake) {
+      WakelockPlus.disable();
+      emit(state.copyWith(keepScreenAwake: false));
+    }
+  }
+
   @override
   Future<void> close() {
     _flutterTts.stop();
+    _timerService.dispose();
+    _timerSubscription?.cancel();
+    _timerStatusSubscription?.cancel();
+    _timerCompleteSubscription?.cancel();
+    WakelockPlus.disable();
     return super.close();
   }
 }

@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'cubits/robot_face_cubit.dart';
 import 'widgets/robot_face_widget.dart';
 import 'widgets/color_picker_dialog.dart';
 import 'widgets/face_type_picker_dialog.dart';
 import 'widgets/settings_dialog.dart';
+import 'widgets/timer_dialog.dart';
 import 'i18n/strings.g.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    print('No .env file found, using fallback responses');
+  }
+
   LocaleSettings.setLocale(AppLocale.en); // Start with English to match robot config default
   runApp(TranslationProvider(child: const HazeBotApp()));
 }
@@ -70,6 +80,32 @@ class RobotFaceScreen extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // Timer button with indicator
+                        Stack(
+                          children: [
+                            IconButton(icon: Icon(Icons.timer), onPressed: () => _showTimer(context)),
+                            if (state.isTimerRunning)
+                              Positioned(
+                                right: 8,
+                                top: 8,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+                                ),
+                              ),
+                          ],
+                        ),
+                        // AI chat button
+                        Stack(
+                          children: [
+                            IconButton(icon: Icon(Icons.smart_toy), onPressed: () => context.read<RobotFaceCubit>().getAIResponse()),
+                            if (state.isLoadingAI)
+                              Positioned.fill(
+                                child: Center(child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))),
+                              ),
+                          ],
+                        ),
                         IconButton(icon: Icon(Icons.palette), onPressed: () => _showColorPicker(context)),
                         IconButton(icon: Icon(Icons.face), onPressed: () => _showFaceTypePicker(context)),
                         IconButton(icon: Icon(Icons.settings), onPressed: () => _showSettings(context)),
@@ -127,6 +163,13 @@ class RobotFaceScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => BlocProvider.value(value: context.read<RobotFaceCubit>(), child: const SettingsDialog()),
+    );
+  }
+
+  void _showTimer(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => BlocProvider.value(value: context.read<RobotFaceCubit>(), child: const TimerDialog()),
     );
   }
 }

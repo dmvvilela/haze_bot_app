@@ -21,6 +21,11 @@ mixin _$RobotFaceState {
   bool get isPressed => throw _privateConstructorUsedError;
   bool get isBlinking => throw _privateConstructorUsedError;
   bool get showControls => throw _privateConstructorUsedError;
+  bool get isTimerRunning => throw _privateConstructorUsedError;
+  int get timerSeconds => throw _privateConstructorUsedError;
+  String get aiMessage => throw _privateConstructorUsedError;
+  bool get isLoadingAI => throw _privateConstructorUsedError;
+  bool get keepScreenAwake => throw _privateConstructorUsedError;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
@@ -41,6 +46,11 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     bool isPressed,
     bool isBlinking,
     bool showControls,
+    bool isTimerRunning,
+    int timerSeconds,
+    String aiMessage,
+    bool isLoadingAI,
+    bool keepScreenAwake,
   });
 
   $RobotConfigCopyWith<$Res> get config;
@@ -65,6 +75,11 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? isPressed = null,
     Object? isBlinking = null,
     Object? showControls = null,
+    Object? isTimerRunning = null,
+    Object? timerSeconds = null,
+    Object? aiMessage = null,
+    Object? isLoadingAI = null,
+    Object? keepScreenAwake = null,
   }) {
     return _then(
       _value.copyWith(
@@ -83,6 +98,26 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
             showControls: null == showControls
                 ? _value.showControls
                 : showControls // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            isTimerRunning: null == isTimerRunning
+                ? _value.isTimerRunning
+                : isTimerRunning // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            timerSeconds: null == timerSeconds
+                ? _value.timerSeconds
+                : timerSeconds // ignore: cast_nullable_to_non_nullable
+                      as int,
+            aiMessage: null == aiMessage
+                ? _value.aiMessage
+                : aiMessage // ignore: cast_nullable_to_non_nullable
+                      as String,
+            isLoadingAI: null == isLoadingAI
+                ? _value.isLoadingAI
+                : isLoadingAI // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            keepScreenAwake: null == keepScreenAwake
+                ? _value.keepScreenAwake
+                : keepScreenAwake // ignore: cast_nullable_to_non_nullable
                       as bool,
           )
           as $Val,
@@ -114,6 +149,11 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
     bool isPressed,
     bool isBlinking,
     bool showControls,
+    bool isTimerRunning,
+    int timerSeconds,
+    String aiMessage,
+    bool isLoadingAI,
+    bool keepScreenAwake,
   });
 
   @override
@@ -138,6 +178,11 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? isPressed = null,
     Object? isBlinking = null,
     Object? showControls = null,
+    Object? isTimerRunning = null,
+    Object? timerSeconds = null,
+    Object? aiMessage = null,
+    Object? isLoadingAI = null,
+    Object? keepScreenAwake = null,
   }) {
     return _then(
       _$RobotFaceStateImpl(
@@ -157,6 +202,26 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
             ? _value.showControls
             : showControls // ignore: cast_nullable_to_non_nullable
                   as bool,
+        isTimerRunning: null == isTimerRunning
+            ? _value.isTimerRunning
+            : isTimerRunning // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        timerSeconds: null == timerSeconds
+            ? _value.timerSeconds
+            : timerSeconds // ignore: cast_nullable_to_non_nullable
+                  as int,
+        aiMessage: null == aiMessage
+            ? _value.aiMessage
+            : aiMessage // ignore: cast_nullable_to_non_nullable
+                  as String,
+        isLoadingAI: null == isLoadingAI
+            ? _value.isLoadingAI
+            : isLoadingAI // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        keepScreenAwake: null == keepScreenAwake
+            ? _value.keepScreenAwake
+            : keepScreenAwake // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -170,6 +235,11 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.isPressed = false,
     this.isBlinking = false,
     this.showControls = true,
+    this.isTimerRunning = false,
+    this.timerSeconds = 0,
+    this.aiMessage = '',
+    this.isLoadingAI = false,
+    this.keepScreenAwake = false,
   });
 
   @override
@@ -184,10 +254,25 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   @override
   @JsonKey()
   final bool showControls;
+  @override
+  @JsonKey()
+  final bool isTimerRunning;
+  @override
+  @JsonKey()
+  final int timerSeconds;
+  @override
+  @JsonKey()
+  final String aiMessage;
+  @override
+  @JsonKey()
+  final bool isLoadingAI;
+  @override
+  @JsonKey()
+  final bool keepScreenAwake;
 
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, keepScreenAwake: $keepScreenAwake)';
   }
 
   @override
@@ -201,12 +286,32 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
             (identical(other.isBlinking, isBlinking) ||
                 other.isBlinking == isBlinking) &&
             (identical(other.showControls, showControls) ||
-                other.showControls == showControls));
+                other.showControls == showControls) &&
+            (identical(other.isTimerRunning, isTimerRunning) ||
+                other.isTimerRunning == isTimerRunning) &&
+            (identical(other.timerSeconds, timerSeconds) ||
+                other.timerSeconds == timerSeconds) &&
+            (identical(other.aiMessage, aiMessage) ||
+                other.aiMessage == aiMessage) &&
+            (identical(other.isLoadingAI, isLoadingAI) ||
+                other.isLoadingAI == isLoadingAI) &&
+            (identical(other.keepScreenAwake, keepScreenAwake) ||
+                other.keepScreenAwake == keepScreenAwake));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, config, isPressed, isBlinking, showControls);
+  int get hashCode => Object.hash(
+    runtimeType,
+    config,
+    isPressed,
+    isBlinking,
+    showControls,
+    isTimerRunning,
+    timerSeconds,
+    aiMessage,
+    isLoadingAI,
+    keepScreenAwake,
+  );
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
@@ -226,6 +331,11 @@ abstract class _RobotFaceState implements RobotFaceState {
     final bool isPressed,
     final bool isBlinking,
     final bool showControls,
+    final bool isTimerRunning,
+    final int timerSeconds,
+    final String aiMessage,
+    final bool isLoadingAI,
+    final bool keepScreenAwake,
   }) = _$RobotFaceStateImpl;
 
   @override
@@ -236,6 +346,16 @@ abstract class _RobotFaceState implements RobotFaceState {
   bool get isBlinking;
   @override
   bool get showControls;
+  @override
+  bool get isTimerRunning;
+  @override
+  int get timerSeconds;
+  @override
+  String get aiMessage;
+  @override
+  bool get isLoadingAI;
+  @override
+  bool get keepScreenAwake;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
