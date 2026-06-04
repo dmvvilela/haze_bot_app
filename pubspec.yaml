@@ -51,9 +51,9 @@ dependencies:
   slang: ^3.31.2
   slang_flutter: ^3.31.0
   
-  # AI Integration
-  google_generative_ai: ^0.4.6
-  
+  # On-device AI (local inference, no server)
+  flutter_gemma: ^0.16.4
+
   # Utilities
   wakelock_plus: ^1.2.8
   http: ^1.2.2

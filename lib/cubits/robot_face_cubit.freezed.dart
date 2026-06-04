@@ -26,6 +26,9 @@ mixin _$RobotFaceState {
   String get aiMessage => throw _privateConstructorUsedError;
   bool get isLoadingAI => throw _privateConstructorUsedError;
   bool get keepScreenAwake => throw _privateConstructorUsedError;
+  BrainStatus get brainStatus => throw _privateConstructorUsedError;
+  int get downloadProgress => throw _privateConstructorUsedError;
+  AiConsent get aiConsent => throw _privateConstructorUsedError;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
@@ -51,6 +54,9 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     String aiMessage,
     bool isLoadingAI,
     bool keepScreenAwake,
+    BrainStatus brainStatus,
+    int downloadProgress,
+    AiConsent aiConsent,
   });
 
   $RobotConfigCopyWith<$Res> get config;
@@ -80,6 +86,9 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? aiMessage = null,
     Object? isLoadingAI = null,
     Object? keepScreenAwake = null,
+    Object? brainStatus = null,
+    Object? downloadProgress = null,
+    Object? aiConsent = null,
   }) {
     return _then(
       _value.copyWith(
@@ -119,6 +128,18 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
                 ? _value.keepScreenAwake
                 : keepScreenAwake // ignore: cast_nullable_to_non_nullable
                       as bool,
+            brainStatus: null == brainStatus
+                ? _value.brainStatus
+                : brainStatus // ignore: cast_nullable_to_non_nullable
+                      as BrainStatus,
+            downloadProgress: null == downloadProgress
+                ? _value.downloadProgress
+                : downloadProgress // ignore: cast_nullable_to_non_nullable
+                      as int,
+            aiConsent: null == aiConsent
+                ? _value.aiConsent
+                : aiConsent // ignore: cast_nullable_to_non_nullable
+                      as AiConsent,
           )
           as $Val,
     );
@@ -154,6 +175,9 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
     String aiMessage,
     bool isLoadingAI,
     bool keepScreenAwake,
+    BrainStatus brainStatus,
+    int downloadProgress,
+    AiConsent aiConsent,
   });
 
   @override
@@ -183,6 +207,9 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? aiMessage = null,
     Object? isLoadingAI = null,
     Object? keepScreenAwake = null,
+    Object? brainStatus = null,
+    Object? downloadProgress = null,
+    Object? aiConsent = null,
   }) {
     return _then(
       _$RobotFaceStateImpl(
@@ -222,6 +249,18 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
             ? _value.keepScreenAwake
             : keepScreenAwake // ignore: cast_nullable_to_non_nullable
                   as bool,
+        brainStatus: null == brainStatus
+            ? _value.brainStatus
+            : brainStatus // ignore: cast_nullable_to_non_nullable
+                  as BrainStatus,
+        downloadProgress: null == downloadProgress
+            ? _value.downloadProgress
+            : downloadProgress // ignore: cast_nullable_to_non_nullable
+                  as int,
+        aiConsent: null == aiConsent
+            ? _value.aiConsent
+            : aiConsent // ignore: cast_nullable_to_non_nullable
+                  as AiConsent,
       ),
     );
   }
@@ -240,6 +279,9 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.aiMessage = '',
     this.isLoadingAI = false,
     this.keepScreenAwake = false,
+    this.brainStatus = BrainStatus.idle,
+    this.downloadProgress = 0,
+    this.aiConsent = AiConsent.unknown,
   });
 
   @override
@@ -269,10 +311,19 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   @override
   @JsonKey()
   final bool keepScreenAwake;
+  @override
+  @JsonKey()
+  final BrainStatus brainStatus;
+  @override
+  @JsonKey()
+  final int downloadProgress;
+  @override
+  @JsonKey()
+  final AiConsent aiConsent;
 
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, keepScreenAwake: $keepScreenAwake)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent)';
   }
 
   @override
@@ -296,7 +347,13 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
             (identical(other.isLoadingAI, isLoadingAI) ||
                 other.isLoadingAI == isLoadingAI) &&
             (identical(other.keepScreenAwake, keepScreenAwake) ||
-                other.keepScreenAwake == keepScreenAwake));
+                other.keepScreenAwake == keepScreenAwake) &&
+            (identical(other.brainStatus, brainStatus) ||
+                other.brainStatus == brainStatus) &&
+            (identical(other.downloadProgress, downloadProgress) ||
+                other.downloadProgress == downloadProgress) &&
+            (identical(other.aiConsent, aiConsent) ||
+                other.aiConsent == aiConsent));
   }
 
   @override
@@ -311,6 +368,9 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     aiMessage,
     isLoadingAI,
     keepScreenAwake,
+    brainStatus,
+    downloadProgress,
+    aiConsent,
   );
 
   /// Create a copy of RobotFaceState
@@ -336,6 +396,9 @@ abstract class _RobotFaceState implements RobotFaceState {
     final String aiMessage,
     final bool isLoadingAI,
     final bool keepScreenAwake,
+    final BrainStatus brainStatus,
+    final int downloadProgress,
+    final AiConsent aiConsent,
   }) = _$RobotFaceStateImpl;
 
   @override
@@ -356,6 +419,12 @@ abstract class _RobotFaceState implements RobotFaceState {
   bool get isLoadingAI;
   @override
   bool get keepScreenAwake;
+  @override
+  BrainStatus get brainStatus;
+  @override
+  int get downloadProgress;
+  @override
+  AiConsent get aiConsent;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.

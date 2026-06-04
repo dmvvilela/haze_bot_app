@@ -3,12 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:flutter_gemma/flutter_gemma.dart';
 import 'dart:math' as math;
 import 'dart:async';
 
 import '../models/robot_config.dart';
 import '../i18n/strings.g.dart';
-import '../services/gemini_service.dart';
+import '../services/haze_brain.dart';
 import '../services/timer_service.dart';
 
 part 'robot_face_state.dart';
@@ -16,7 +17,7 @@ part 'robot_face_cubit.freezed.dart';
 
 class RobotFaceCubit extends Cubit<RobotFaceState> {
   final FlutterTts _flutterTts = FlutterTts();
-  final GeminiService _geminiService = GeminiService();
+  final HazeBrain _brain = HazeBrain();
   final TimerService _timerService = TimerService();
   StreamSubscription? _timerSubscription;
   StreamSubscription? _timerStatusSubscription;
@@ -25,6 +26,28 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   RobotFaceCubit() : super(const RobotFaceState()) {
     _initializeTts();
     _initializeTimer();
+    _restoreConsent();
+  }
+
+  /// If the model was already downloaded in a previous run, the user has
+  /// clearly consented before — don't ask again. (flutter_gemma persists the
+  /// active model across launches, so this survives restarts without us
+  /// storing anything ourselves.)
+  void _restoreConsent() {
+    if (FlutterGemma.hasActiveModel()) {
+      emit(state.copyWith(aiConsent: AiConsent.granted));
+    }
+  }
+
+  /// User agreed in the consent dialog: remember it and start the download now.
+  Future<void> grantAiConsent() async {
+    emit(state.copyWith(aiConsent: AiConsent.granted));
+    await prepareBrain();
+  }
+
+  /// User declined: keep Haze on built-in canned lines, never download.
+  void declineAiConsent() {
+    emit(state.copyWith(aiConsent: AiConsent.declined));
   }
 
   Future<void> _initializeTts() async {
@@ -177,7 +200,10 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   // Timer functionality
   void startTimer(int minutes) {
     _timerService.startTimer(minutes);
-    _getTimerMotivation(minutes);
+    _respond(
+      '(The user just started a $minutes-minute focus timer. Cheer them on in one short sentence.)',
+      bias: RobotExpression.excited,
+    );
   }
 
   void stopTimer() {
@@ -193,50 +219,77 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   void _onTimerComplete() {
-    updateExpression(RobotExpression.excited);
-    _getTimerCompleteMessage();
+    _respond(
+      '(The focus timer just finished! Congratulate the user warmly in one short sentence.)',
+      bias: RobotExpression.excited,
+    );
   }
 
-  // AI functionality
-  Future<void> getAIResponse() async {
+  // On-device AI ("brain") functionality
+
+  /// Download (first run) + load Haze's local model, streaming progress into
+  /// state so the UI can show a "waking up" indicator. No-op once ready.
+  Future<void> prepareBrain() async {
+    await _brain.ensureReady(
+      onUpdate: (status, progress) {
+        if (!isClosed) {
+          emit(state.copyWith(brainStatus: status, downloadProgress: progress));
+        }
+      },
+    );
+  }
+
+  /// The user typed (or dictated) something to Haze.
+  Future<void> talkToHaze(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return Future.value();
+    return _respond(trimmed);
+  }
+
+  /// "Say something" button: Haze comments on the face it currently shows.
+  Future<void> getAIResponse() {
+    final emotion = state.config.expression;
+    return _respond(
+      '(The user tapped you while your face shows "${emotion.name}". '
+      'Say something in character about how you feel right now.)',
+      bias: emotion,
+    );
+  }
+
+  /// Shared path for every Haze utterance: make sure the brain is ready, ask it
+  /// for a {emotion, say}, drive the face, remember the line, then speak.
+  Future<void> _respond(
+    String userText, {
+    RobotExpression bias = RobotExpression.happy,
+  }) async {
     emit(state.copyWith(isLoadingAI: true));
+    // Only ever download / load the model once the user has opted in. Without
+    // consent the brain stays unloaded and respond() returns a canned line.
+    if (state.aiConsent == AiConsent.granted) {
+      await prepareBrain();
+    }
 
     try {
-      final emotion = state.config.expression.name;
-      final response = await _geminiService.getEmotionResponse(emotion);
-      emit(state.copyWith(aiMessage: response, isLoadingAI: false));
+      final reply = await _brain.respond(
+        userText: userText,
+        languageCode: state.config.language,
+        fallbackEmotion: bias,
+      );
+
+      final newConfig = state.config.copyWith(expression: reply.emotion);
+      emit(
+        state.copyWith(
+          config: newConfig,
+          aiMessage: reply.say,
+          isLoadingAI: false,
+        ),
+      );
 
       if (state.config.speechEnabled) {
-        await _speak(response);
+        await _speak(reply.say);
       }
     } catch (e) {
       emit(state.copyWith(isLoadingAI: false));
-    }
-  }
-
-  Future<void> _getTimerMotivation(int minutes) async {
-    try {
-      final message = await _geminiService.getTimerMotivation(minutes);
-      emit(state.copyWith(aiMessage: message));
-
-      if (state.config.speechEnabled) {
-        await _speak(message);
-      }
-    } catch (e) {
-      // Fallback handled by service
-    }
-  }
-
-  Future<void> _getTimerCompleteMessage() async {
-    try {
-      final message = await _geminiService.getTimerComplete();
-      emit(state.copyWith(aiMessage: message));
-
-      if (state.config.speechEnabled) {
-        await _speak(message);
-      }
-    } catch (e) {
-      // Fallback handled by service
     }
   }
 
@@ -265,6 +318,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   @override
   Future<void> close() {
     _flutterTts.stop();
+    _brain.dispose();
     _timerService.dispose();
     _timerSubscription?.cancel();
     _timerStatusSubscription?.cancel();

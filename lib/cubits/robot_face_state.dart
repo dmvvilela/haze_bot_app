@@ -12,5 +12,8 @@ class RobotFaceState with _$RobotFaceState {
     @Default('') String aiMessage,
     @Default(false) bool isLoadingAI,
     @Default(false) bool keepScreenAwake,
+    @Default(BrainStatus.idle) BrainStatus brainStatus,
+    @Default(0) int downloadProgress,
+    @Default(AiConsent.unknown) AiConsent aiConsent,
   }) = _RobotFaceState;
 }
