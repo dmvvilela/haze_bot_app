@@ -271,10 +271,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   // Timer functionality
   void startTimer(int minutes) {
     _timerService.startTimer(minutes);
-    _respond(
-      '(The user just started a $minutes-minute focus timer. Cheer them on in one short sentence.)',
-      bias: RobotExpression.excited,
-    );
+    _respond(_timerStartPrompt(minutes), bias: _timerPromptBias);
   }
 
   void stopTimer() {
@@ -290,11 +287,24 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   void _onTimerComplete() {
-    _respond(
-      '(The focus timer just finished! Congratulate the user warmly in one short sentence.)',
-      bias: RobotExpression.excited,
-    );
+    _respond(_timerCompletePrompt, bias: _timerPromptBias);
   }
+
+  bool get _usesCalmTimerVoice =>
+      state.personality == HazePersonality.sleepy ||
+      state.personality == HazePersonality.zen ||
+      state.personality == HazePersonality.meditative;
+
+  RobotExpression get _timerPromptBias =>
+      _usesCalmTimerVoice ? RobotExpression.sleepy : RobotExpression.excited;
+
+  String _timerStartPrompt(int minutes) => _usesCalmTimerVoice
+      ? '(The user just started a $minutes-minute calm focus or meditation timer. Invite them to breathe, settle in, and go gently in one soft sentence.)'
+      : '(The user just started a $minutes-minute focus timer. Cheer them on in one short sentence.)';
+
+  String get _timerCompletePrompt => _usesCalmTimerVoice
+      ? '(The calm timer just finished. Gently welcome the user back in one soft, sleepy sentence.)'
+      : '(The focus timer just finished! Congratulate the user warmly in one short sentence.)';
 
   // On-device AI ("brain") functionality
 

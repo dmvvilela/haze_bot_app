@@ -228,6 +228,13 @@ class RobotFaceScreen extends StatelessWidget {
                       child: Container(color: Colors.transparent),
                     ),
                   ),
+                if (state.timerSeconds > 0 || state.isTimerRunning)
+                  Positioned(
+                    left: 20,
+                    right: 20,
+                    bottom: 28,
+                    child: _TimerOverlay(state: state),
+                  ),
               ],
             ),
           ),
@@ -303,5 +310,78 @@ class RobotFaceScreen extends StatelessWidget {
     } else {
       action();
     }
+  }
+}
+
+class _TimerOverlay extends StatelessWidget {
+  final RobotFaceState state;
+
+  const _TimerOverlay({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<RobotFaceCubit>();
+    final colors = Theme.of(context).colorScheme;
+    final paused = !state.isTimerRunning && state.timerSeconds > 0;
+
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Material(
+        elevation: 10,
+        color: colors.surface.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(28),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 360),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: colors.primary.withValues(alpha: 0.24)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                state.personality == HazePersonality.meditative ||
+                        state.personality == HazePersonality.sleepy
+                    ? Icons.self_improvement
+                    : Icons.timer,
+                color: colors.primary,
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: 74,
+                child: Text(
+                  _formatTimer(state.timerSeconds),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                    fontWeight: FontWeight.w700,
+                    color: colors.onSurface,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton.filledTonal(
+                tooltip: paused ? 'Resume' : 'Pause',
+                onPressed: paused ? cubit.resumeTimer : cubit.pauseTimer,
+                icon: Icon(paused ? Icons.play_arrow : Icons.pause),
+              ),
+              const SizedBox(width: 6),
+              IconButton(
+                tooltip: 'Stop',
+                onPressed: cubit.stopTimer,
+                icon: const Icon(Icons.stop),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatTimer(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 }

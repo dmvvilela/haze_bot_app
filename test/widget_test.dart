@@ -31,6 +31,13 @@ void main() {
     expect(find.byIcon(Icons.smart_toy), findsOneWidget);
     expect(find.byIcon(Icons.chat_bubble_outline), findsOneWidget);
     expect(find.byIcon(Icons.timer), findsOneWidget);
+
+    cubit.startTimer(1);
+    await tester.pump();
+
+    expect(find.text('01:00'), findsOneWidget);
+    expect(find.byIcon(Icons.pause), findsOneWidget);
+    cubit.stopTimer();
   });
 
   testWidgets('declining AI consent still resolves pending action', (

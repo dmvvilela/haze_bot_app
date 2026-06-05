@@ -29,7 +29,7 @@ enum AiConsent { unknown, granted, declined }
 
 /// Haze's voice. Only swaps the system-prompt flavor; the format rules and the
 /// 8 faces stay identical across personalities.
-enum HazePersonality { playful, sarcastic, sleepy, zen }
+enum HazePersonality { playful, sarcastic, sleepy, zen, meditative }
 
 extension HazePersonalityX on HazePersonality {
   String get displayName => switch (this) {
@@ -37,6 +37,7 @@ extension HazePersonalityX on HazePersonality {
     HazePersonality.sarcastic => 'Sarcastic',
     HazePersonality.sleepy => 'Sleepy',
     HazePersonality.zen => 'Zen',
+    HazePersonality.meditative => 'Meditative',
   };
 
   /// One line injected into the system prompt to set Haze's tone.
@@ -49,6 +50,8 @@ extension HazePersonalityX on HazePersonality {
       'You are drowsy and cozy, speaking softly and slowly like you are half asleep.',
     HazePersonality.zen =>
       'You are calm, gentle and mindful, like a tiny robot monk who soothes and reassures.',
+    HazePersonality.meditative =>
+      'You are soft, slow and meditative, helping the user breathe, settle and rest with sleepy little zzz energy.',
   };
 }
 

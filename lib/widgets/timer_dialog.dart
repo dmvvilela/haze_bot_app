@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/robot_face_cubit.dart';
-import '../services/timer_service.dart';
+import '../services/haze_brain.dart';
 
 class TimerDialog extends StatefulWidget {
   const TimerDialog({super.key});
@@ -18,18 +18,28 @@ class _TimerDialogState extends State<TimerDialog> {
   Widget build(BuildContext context) {
     return BlocBuilder<RobotFaceCubit, RobotFaceState>(
       builder: (context, state) {
+        final timerActive = state.timerSeconds > 0 || state.isTimerRunning;
+        final calmTimer =
+            state.personality == HazePersonality.sleepy ||
+            state.personality == HazePersonality.zen ||
+            state.personality == HazePersonality.meditative;
+        final paused = timerActive && !state.isTimerRunning;
+
         return AlertDialog(
           title: Row(
             children: [
-              Icon(Icons.timer, color: Theme.of(context).primaryColor),
+              Icon(
+                calmTimer ? Icons.self_improvement : Icons.timer,
+                color: Theme.of(context).primaryColor,
+              ),
               const SizedBox(width: 8),
-              const Text('Focus Timer'),
+              Text(calmTimer ? 'Meditation Timer' : 'Focus Timer'),
             ],
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (!state.isTimerRunning) ...[
+              if (!timerActive) ...[
                 const Text('Select timer duration:'),
                 const SizedBox(height: 16),
                 Wrap(
@@ -45,7 +55,9 @@ class _TimerDialogState extends State<TimerDialog> {
                           _selectedMinutes = minutes;
                         });
                       },
-                      selectedColor: Theme.of(context).primaryColor.withOpacity(0.3),
+                      selectedColor: Theme.of(
+                        context,
+                      ).primaryColor.withValues(alpha: 0.3),
                     );
                   }).toList(),
                 ),
@@ -53,19 +65,26 @@ class _TimerDialogState extends State<TimerDialog> {
                 // Timer is running - show current status
                 Column(
                   children: [
-                    Text('Timer Running', style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      paused ? 'Timer Paused' : 'Timer Running',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withOpacity(0.1),
+                        color: Theme.of(
+                          context,
+                        ).primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        TimerService().formatTime(state.timerSeconds),
-                        style: Theme.of(
-                          context,
-                        ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
+                        _formatTimer(state.timerSeconds),
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                            ),
                       ),
                     ),
                     if (state.aiMessage.isNotEmpty) ...[
@@ -73,16 +92,24 @@ class _TimerDialogState extends State<TimerDialog> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.blue.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                          border: Border.all(
+                            color: Colors.blue.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Row(
                           children: [
                             Icon(Icons.smart_toy, color: Colors.blue, size: 20),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Text(state.aiMessage, style: TextStyle(color: Colors.blue.shade700, fontSize: 12)),
+                              child: Text(
+                                state.aiMessage,
+                                style: TextStyle(
+                                  color: Colors.blue.shade700,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -94,8 +121,11 @@ class _TimerDialogState extends State<TimerDialog> {
             ],
           ),
           actions: [
-            if (!state.isTimerRunning) ...[
-              TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+            if (!timerActive) ...[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
               ElevatedButton.icon(
                 onPressed: () {
                   context.read<RobotFaceCubit>().startTimer(_selectedMinutes);
@@ -115,15 +145,25 @@ class _TimerDialogState extends State<TimerDialog> {
               ),
               ElevatedButton.icon(
                 onPressed: () {
-                  context.read<RobotFaceCubit>().pauseTimer();
+                  if (paused) {
+                    context.read<RobotFaceCubit>().resumeTimer();
+                  } else {
+                    context.read<RobotFaceCubit>().pauseTimer();
+                  }
                 },
-                icon: const Icon(Icons.pause),
-                label: const Text('Pause'),
+                icon: Icon(paused ? Icons.play_arrow : Icons.pause),
+                label: Text(paused ? 'Resume' : 'Pause'),
               ),
             ],
           ],
         );
       },
     );
+  }
+
+  String _formatTimer(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 }
