@@ -17,8 +17,5 @@ class RobotFaceState with _$RobotFaceState {
     @Default(0) int downloadProgress,
     @Default(AiConsent.unknown) AiConsent aiConsent,
     @Default(HazePersonality.playful) HazePersonality personality,
-    @Default(TtsVoicePreference.automatic)
-    TtsVoicePreference ttsVoicePreference,
-    @Default(false) bool supportsGenderedVoiceChoice,
   }) = _RobotFaceState;
 }

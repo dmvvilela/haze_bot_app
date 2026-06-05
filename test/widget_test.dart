@@ -18,18 +18,11 @@ void main() {
     expect(config.speechPitch, 0.95);
   });
 
-  test('Voice style support is opt-in by device capability', () {
+  test('Robot interaction defaults are idle', () {
     const state = RobotFaceState();
 
-    expect(state.supportsGenderedVoiceChoice, isFalse);
-    expect(state.ttsVoicePreference, TtsVoicePreference.automatic);
     expect(state.isSpeaking, isFalse);
-    expect(
-      state
-          .copyWith(supportsGenderedVoiceChoice: true)
-          .supportsGenderedVoiceChoice,
-      isTrue,
-    );
+    expect(state.isLoadingAI, isFalse);
   });
 
   testWidgets('Haze app renders main controls', (WidgetTester tester) async {
@@ -70,6 +63,7 @@ void main() {
 
     expect(find.text('AI Brain'), findsOneWidget);
     expect(find.text('Haze mood'), findsOneWidget);
+    expect(find.text('Voice and language'), findsOneWidget);
     expect(find.text('Playful'), findsWidgets);
     expect(find.text('Voice style'), findsNothing);
     await tester.tap(find.text('Done'));

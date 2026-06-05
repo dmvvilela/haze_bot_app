@@ -15,18 +15,19 @@ class SettingsDialog extends StatelessWidget {
         return AlertDialog(
           title: Text(t.ui.settings),
           content: SizedBox(
-            width: 420,
+            width: 460,
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ListTile(
-                    leading: const Icon(Icons.auto_awesome),
-                    title: const Text('AI Brain'),
-                    subtitle: Text(_brainStatusText(state)),
+                  _SectionHeader(
+                    icon: Icons.auto_awesome,
+                    title: 'AI Brain',
+                    subtitle: _brainStatusText(state),
                   ),
                   if (state.brainStatus == BrainStatus.downloading) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 10),
                     LinearProgressIndicator(
                       value: state.downloadProgress > 0
                           ? state.downloadProgress / 100
@@ -42,63 +43,63 @@ class SettingsDialog extends StatelessWidget {
                       children: _brainActions(context, state),
                     ),
                   ),
-                  const Divider(height: 28),
-                  ListTile(
-                    leading: const Icon(Icons.theater_comedy),
-                    title: const Text('Haze mood'),
-                    subtitle: Text(state.personality.displayName),
-                    trailing: DropdownButton<HazePersonality>(
-                      value: state.personality,
-                      items: HazePersonality.values
-                          .map(
-                            (personality) => DropdownMenuItem(
-                              value: personality,
-                              child: Text(personality.displayName),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (personality) {
-                        if (personality != null) {
-                          context.read<RobotFaceCubit>().setPersonality(
-                            personality,
-                          );
-                        }
-                      },
-                    ),
+                  const Divider(height: 32),
+                  _SectionHeader(
+                    icon: Icons.tune,
+                    title: 'Voice and language',
+                    subtitle: 'Local voice, mood, and speech settings.',
                   ),
-                  ListTile(
-                    title: Text(t.ui.language),
-                    subtitle: Text(
-                      state.config.language == 'en-US'
-                          ? 'English'
-                          : 'Português',
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<HazePersonality>(
+                    initialValue: state.personality,
+                    decoration: const InputDecoration(
+                      labelText: 'Haze mood',
+                      border: OutlineInputBorder(),
                     ),
-                    trailing: DropdownButton<String>(
-                      value: state.config.language,
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'en-US',
-                          child: Text('English'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'pt-BR',
-                          child: Text('Português'),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          context.read<RobotFaceCubit>().updateLanguage(value);
-                          // Update app locale
-                          if (value == 'pt-BR') {
-                            LocaleSettings.setLocale(AppLocale.pt);
-                          } else {
-                            LocaleSettings.setLocale(AppLocale.en);
-                          }
-                        }
-                      },
-                    ),
+                    items: HazePersonality.values
+                        .map(
+                          (personality) => DropdownMenuItem(
+                            value: personality,
+                            child: Text(personality.displayName),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (personality) {
+                      if (personality != null) {
+                        context.read<RobotFaceCubit>().setPersonality(
+                          personality,
+                        );
+                      }
+                    },
                   ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    initialValue: state.config.language,
+                    decoration: InputDecoration(
+                      labelText: t.ui.language,
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'en-US', child: Text('English')),
+                      DropdownMenuItem(
+                        value: 'pt-BR',
+                        child: Text('Português'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        context.read<RobotFaceCubit>().updateLanguage(value);
+                        if (value == 'pt-BR') {
+                          LocaleSettings.setLocale(AppLocale.pt);
+                        } else {
+                          LocaleSettings.setLocale(AppLocale.en);
+                        }
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 12),
                   SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
                     title: Text(t.ui.speech_enabled),
                     subtitle: Text(t.ui.speech_description),
                     value: state.config.speechEnabled,
@@ -106,30 +107,6 @@ class SettingsDialog extends StatelessWidget {
                         context.read<RobotFaceCubit>().toggleSpeech(),
                   ),
                   if (state.config.speechEnabled) ...[
-                    if (state.supportsGenderedVoiceChoice)
-                      ListTile(
-                        leading: const Icon(Icons.record_voice_over),
-                        title: const Text('Voice style'),
-                        subtitle: const Text('Uses installed local voices'),
-                        trailing: DropdownButton<TtsVoicePreference>(
-                          value: state.ttsVoicePreference,
-                          items: TtsVoicePreference.values
-                              .map(
-                                (preference) => DropdownMenuItem(
-                                  value: preference,
-                                  child: Text(preference.displayName),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (preference) {
-                            if (preference != null) {
-                              context.read<RobotFaceCubit>().setVoicePreference(
-                                preference,
-                              );
-                            }
-                          },
-                        ),
-                      ),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: OutlinedButton.icon(
@@ -139,10 +116,8 @@ class SettingsDialog extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      '${t.ui.speech_rate}: ${state.config.speechRate.toStringAsFixed(1)}',
-                    ),
-                    Slider(
+                    _SliderField(
+                      label: t.ui.speech_rate,
                       value: state.config.speechRate,
                       min: 0.1,
                       max: 2.0,
@@ -151,11 +126,9 @@ class SettingsDialog extends StatelessWidget {
                           .read<RobotFaceCubit>()
                           .updateSpeechRate(value),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${t.ui.speech_pitch}: ${state.config.speechPitch.toStringAsFixed(1)}',
-                    ),
-                    Slider(
+                    const SizedBox(height: 12),
+                    _SliderField(
+                      label: t.ui.speech_pitch,
                       value: state.config.speechPitch,
                       min: 0.5,
                       max: 2.0,
@@ -233,5 +206,79 @@ class SettingsDialog extends StatelessWidget {
       );
     }
     return actions;
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const _SectionHeader({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: colors.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 2),
+              Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SliderField extends StatelessWidget {
+  final String label;
+  final double value;
+  final double min;
+  final double max;
+  final int divisions;
+  final ValueChanged<double> onChanged;
+
+  const _SliderField({
+    required this.label,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.divisions,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(child: Text(label)),
+            Text(value.toStringAsFixed(1)),
+          ],
+        ),
+        Slider(
+          value: value,
+          min: min,
+          max: max,
+          divisions: divisions,
+          onChanged: onChanged,
+        ),
+      ],
+    );
   }
 }

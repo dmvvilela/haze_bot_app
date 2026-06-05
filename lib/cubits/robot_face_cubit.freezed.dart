@@ -31,9 +31,6 @@ mixin _$RobotFaceState {
   int get downloadProgress => throw _privateConstructorUsedError;
   AiConsent get aiConsent => throw _privateConstructorUsedError;
   HazePersonality get personality => throw _privateConstructorUsedError;
-  TtsVoicePreference get ttsVoicePreference =>
-      throw _privateConstructorUsedError;
-  bool get supportsGenderedVoiceChoice => throw _privateConstructorUsedError;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
@@ -64,8 +61,6 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     int downloadProgress,
     AiConsent aiConsent,
     HazePersonality personality,
-    TtsVoicePreference ttsVoicePreference,
-    bool supportsGenderedVoiceChoice,
   });
 
   $RobotConfigCopyWith<$Res> get config;
@@ -100,8 +95,6 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? downloadProgress = null,
     Object? aiConsent = null,
     Object? personality = null,
-    Object? ttsVoicePreference = null,
-    Object? supportsGenderedVoiceChoice = null,
   }) {
     return _then(
       _value.copyWith(
@@ -161,14 +154,6 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
                 ? _value.personality
                 : personality // ignore: cast_nullable_to_non_nullable
                       as HazePersonality,
-            ttsVoicePreference: null == ttsVoicePreference
-                ? _value.ttsVoicePreference
-                : ttsVoicePreference // ignore: cast_nullable_to_non_nullable
-                      as TtsVoicePreference,
-            supportsGenderedVoiceChoice: null == supportsGenderedVoiceChoice
-                ? _value.supportsGenderedVoiceChoice
-                : supportsGenderedVoiceChoice // ignore: cast_nullable_to_non_nullable
-                      as bool,
           )
           as $Val,
     );
@@ -209,8 +194,6 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
     int downloadProgress,
     AiConsent aiConsent,
     HazePersonality personality,
-    TtsVoicePreference ttsVoicePreference,
-    bool supportsGenderedVoiceChoice,
   });
 
   @override
@@ -245,8 +228,6 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? downloadProgress = null,
     Object? aiConsent = null,
     Object? personality = null,
-    Object? ttsVoicePreference = null,
-    Object? supportsGenderedVoiceChoice = null,
   }) {
     return _then(
       _$RobotFaceStateImpl(
@@ -306,14 +287,6 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
             ? _value.personality
             : personality // ignore: cast_nullable_to_non_nullable
                   as HazePersonality,
-        ttsVoicePreference: null == ttsVoicePreference
-            ? _value.ttsVoicePreference
-            : ttsVoicePreference // ignore: cast_nullable_to_non_nullable
-                  as TtsVoicePreference,
-        supportsGenderedVoiceChoice: null == supportsGenderedVoiceChoice
-            ? _value.supportsGenderedVoiceChoice
-            : supportsGenderedVoiceChoice // ignore: cast_nullable_to_non_nullable
-                  as bool,
       ),
     );
   }
@@ -337,8 +310,6 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.downloadProgress = 0,
     this.aiConsent = AiConsent.unknown,
     this.personality = HazePersonality.playful,
-    this.ttsVoicePreference = TtsVoicePreference.automatic,
-    this.supportsGenderedVoiceChoice = false,
   });
 
   @override
@@ -383,16 +354,10 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   @override
   @JsonKey()
   final HazePersonality personality;
-  @override
-  @JsonKey()
-  final TtsVoicePreference ttsVoicePreference;
-  @override
-  @JsonKey()
-  final bool supportsGenderedVoiceChoice;
 
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoicePreference: $ttsVoicePreference, supportsGenderedVoiceChoice: $supportsGenderedVoiceChoice)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality)';
   }
 
   @override
@@ -426,15 +391,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
             (identical(other.aiConsent, aiConsent) ||
                 other.aiConsent == aiConsent) &&
             (identical(other.personality, personality) ||
-                other.personality == personality) &&
-            (identical(other.ttsVoicePreference, ttsVoicePreference) ||
-                other.ttsVoicePreference == ttsVoicePreference) &&
-            (identical(
-                  other.supportsGenderedVoiceChoice,
-                  supportsGenderedVoiceChoice,
-                ) ||
-                other.supportsGenderedVoiceChoice ==
-                    supportsGenderedVoiceChoice));
+                other.personality == personality));
   }
 
   @override
@@ -454,8 +411,6 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     downloadProgress,
     aiConsent,
     personality,
-    ttsVoicePreference,
-    supportsGenderedVoiceChoice,
   );
 
   /// Create a copy of RobotFaceState
@@ -486,8 +441,6 @@ abstract class _RobotFaceState implements RobotFaceState {
     final int downloadProgress,
     final AiConsent aiConsent,
     final HazePersonality personality,
-    final TtsVoicePreference ttsVoicePreference,
-    final bool supportsGenderedVoiceChoice,
   }) = _$RobotFaceStateImpl;
 
   @override
@@ -518,10 +471,6 @@ abstract class _RobotFaceState implements RobotFaceState {
   AiConsent get aiConsent;
   @override
   HazePersonality get personality;
-  @override
-  TtsVoicePreference get ttsVoicePreference;
-  @override
-  bool get supportsGenderedVoiceChoice;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.

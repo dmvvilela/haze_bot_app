@@ -16,20 +16,9 @@ import '../services/timer_service.dart';
 part 'robot_face_state.dart';
 part 'robot_face_cubit.freezed.dart';
 
-enum TtsVoicePreference { automatic, feminine, masculine }
-
-extension TtsVoicePreferenceX on TtsVoicePreference {
-  String get displayName => switch (this) {
-    TtsVoicePreference.automatic => 'Auto',
-    TtsVoicePreference.feminine => 'Feminine',
-    TtsVoicePreference.masculine => 'Masculine',
-  };
-}
-
 class RobotFaceCubit extends Cubit<RobotFaceState> {
   static const _aiConsentKey = 'haze_ai_consent';
   static const _personalityKey = 'haze_personality';
-  static const _voicePreferenceKey = 'haze_voice_preference';
 
   final FlutterTts _flutterTts = FlutterTts();
   final HazeBrain _brain = HazeBrain();
@@ -66,16 +55,11 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       final restoredPersonality = _personalityFromName(
         prefs.getString(_personalityKey),
       );
-      final restoredVoicePreference = _voicePreferenceFromName(
-        prefs.getString(_voicePreferenceKey),
-      );
       if (!isClosed) {
         emit(
           state.copyWith(
             aiConsent: restoredConsent,
             personality: restoredPersonality ?? state.personality,
-            ttsVoicePreference:
-                restoredVoicePreference ?? state.ttsVoicePreference,
           ),
         );
         if (restoredPersonality != null) {
@@ -110,13 +94,6 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     await _brain.setPersonality(personality);
   }
 
-  Future<void> setVoicePreference(TtsVoicePreference preference) async {
-    emit(state.copyWith(ttsVoicePreference: preference));
-    await _saveVoicePreference(preference);
-    _activeVoiceLocale = null;
-    await _applyTtsSettings();
-  }
-
   Future<void> _saveConsent(AiConsent consent) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -139,27 +116,10 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     }
   }
 
-  Future<void> _saveVoicePreference(TtsVoicePreference preference) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_voicePreferenceKey, preference.name);
-    } catch (e) {
-      debugPrint('RobotFaceCubit: failed to save voice preference: $e');
-    }
-  }
-
   HazePersonality? _personalityFromName(String? name) {
     if (name == null) return null;
     for (final personality in HazePersonality.values) {
       if (personality.name == name) return personality;
-    }
-    return null;
-  }
-
-  TtsVoicePreference? _voicePreferenceFromName(String? name) {
-    if (name == null) return null;
-    for (final preference in TtsVoicePreference.values) {
-      if (preference.name == name) return preference;
     }
     return null;
   }
@@ -392,7 +352,6 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
           .map((voice) => voice.map((key, value) => MapEntry('$key', '$value')))
           .where((voice) => voice['locale'] == state.config.language)
           .toList();
-      _updateGenderedVoiceSupport(voices);
       if (voices.isEmpty) return;
 
       voices.sort((a, b) => _voiceScore(b).compareTo(_voiceScore(a)));
@@ -408,15 +367,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     final name = (voice['name'] ?? '').toLowerCase();
     final quality = (voice['quality'] ?? '').toLowerCase();
     final networkRequired = (voice['network_required'] ?? '').toLowerCase();
-    final gender = _voiceGender(voice);
     var score = 0;
-    if (state.supportsGenderedVoiceChoice) {
-      if (state.ttsVoicePreference == TtsVoicePreference.feminine) {
-        score += gender == TtsVoicePreference.feminine ? 100 : -30;
-      } else if (state.ttsVoicePreference == TtsVoicePreference.masculine) {
-        score += gender == TtsVoicePreference.masculine ? 100 : -30;
-      }
-    }
     if (networkRequired == 'false') score += 20;
     if (quality.contains('enhanced') || quality.contains('premium')) {
       score += 12;
@@ -434,30 +385,6 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     }
     if (name.contains('compact')) score -= 3;
     return score;
-  }
-
-  void _updateGenderedVoiceSupport(List<Map<String, String>> voices) {
-    final hasFeminine = voices.any(
-      (voice) => _voiceGender(voice) == TtsVoicePreference.feminine,
-    );
-    final hasMasculine = voices.any(
-      (voice) => _voiceGender(voice) == TtsVoicePreference.masculine,
-    );
-    final supportsChoice = hasFeminine && hasMasculine;
-    if (!isClosed && state.supportsGenderedVoiceChoice != supportsChoice) {
-      emit(state.copyWith(supportsGenderedVoiceChoice: supportsChoice));
-    }
-  }
-
-  TtsVoicePreference? _voiceGender(Map<String, String> voice) {
-    final gender = (voice['gender'] ?? '').toLowerCase();
-    if (gender.contains('female') || gender.contains('feminine')) {
-      return TtsVoicePreference.feminine;
-    }
-    if (gender.contains('male') || gender.contains('masculine')) {
-      return TtsVoicePreference.masculine;
-    }
-    return null;
   }
 
   Future<void> _safeTtsCall(
