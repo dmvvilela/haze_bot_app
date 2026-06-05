@@ -168,9 +168,9 @@ class _AliveFacePainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..color = eyeColor.withValues(alpha: 0.38);
     for (final tuft in [
-      (x: 0.38, dx: -7.0, dy: -14.0),
-      (x: 0.44, dx: -3.0, dy: -15.0),
-      (x: 0.63, dx: 7.0, dy: -14.0),
+      (x: 0.46, dx: -5.0, dy: -15.0),
+      (x: 0.53, dx: 1.5, dy: -13.0),
+      (x: 0.6, dx: 6.0, dy: -14.0),
     ]) {
       final base = Offset(size.width * tuft.x, size.height * 0.17 + bodyLift);
       canvas.drawLine(base, base.translate(tuft.dx, tuft.dy), tuftPaint);
