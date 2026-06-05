@@ -168,9 +168,9 @@ class _AliveFacePainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..color = eyeColor.withValues(alpha: 0.38);
     for (final tuft in [
-      (x: 0.46, dx: -5.0, dy: -15.0),
-      (x: 0.53, dx: 1.5, dy: -13.0),
-      (x: 0.6, dx: 6.0, dy: -14.0),
+      (x: 0.38, dx: -7.0, dy: -14.0),
+      (x: 0.44, dx: -3.0, dy: -15.0),
+      (x: 0.63, dx: 7.0, dy: -14.0),
     ]) {
       final base = Offset(size.width * tuft.x, size.height * 0.17 + bodyLift);
       canvas.drawLine(base, base.translate(tuft.dx, tuft.dy), tuftPaint);
@@ -570,6 +570,11 @@ class _AliveFacePainter extends CustomPainter {
     double bodyLift,
   ) {
     final center = Offset(size.width / 2, size.height * 0.6 + bodyLift);
+    if (state.isSpeaking) {
+      _drawTalkingMouth(canvas, center, mouthColor);
+      return;
+    }
+
     final paint = Paint()
       ..color = mouthColor.withValues(alpha: 0.92)
       ..style = PaintingStyle.stroke
@@ -646,6 +651,44 @@ class _AliveFacePainter extends CustomPainter {
     }
 
     canvas.drawPath(path, paint);
+  }
+
+  void _drawTalkingMouth(Canvas canvas, Offset center, Color mouthColor) {
+    final syllable = (math.sin(time * 11) + 1) / 2;
+    final open = 8 + syllable * 18;
+    final width = 30 + (1 - syllable) * 14;
+    final fillPaint = Paint()
+      ..color = mouthColor.withValues(alpha: 0.18 + syllable * 0.08);
+    final linePaint = Paint()
+      ..color = mouthColor.withValues(alpha: 0.95)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4.8
+      ..strokeCap = StrokeCap.round;
+
+    final mouthRect = Rect.fromCenter(
+      center: center.translate(0, 6),
+      width: width,
+      height: open,
+    );
+    canvas.drawOval(mouthRect, fillPaint);
+    canvas.drawArc(mouthRect, 0, math.pi * 2, false, linePaint);
+
+    final smile = Path()
+      ..moveTo(center.dx - 28, center.dy - 2)
+      ..quadraticBezierTo(
+        center.dx,
+        center.dy + 10 + syllable * 3,
+        center.dx + 28,
+        center.dy - 2,
+      );
+    canvas.drawPath(
+      smile,
+      Paint()
+        ..color = mouthColor.withValues(alpha: 0.28)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.2
+        ..strokeCap = StrokeCap.round,
+    );
   }
 
   void _drawExpressionAccents(
@@ -743,6 +786,7 @@ class _AliveFacePainter extends CustomPainter {
         oldDelegate.state.config != state.config ||
         oldDelegate.state.isBlinking != state.isBlinking ||
         oldDelegate.state.isPressed != state.isPressed ||
+        oldDelegate.state.isSpeaking != state.isSpeaking ||
         oldDelegate.state.isLoadingAI != state.isLoadingAI ||
         oldDelegate.state.isTimerRunning != state.isTimerRunning;
   }

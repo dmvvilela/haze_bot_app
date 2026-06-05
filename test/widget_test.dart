@@ -23,6 +23,7 @@ void main() {
 
     expect(state.supportsGenderedVoiceChoice, isFalse);
     expect(state.ttsVoicePreference, TtsVoicePreference.automatic);
+    expect(state.isSpeaking, isFalse);
     expect(
       state
           .copyWith(supportsGenderedVoiceChoice: true)

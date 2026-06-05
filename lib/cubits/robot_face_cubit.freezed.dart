@@ -25,6 +25,7 @@ mixin _$RobotFaceState {
   int get timerSeconds => throw _privateConstructorUsedError;
   String get aiMessage => throw _privateConstructorUsedError;
   bool get isLoadingAI => throw _privateConstructorUsedError;
+  bool get isSpeaking => throw _privateConstructorUsedError;
   bool get keepScreenAwake => throw _privateConstructorUsedError;
   BrainStatus get brainStatus => throw _privateConstructorUsedError;
   int get downloadProgress => throw _privateConstructorUsedError;
@@ -57,6 +58,7 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     int timerSeconds,
     String aiMessage,
     bool isLoadingAI,
+    bool isSpeaking,
     bool keepScreenAwake,
     BrainStatus brainStatus,
     int downloadProgress,
@@ -92,6 +94,7 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? timerSeconds = null,
     Object? aiMessage = null,
     Object? isLoadingAI = null,
+    Object? isSpeaking = null,
     Object? keepScreenAwake = null,
     Object? brainStatus = null,
     Object? downloadProgress = null,
@@ -133,6 +136,10 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
             isLoadingAI: null == isLoadingAI
                 ? _value.isLoadingAI
                 : isLoadingAI // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            isSpeaking: null == isSpeaking
+                ? _value.isSpeaking
+                : isSpeaking // ignore: cast_nullable_to_non_nullable
                       as bool,
             keepScreenAwake: null == keepScreenAwake
                 ? _value.keepScreenAwake
@@ -196,6 +203,7 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
     int timerSeconds,
     String aiMessage,
     bool isLoadingAI,
+    bool isSpeaking,
     bool keepScreenAwake,
     BrainStatus brainStatus,
     int downloadProgress,
@@ -231,6 +239,7 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? timerSeconds = null,
     Object? aiMessage = null,
     Object? isLoadingAI = null,
+    Object? isSpeaking = null,
     Object? keepScreenAwake = null,
     Object? brainStatus = null,
     Object? downloadProgress = null,
@@ -272,6 +281,10 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
         isLoadingAI: null == isLoadingAI
             ? _value.isLoadingAI
             : isLoadingAI // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        isSpeaking: null == isSpeaking
+            ? _value.isSpeaking
+            : isSpeaking // ignore: cast_nullable_to_non_nullable
                   as bool,
         keepScreenAwake: null == keepScreenAwake
             ? _value.keepScreenAwake
@@ -318,6 +331,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.timerSeconds = 0,
     this.aiMessage = '',
     this.isLoadingAI = false,
+    this.isSpeaking = false,
     this.keepScreenAwake = false,
     this.brainStatus = BrainStatus.idle,
     this.downloadProgress = 0,
@@ -353,6 +367,9 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   final bool isLoadingAI;
   @override
   @JsonKey()
+  final bool isSpeaking;
+  @override
+  @JsonKey()
   final bool keepScreenAwake;
   @override
   @JsonKey()
@@ -375,7 +392,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
 
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoicePreference: $ttsVoicePreference, supportsGenderedVoiceChoice: $supportsGenderedVoiceChoice)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoicePreference: $ttsVoicePreference, supportsGenderedVoiceChoice: $supportsGenderedVoiceChoice)';
   }
 
   @override
@@ -398,6 +415,8 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
                 other.aiMessage == aiMessage) &&
             (identical(other.isLoadingAI, isLoadingAI) ||
                 other.isLoadingAI == isLoadingAI) &&
+            (identical(other.isSpeaking, isSpeaking) ||
+                other.isSpeaking == isSpeaking) &&
             (identical(other.keepScreenAwake, keepScreenAwake) ||
                 other.keepScreenAwake == keepScreenAwake) &&
             (identical(other.brainStatus, brainStatus) ||
@@ -429,6 +448,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     timerSeconds,
     aiMessage,
     isLoadingAI,
+    isSpeaking,
     keepScreenAwake,
     brainStatus,
     downloadProgress,
@@ -460,6 +480,7 @@ abstract class _RobotFaceState implements RobotFaceState {
     final int timerSeconds,
     final String aiMessage,
     final bool isLoadingAI,
+    final bool isSpeaking,
     final bool keepScreenAwake,
     final BrainStatus brainStatus,
     final int downloadProgress,
@@ -485,6 +506,8 @@ abstract class _RobotFaceState implements RobotFaceState {
   String get aiMessage;
   @override
   bool get isLoadingAI;
+  @override
+  bool get isSpeaking;
   @override
   bool get keepScreenAwake;
   @override

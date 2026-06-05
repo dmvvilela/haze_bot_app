@@ -335,12 +335,15 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     try {
       await _applyTtsSettings();
       await _flutterTts.stop();
+      if (!isClosed) emit(state.copyWith(isSpeaking: true));
       final result = await _flutterTts.speak(line, focus: true);
       if (result != 1) {
         debugPrint('Haze TTS: speak returned $result');
       }
     } catch (e) {
       debugPrint('Haze TTS: failed to speak: $e');
+    } finally {
+      if (!isClosed) emit(state.copyWith(isSpeaking: false));
     }
   }
 

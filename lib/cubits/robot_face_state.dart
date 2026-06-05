@@ -11,6 +11,7 @@ class RobotFaceState with _$RobotFaceState {
     @Default(0) int timerSeconds,
     @Default('') String aiMessage,
     @Default(false) bool isLoadingAI,
+    @Default(false) bool isSpeaking,
     @Default(false) bool keepScreenAwake,
     @Default(BrainStatus.idle) BrainStatus brainStatus,
     @Default(0) int downloadProgress,
