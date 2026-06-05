@@ -95,8 +95,8 @@ class _AliveFacePainter extends CustomPainter {
     _drawGlow(canvas, size, eyeColor, mouthColor, active, pulse, pressPulse);
     _drawShadow(canvas, size, bodyLift, isDark);
     _drawShell(canvas, size, eyeColor, isDark, bodyLift);
+    _drawAntennaAndTufts(canvas, size, eyeColor, bodyLift, active, pulse);
     _drawDeviceDetails(canvas, size, eyeColor, isDark, pulse, bodyLift);
-    _drawStatusGem(canvas, size, eyeColor, bodyLift, active, pulse);
     _drawFacePanel(canvas, size, eyeColor, isDark, bodyLift);
     _drawCheeks(canvas, size, mouthColor, pulse, bodyLift);
     _drawEyes(canvas, size, eyeColor, mouthColor, expression, bodyLift);
@@ -154,7 +154,7 @@ class _AliveFacePainter extends CustomPainter {
     );
   }
 
-  void _drawStatusGem(
+  void _drawAntennaAndTufts(
     Canvas canvas,
     Size size,
     Color eyeColor,
@@ -162,25 +162,56 @@ class _AliveFacePainter extends CustomPainter {
     bool active,
     double pulse,
   ) {
-    final center = Offset(size.width / 2, size.height * 0.17 + bodyLift);
-    final slot = RRect.fromRectAndRadius(
-      Rect.fromCenter(center: center, width: 54, height: 9),
-      const Radius.circular(6),
+    final hairPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round
+      ..color = eyeColor.withValues(alpha: 0.42);
+
+    for (final tuft in [
+      (x: 0.42, angle: -0.28, length: 18.0),
+      (x: 0.48, angle: -0.08, length: 15.0),
+      (x: 0.54, angle: 0.1, length: 15.0),
+      (x: 0.6, angle: 0.32, length: 17.0),
+    ]) {
+      final base = Offset(size.width * tuft.x, size.height * 0.17 + bodyLift);
+      canvas.drawLine(
+        base,
+        base.translate(math.sin(tuft.angle) * tuft.length, -tuft.length),
+        hairPaint,
+      );
+    }
+
+    final base = Offset(size.width * 0.5, size.height * 0.15 + bodyLift);
+    final tip = Offset(
+      size.width * 0.5 + math.sin(time * 1.7) * 7,
+      size.height * 0.06 + math.sin(time * 2.1) * 2,
     );
-    canvas.drawRRect(
-      slot,
-      Paint()..color = const Color(0xFF03080D).withValues(alpha: 0.34),
-    );
+    final wirePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.2
+      ..strokeCap = StrokeCap.round
+      ..color = eyeColor.withValues(alpha: 0.62);
+    final path = Path()
+      ..moveTo(base.dx, base.dy)
+      ..quadraticBezierTo(
+        size.width * 0.48,
+        size.height * 0.09,
+        tip.dx,
+        tip.dy,
+      );
+    canvas.drawPath(path, wirePaint);
+
     canvas.drawCircle(
-      center.translate(math.sin(time * 1.6) * 3, 0),
-      active ? 4.4 + pulse : 3.8,
+      tip,
+      active ? 6 + pulse * 2 : 5.4,
       Paint()
-        ..color = eyeColor.withValues(alpha: active ? 0.95 : 0.62)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+        ..color = eyeColor.withValues(alpha: active ? 0.95 : 0.66)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
     );
     canvas.drawCircle(
-      center.translate(math.sin(time * 1.6) * 3 - 1, -1),
-      1.7,
+      tip.translate(-1, -1),
+      2.7,
       Paint()..color = Colors.white.withValues(alpha: 0.86),
     );
   }
@@ -232,46 +263,46 @@ class _AliveFacePainter extends CustomPainter {
     final h = size.height;
     final y = bodyLift + 12;
     return Path()
-      ..moveTo(w * 0.34, h * 0.14 + y)
+      ..moveTo(w * 0.35, h * 0.15 + y)
       ..cubicTo(
         w * 0.44,
-        h * 0.1 + y,
-        w * 0.61,
-        h * 0.1 + y,
-        w * 0.71,
-        h * 0.14 + y,
+        h * 0.11 + y,
+        w * 0.6,
+        h * 0.11 + y,
+        w * 0.69,
+        h * 0.15 + y,
       )
       ..cubicTo(
-        w * 0.83,
+        w * 0.79,
         h * 0.19 + y,
-        w * 0.86,
+        w * 0.82,
         h * 0.34 + y,
-        w * 0.84,
+        w * 0.79,
         h * 0.54 + y,
       )
       ..cubicTo(
-        w * 0.82,
-        h * 0.76 + y,
-        w * 0.69,
-        h * 0.86 + y,
+        w * 0.77,
+        h * 0.75 + y,
+        w * 0.66,
+        h * 0.85 + y,
         w * 0.5,
         h * 0.86 + y,
       )
       ..cubicTo(
-        w * 0.31,
-        h * 0.86 + y,
-        w * 0.18,
-        h * 0.76 + y,
-        w * 0.16,
+        w * 0.34,
+        h * 0.85 + y,
+        w * 0.23,
+        h * 0.75 + y,
+        w * 0.21,
         h * 0.54 + y,
       )
       ..cubicTo(
-        w * 0.14,
+        w * 0.18,
         h * 0.34 + y,
-        w * 0.22,
+        w * 0.25,
         h * 0.19 + y,
-        w * 0.34,
-        h * 0.14 + y,
+        w * 0.35,
+        h * 0.15 + y,
       )
       ..close();
   }
@@ -291,14 +322,14 @@ class _AliveFacePainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..color = eyeColor.withValues(alpha: isDark ? 0.18 : 0.14);
     canvas.drawLine(
-      Offset(size.width * 0.31, size.height * 0.78 + y),
-      Offset(size.width * 0.69, size.height * 0.78 + y),
+      Offset(size.width * 0.34, size.height * 0.78 + y),
+      Offset(size.width * 0.66, size.height * 0.78 + y),
       detailPaint,
     );
 
     final screwPaint = Paint()
       ..color = eyeColor.withValues(alpha: 0.16 + pulse * 0.04);
-    for (final x in [size.width * 0.28, size.width * 0.72]) {
+    for (final x in [size.width * 0.31, size.width * 0.69]) {
       canvas.drawCircle(Offset(x, size.height * 0.7 + y), 3.2, screwPaint);
     }
   }
