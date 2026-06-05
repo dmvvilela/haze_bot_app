@@ -278,6 +278,7 @@ class RobotFaceScreen extends StatelessWidget {
     if (context.read<RobotFaceCubit>().state.aiConsent == AiConsent.unknown) {
       showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (dialogContext) => BlocProvider.value(
           value: context.read<RobotFaceCubit>(),
           child: AiConsentDialog(onResolved: action),

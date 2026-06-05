@@ -299,7 +299,8 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     emit(state.copyWith(isLoadingAI: true));
     // Only ever download / load the model once the user has opted in. Without
     // consent the brain stays unloaded and respond() returns a canned line.
-    if (state.aiConsent == AiConsent.granted) {
+    if (state.aiConsent == AiConsent.granted &&
+        state.brainStatus != BrainStatus.unavailable) {
       await prepareBrain();
     }
 

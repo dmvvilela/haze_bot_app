@@ -108,7 +108,7 @@ class AiConsentDialog extends StatelessWidget {
   ) {
     final cubit = context.read<RobotFaceCubit>();
 
-    if (ready || failed) {
+    if (ready) {
       return [
         ElevatedButton(
           onPressed: () {
@@ -119,7 +119,24 @@ class AiConsentDialog extends StatelessWidget {
         ),
       ];
     }
+    if (failed) {
+      return [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            onResolved?.call();
+          },
+          child: const Text('Use built-in reply'),
+        ),
+        ElevatedButton.icon(
+          onPressed: () => cubit.grantAiConsent(),
+          icon: const Icon(Icons.refresh),
+          label: const Text('Retry'),
+        ),
+      ];
+    }
     if (busy) {
+      if (onResolved != null) return [];
       return [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),

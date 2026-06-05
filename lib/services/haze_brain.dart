@@ -82,20 +82,22 @@ class HazeBrain {
   }
 
   Future<void> _prepare(void Function(BrainStatus, int)? onUpdate) async {
-    // 1) Make sure the model file is installed. install() is idempotent: it
-    //    resumes / skips the download if the file is already present.
-    if (!FlutterGemma.hasActiveModel()) {
+    // 1) Make sure the model file is installed and active. install() is
+    //    idempotent: it skips the download if the file is already present, and
+    //    it repairs the "installed but not active" case before loading.
+    final hadActiveModel = FlutterGemma.hasActiveModel();
+    if (!hadActiveModel) {
       status = BrainStatus.downloading;
       onUpdate?.call(status, 0);
-      final token = _effectiveToken;
-      await FlutterGemma.installModel(modelType: ModelType.gemmaIt)
-          .fromNetwork(_effectiveModelUrl, token: token.isEmpty ? null : token)
-          .withProgress((p) {
-            downloadProgress = p;
-            onUpdate?.call(BrainStatus.downloading, p);
-          })
-          .install();
     }
+    final token = _effectiveToken;
+    await FlutterGemma.installModel(modelType: ModelType.gemmaIt)
+        .fromNetwork(_effectiveModelUrl, token: token.isEmpty ? null : token)
+        .withProgress((p) {
+          downloadProgress = p;
+          onUpdate?.call(BrainStatus.downloading, p);
+        })
+        .install();
 
     // 2) Load the model into memory and open one chat carrying Haze's persona.
     status = BrainStatus.preparing;
