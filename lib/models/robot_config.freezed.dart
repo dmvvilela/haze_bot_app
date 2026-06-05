@@ -230,8 +230,8 @@ class _$RobotConfigImpl implements _RobotConfig {
     @ColorConverter() this.mouthColor = Colors.pink,
     this.faceType = FaceType.classic,
     this.speechEnabled = false,
-    this.speechRate = 0.7,
-    this.speechPitch = 1.2,
+    this.speechRate = 0.55,
+    this.speechPitch = 0.95,
     this.language = 'en-US',
     this.isDarkTheme = true,
   });

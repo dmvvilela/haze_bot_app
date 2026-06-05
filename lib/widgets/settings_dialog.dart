@@ -106,6 +106,14 @@ class SettingsDialog extends StatelessWidget {
                         context.read<RobotFaceCubit>().toggleSpeech(),
                   ),
                   if (state.config.speechEnabled) ...[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: OutlinedButton.icon(
+                        onPressed: context.read<RobotFaceCubit>().previewVoice,
+                        icon: const Icon(Icons.volume_up),
+                        label: const Text('Test voice'),
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       '${t.ui.speech_rate}: ${state.config.speechRate.toStringAsFixed(1)}',

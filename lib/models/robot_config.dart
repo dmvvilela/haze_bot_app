@@ -12,16 +12,26 @@ class RobotConfig with _$RobotConfig {
     @Default(Colors.pink) @ColorConverter() Color mouthColor,
     @Default(FaceType.classic) FaceType faceType,
     @Default(false) bool speechEnabled,
-    @Default(0.7) double speechRate,
-    @Default(1.2) double speechPitch,
+    @Default(0.55) double speechRate,
+    @Default(0.95) double speechPitch,
     @Default('en-US') String language,
     @Default(true) bool isDarkTheme,
   }) = _RobotConfig;
 
-  factory RobotConfig.fromJson(Map<String, dynamic> json) => _$RobotConfigFromJson(json);
+  factory RobotConfig.fromJson(Map<String, dynamic> json) =>
+      _$RobotConfigFromJson(json);
 }
 
-enum RobotExpression { happy, surprised, sleepy, excited, confused, love, angry, winking }
+enum RobotExpression {
+  happy,
+  surprised,
+  sleepy,
+  excited,
+  confused,
+  love,
+  angry,
+  winking,
+}
 
 enum FaceType { classic, looi, minimal, bean }
 

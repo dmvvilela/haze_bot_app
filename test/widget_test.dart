@@ -6,10 +6,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:haze_bot_app/cubits/robot_face_cubit.dart';
 import 'package:haze_bot_app/i18n/strings.g.dart';
 import 'package:haze_bot_app/main.dart';
+import 'package:haze_bot_app/models/robot_config.dart';
 import 'package:haze_bot_app/services/haze_brain.dart';
 import 'package:haze_bot_app/widgets/ai_consent_dialog.dart';
 
 void main() {
+  test('Robot voice defaults are calm', () {
+    const config = RobotConfig();
+
+    expect(config.speechRate, 0.55);
+    expect(config.speechPitch, 0.95);
+  });
+
   testWidgets('Haze app renders main controls', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     LocaleSettings.setLocale(AppLocale.en);

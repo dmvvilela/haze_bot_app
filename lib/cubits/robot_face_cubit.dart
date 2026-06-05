@@ -26,6 +26,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   StreamSubscription? _timerSubscription;
   StreamSubscription? _timerStatusSubscription;
   StreamSubscription? _timerCompleteSubscription;
+  String? _activeVoiceLocale;
 
   RobotFaceCubit() : super(const RobotFaceState()) {
     _initializeTts();
@@ -118,9 +119,34 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   Future<void> _initializeTts() async {
-    await _flutterTts.setLanguage(state.config.language);
-    await _flutterTts.setSpeechRate(state.config.speechRate);
-    await _flutterTts.setPitch(state.config.speechPitch);
+    _flutterTts.setCompletionHandler(() {
+      debugPrint('Haze TTS: completed');
+    });
+    _flutterTts.setErrorHandler((message) {
+      debugPrint('Haze TTS: error: $message');
+    });
+    await _safeTtsCall(
+      () => _flutterTts.awaitSpeakCompletion(true),
+      'await completion',
+    );
+    await _safeTtsCall(() => _flutterTts.setVolume(1.0), 'set volume');
+    await _safeTtsCall(
+      () => _flutterTts.setSharedInstance(true),
+      'share audio',
+    );
+    await _safeTtsCall(
+      () => _flutterTts.setIosAudioCategory(
+        IosTextToSpeechAudioCategory.playback,
+        [
+          IosTextToSpeechAudioCategoryOptions.mixWithOthers,
+          IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+          IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+        ],
+        IosTextToSpeechAudioMode.voicePrompt,
+      ),
+      'set iOS audio category',
+    );
+    await _applyTtsSettings();
   }
 
   void _initializeTimer() {
@@ -200,19 +226,20 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   void updateSpeechRate(double rate) {
     final newConfig = state.config.copyWith(speechRate: rate);
     emit(state.copyWith(config: newConfig));
-    _flutterTts.setSpeechRate(rate);
+    _safeTtsCall(() => _flutterTts.setSpeechRate(rate), 'set speech rate');
   }
 
   void updateSpeechPitch(double pitch) {
     final newConfig = state.config.copyWith(speechPitch: pitch);
     emit(state.copyWith(config: newConfig));
-    _flutterTts.setPitch(pitch);
+    _safeTtsCall(() => _flutterTts.setPitch(pitch), 'set speech pitch');
   }
 
   void updateLanguage(String language) {
     final newConfig = state.config.copyWith(language: language);
     emit(state.copyWith(config: newConfig));
-    _flutterTts.setLanguage(language);
+    _activeVoiceLocale = null;
+    _applyTtsSettings();
   }
 
   void toggleTheme() {
@@ -263,8 +290,102 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   Future<void> _speak(String text) async {
-    if (state.config.speechEnabled) {
-      await _flutterTts.speak(text);
+    final line = text.trim();
+    if (!state.config.speechEnabled || line.isEmpty) return;
+    try {
+      await _applyTtsSettings();
+      await _flutterTts.stop();
+      final result = await _flutterTts.speak(line, focus: true);
+      if (result != 1) {
+        debugPrint('Haze TTS: speak returned $result');
+      }
+    } catch (e) {
+      debugPrint('Haze TTS: failed to speak: $e');
+    }
+  }
+
+  Future<void> previewVoice() => _speak(_voicePreviewLine);
+
+  String get _voicePreviewLine => switch (state.personality) {
+    HazePersonality.sleepy =>
+      'Haze voice check... sleepy circuits online... zzz.',
+    HazePersonality.zen || HazePersonality.meditative =>
+      'Haze voice check. Breathe in gently, and let the little robot hum settle.',
+    HazePersonality.sarcastic =>
+      'Haze voice check. Miraculously, the tiny speaker has opinions.',
+    HazePersonality.playful =>
+      'Haze voice check! Beep boop, local voice systems are online.',
+  };
+
+  Future<void> _applyTtsSettings() async {
+    await _safeTtsCall(
+      () => _flutterTts.setLanguage(state.config.language),
+      'set language',
+    );
+    await _safeTtsCall(
+      () => _flutterTts.setSpeechRate(state.config.speechRate),
+      'set speech rate',
+    );
+    await _safeTtsCall(
+      () => _flutterTts.setPitch(state.config.speechPitch),
+      'set speech pitch',
+    );
+    await _selectBestLocalVoice();
+  }
+
+  Future<void> _selectBestLocalVoice() async {
+    if (_activeVoiceLocale == state.config.language) return;
+    try {
+      final rawVoices = await _flutterTts.getVoices;
+      if (rawVoices is! List) return;
+      final voices = rawVoices
+          .whereType<Map>()
+          .map((voice) => voice.map((key, value) => MapEntry('$key', '$value')))
+          .where((voice) => voice['locale'] == state.config.language)
+          .toList();
+      if (voices.isEmpty) return;
+
+      voices.sort((a, b) => _voiceScore(b).compareTo(_voiceScore(a)));
+      await _flutterTts.setVoice(voices.first);
+      _activeVoiceLocale = state.config.language;
+      debugPrint('Haze TTS: selected voice ${voices.first}');
+    } catch (e) {
+      debugPrint('Haze TTS: could not select voice: $e');
+    }
+  }
+
+  int _voiceScore(Map<String, String> voice) {
+    final name = (voice['name'] ?? '').toLowerCase();
+    final quality = (voice['quality'] ?? '').toLowerCase();
+    final networkRequired = (voice['network_required'] ?? '').toLowerCase();
+    var score = 0;
+    if (networkRequired == 'false') score += 20;
+    if (quality.contains('enhanced') || quality.contains('premium')) {
+      score += 12;
+    }
+    if (quality.contains('default')) score += 4;
+    for (final preferred in [
+      'samantha',
+      'ava',
+      'allison',
+      'karen',
+      'daniel',
+      'luciana',
+    ]) {
+      if (name.contains(preferred)) score += 8;
+    }
+    if (name.contains('compact')) score -= 3;
+    return score;
+  }
+
+  Future<void> _safeTtsCall(
+    Future<dynamic> Function() action,
+    String label,
+  ) async {
+    try {
+      await action();
+    } catch (e) {
+      debugPrint('Haze TTS: $label failed: $e');
     }
   }
 
