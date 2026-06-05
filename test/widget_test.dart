@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:haze_bot_app/cubits/robot_face_cubit.dart';
 import 'package:haze_bot_app/i18n/strings.g.dart';
 import 'package:haze_bot_app/main.dart';
+import 'package:haze_bot_app/services/haze_brain.dart';
 import 'package:haze_bot_app/widgets/ai_consent_dialog.dart';
 
 void main() {
@@ -68,5 +69,24 @@ void main() {
 
     expect(resolved, isTrue);
     expect(cubit.state.aiConsent.name, 'declined');
+  });
+
+  testWidgets('personality selection is persisted and restored', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+
+    final firstCubit = RobotFaceCubit();
+    addTearDown(firstCubit.close);
+    await firstCubit.setPersonality(HazePersonality.zen);
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('haze_personality'), 'zen');
+
+    final secondCubit = RobotFaceCubit();
+    addTearDown(secondCubit.close);
+    await tester.pump();
+
+    expect(secondCubit.state.personality, HazePersonality.zen);
   });
 }

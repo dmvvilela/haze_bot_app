@@ -18,6 +18,7 @@ part 'robot_face_cubit.freezed.dart';
 
 class RobotFaceCubit extends Cubit<RobotFaceState> {
   static const _aiConsentKey = 'haze_ai_consent';
+  static const _personalityKey = 'haze_personality';
 
   final FlutterTts _flutterTts = FlutterTts();
   final HazeBrain _brain = HazeBrain();
@@ -32,26 +33,38 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     if (FlutterGemma.hasActiveModel()) {
       emit(state.copyWith(aiConsent: AiConsent.granted));
     }
-    _restoreConsent();
+    _restorePreferences();
   }
 
-  /// Restore the user's explicit AI choice. If an older build already installed
-  /// the model before we persisted consent, treat the active model as granted.
-  Future<void> _restoreConsent() async {
+  /// Restore the user's explicit AI choice and preferred Haze voice. If an
+  /// older build already installed the model before we persisted consent, treat
+  /// the active model as granted.
+  Future<void> _restorePreferences() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final saved = prefs.getString(_aiConsentKey);
-      final restored = switch (saved) {
+      final restoredConsent = switch (saved) {
         'granted' => AiConsent.granted,
         'declined' => AiConsent.declined,
         _ =>
           FlutterGemma.hasActiveModel() ? AiConsent.granted : AiConsent.unknown,
       };
+      final restoredPersonality = _personalityFromName(
+        prefs.getString(_personalityKey),
+      );
       if (!isClosed) {
-        emit(state.copyWith(aiConsent: restored));
+        emit(
+          state.copyWith(
+            aiConsent: restoredConsent,
+            personality: restoredPersonality ?? state.personality,
+          ),
+        );
+        if (restoredPersonality != null) {
+          await _brain.setPersonality(restoredPersonality);
+        }
       }
     } catch (e) {
-      debugPrint('RobotFaceCubit: failed to restore AI consent: $e');
+      debugPrint('RobotFaceCubit: failed to restore preferences: $e');
       if (!isClosed && FlutterGemma.hasActiveModel()) {
         emit(state.copyWith(aiConsent: AiConsent.granted));
       }
@@ -72,9 +85,10 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   /// Switch Haze's voice (playful / sarcastic / sleepy / zen).
-  void setPersonality(HazePersonality personality) {
+  Future<void> setPersonality(HazePersonality personality) async {
     emit(state.copyWith(personality: personality));
-    _brain.setPersonality(personality);
+    await _savePersonality(personality);
+    await _brain.setPersonality(personality);
   }
 
   Future<void> _saveConsent(AiConsent consent) async {
@@ -84,6 +98,23 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     } catch (e) {
       debugPrint('RobotFaceCubit: failed to save AI consent: $e');
     }
+  }
+
+  Future<void> _savePersonality(HazePersonality personality) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_personalityKey, personality.name);
+    } catch (e) {
+      debugPrint('RobotFaceCubit: failed to save personality: $e');
+    }
+  }
+
+  HazePersonality? _personalityFromName(String? name) {
+    if (name == null) return null;
+    for (final personality in HazePersonality.values) {
+      if (personality.name == name) return personality;
+    }
+    return null;
   }
 
   Future<void> _initializeTts() async {
@@ -357,14 +388,18 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   @override
-  Future<void> close() {
-    _flutterTts.stop();
-    _brain.dispose();
+  Future<void> close() async {
+    try {
+      await _flutterTts.stop();
+    } catch (_) {}
+    await _brain.dispose();
     _timerService.dispose();
-    _timerSubscription?.cancel();
-    _timerStatusSubscription?.cancel();
-    _timerCompleteSubscription?.cancel();
-    WakelockPlus.disable();
+    await _timerSubscription?.cancel();
+    await _timerStatusSubscription?.cancel();
+    await _timerCompleteSubscription?.cancel();
+    try {
+      await WakelockPlus.disable();
+    } catch (_) {}
     return super.close();
   }
 }
