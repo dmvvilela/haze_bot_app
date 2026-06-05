@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'dart:math' as math;
@@ -16,6 +17,8 @@ part 'robot_face_state.dart';
 part 'robot_face_cubit.freezed.dart';
 
 class RobotFaceCubit extends Cubit<RobotFaceState> {
+  static const _aiConsentKey = 'haze_ai_consent';
+
   final FlutterTts _flutterTts = FlutterTts();
   final HazeBrain _brain = HazeBrain();
   final TimerService _timerService = TimerService();
@@ -26,28 +29,55 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   RobotFaceCubit() : super(const RobotFaceState()) {
     _initializeTts();
     _initializeTimer();
+    if (FlutterGemma.hasActiveModel()) {
+      emit(state.copyWith(aiConsent: AiConsent.granted));
+    }
     _restoreConsent();
   }
 
-  /// If the model was already downloaded in a previous run, the user has
-  /// clearly consented before — don't ask again. (flutter_gemma persists the
-  /// active model across launches, so this survives restarts without us
-  /// storing anything ourselves.)
-  void _restoreConsent() {
-    if (FlutterGemma.hasActiveModel()) {
-      emit(state.copyWith(aiConsent: AiConsent.granted));
+  /// Restore the user's explicit AI choice. If an older build already installed
+  /// the model before we persisted consent, treat the active model as granted.
+  Future<void> _restoreConsent() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getString(_aiConsentKey);
+      final restored = switch (saved) {
+        'granted' => AiConsent.granted,
+        'declined' => AiConsent.declined,
+        _ =>
+          FlutterGemma.hasActiveModel() ? AiConsent.granted : AiConsent.unknown,
+      };
+      if (!isClosed) {
+        emit(state.copyWith(aiConsent: restored));
+      }
+    } catch (e) {
+      debugPrint('RobotFaceCubit: failed to restore AI consent: $e');
+      if (!isClosed && FlutterGemma.hasActiveModel()) {
+        emit(state.copyWith(aiConsent: AiConsent.granted));
+      }
     }
   }
 
   /// User agreed in the consent dialog: remember it and start the download now.
   Future<void> grantAiConsent() async {
     emit(state.copyWith(aiConsent: AiConsent.granted));
+    await _saveConsent(AiConsent.granted);
     await prepareBrain();
   }
 
   /// User declined: keep Haze on built-in canned lines, never download.
-  void declineAiConsent() {
+  Future<void> declineAiConsent() async {
     emit(state.copyWith(aiConsent: AiConsent.declined));
+    await _saveConsent(AiConsent.declined);
+  }
+
+  Future<void> _saveConsent(AiConsent consent) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_aiConsentKey, consent.name);
+    } catch (e) {
+      debugPrint('RobotFaceCubit: failed to save AI consent: $e');
+    }
   }
 
   Future<void> _initializeTts() async {
@@ -124,7 +154,9 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   void toggleSpeech() {
-    final newConfig = state.config.copyWith(speechEnabled: !state.config.speechEnabled);
+    final newConfig = state.config.copyWith(
+      speechEnabled: !state.config.speechEnabled,
+    );
     emit(state.copyWith(config: newConfig));
   }
 
@@ -147,7 +179,9 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   void toggleTheme() {
-    final newConfig = state.config.copyWith(isDarkTheme: !state.config.isDarkTheme);
+    final newConfig = state.config.copyWith(
+      isDarkTheme: !state.config.isDarkTheme,
+    );
     emit(state.copyWith(config: newConfig));
   }
 

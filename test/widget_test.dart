@@ -1,30 +1,33 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:haze_bot_app/cubits/robot_face_cubit.dart';
+import 'package:haze_bot_app/i18n/strings.g.dart';
 import 'package:haze_bot_app/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const HazeBotApp());
+  testWidgets('Haze app renders main controls', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    LocaleSettings.setLocale(AppLocale.en);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    final cubit = RobotFaceCubit();
+    addTearDown(cubit.close);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          home: BlocProvider.value(
+            value: cubit,
+            child: const RobotFaceScreen(),
+          ),
+        ),
+      ),
+    );
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.byIcon(Icons.smart_toy), findsOneWidget);
+    expect(find.byIcon(Icons.chat_bubble_outline), findsOneWidget);
+    expect(find.byIcon(Icons.timer), findsOneWidget);
   });
 }

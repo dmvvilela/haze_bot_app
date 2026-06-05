@@ -8,7 +8,9 @@ import '../services/haze_brain.dart';
 /// model. Nothing is downloaded until the user taps "Download" here — and Haze
 /// keeps working with built-in replies if they decline.
 class AiConsentDialog extends StatelessWidget {
-  const AiConsentDialog({super.key});
+  final VoidCallback? onResolved;
+
+  const AiConsentDialog({super.key, this.onResolved});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,8 @@ class AiConsentDialog extends StatelessWidget {
       builder: (context, state) {
         final status = state.brainStatus;
         final busy =
-            status == BrainStatus.downloading || status == BrainStatus.preparing;
+            status == BrainStatus.downloading ||
+            status == BrainStatus.preparing;
         final ready = status == BrainStatus.ready;
         final failed = status == BrainStatus.unavailable;
 
@@ -37,12 +40,21 @@ class AiConsentDialog extends StatelessWidget {
                   'Haze can run a small AI model right on your phone so it can '
                   'chat and react with real feelings.\n',
                 ),
-                _bullet(context, Icons.download,
-                    'One-time download of about 550 MB — Wi-Fi recommended.'),
-                _bullet(context, Icons.wifi_off,
-                    'After that it runs fully offline. Nothing you say leaves your phone.'),
-                _bullet(context, Icons.toys,
-                    'Totally optional — Haze still works without it, using built-in replies.'),
+                _bullet(
+                  context,
+                  Icons.download,
+                  'One-time download of about 550 MB — Wi-Fi recommended.',
+                ),
+                _bullet(
+                  context,
+                  Icons.wifi_off,
+                  'After that it runs fully offline. Nothing you say leaves your phone.',
+                ),
+                _bullet(
+                  context,
+                  Icons.toys,
+                  'Totally optional — Haze still works without it, using built-in replies.',
+                ),
               ],
               if (busy) ...[
                 Text(
@@ -52,16 +64,15 @@ class AiConsentDialog extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 LinearProgressIndicator(
-                  value: status == BrainStatus.downloading &&
+                  value:
+                      status == BrainStatus.downloading &&
                           state.downloadProgress > 0
                       ? state.downloadProgress / 100
                       : null,
                 ),
               ],
               if (ready)
-                const Text(
-                  'Haze is awake! 🤖 Tap the chat bubble to talk.',
-                ),
+                const Text('Haze is awake! 🤖 Tap the chat bubble to talk.'),
               if (failed)
                 const Text(
                   "Hmm, that didn't work on this device. Haze will use its "
@@ -90,13 +101,20 @@ class AiConsentDialog extends StatelessWidget {
   }
 
   List<Widget> _actions(
-      BuildContext context, bool busy, bool ready, bool failed) {
+    BuildContext context,
+    bool busy,
+    bool ready,
+    bool failed,
+  ) {
     final cubit = context.read<RobotFaceCubit>();
 
     if (ready || failed) {
       return [
         ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            Navigator.of(context).pop();
+            onResolved?.call();
+          },
           child: const Text('Done'),
         ),
       ];
@@ -111,14 +129,21 @@ class AiConsentDialog extends StatelessWidget {
     }
     return [
       TextButton(
-        onPressed: () {
-          cubit.declineAiConsent();
+        onPressed: () async {
+          await cubit.declineAiConsent();
+          if (!context.mounted) return;
           Navigator.of(context).pop();
+          onResolved?.call();
         },
         child: const Text('Not now'),
       ),
       ElevatedButton.icon(
-        onPressed: () => cubit.grantAiConsent(),
+        onPressed: () async {
+          await cubit.grantAiConsent();
+          if (!context.mounted) return;
+          Navigator.of(context).pop();
+          onResolved?.call();
+        },
         icon: const Icon(Icons.download),
         label: const Text('Download'),
       ),
