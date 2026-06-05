@@ -94,9 +94,9 @@ class _AliveFacePainter extends CustomPainter {
 
     _drawGlow(canvas, size, eyeColor, mouthColor, active, pulse, pressPulse);
     _drawShadow(canvas, size, bodyLift, isDark);
+    _drawAntenna(canvas, size, eyeColor, bodyLift, active, pulse);
+    _drawSidePods(canvas, size, eyeColor, isDark, pulse, bodyLift);
     _drawShell(canvas, size, eyeColor, isDark, bodyLift);
-    _drawAntennaAndTufts(canvas, size, eyeColor, bodyLift, active, pulse);
-    _drawDeviceDetails(canvas, size, eyeColor, isDark, pulse, bodyLift);
     _drawFacePanel(canvas, size, eyeColor, isDark, bodyLift);
     _drawCheeks(canvas, size, mouthColor, pulse, bodyLift);
     _drawEyes(canvas, size, eyeColor, mouthColor, expression, bodyLift);
@@ -154,7 +154,7 @@ class _AliveFacePainter extends CustomPainter {
     );
   }
 
-  void _drawAntennaAndTufts(
+  void _drawAntenna(
     Canvas canvas,
     Size size,
     Color eyeColor,
@@ -162,58 +162,65 @@ class _AliveFacePainter extends CustomPainter {
     bool active,
     double pulse,
   ) {
-    final hairPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round
-      ..color = eyeColor.withValues(alpha: 0.42);
-
-    for (final tuft in [
-      (x: 0.42, angle: -0.28, length: 18.0),
-      (x: 0.48, angle: -0.08, length: 15.0),
-      (x: 0.54, angle: 0.1, length: 15.0),
-      (x: 0.6, angle: 0.32, length: 17.0),
-    ]) {
-      final base = Offset(size.width * tuft.x, size.height * 0.17 + bodyLift);
-      canvas.drawLine(
-        base,
-        base.translate(math.sin(tuft.angle) * tuft.length, -tuft.length),
-        hairPaint,
-      );
-    }
-
-    final base = Offset(size.width * 0.5, size.height * 0.15 + bodyLift);
+    final base = Offset(size.width / 2, size.height * 0.18 + bodyLift);
     final tip = Offset(
-      size.width * 0.5 + math.sin(time * 1.7) * 7,
-      size.height * 0.06 + math.sin(time * 2.1) * 2,
+      size.width / 2 + math.sin(time * 1.7) * 7,
+      size.height * 0.09 + math.sin(time * 2.1) * 2,
     );
     final wirePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.2
       ..strokeCap = StrokeCap.round
-      ..color = eyeColor.withValues(alpha: 0.62);
+      ..color = eyeColor.withValues(alpha: 0.58);
     final path = Path()
       ..moveTo(base.dx, base.dy)
-      ..quadraticBezierTo(
-        size.width * 0.48,
-        size.height * 0.09,
-        tip.dx,
-        tip.dy,
-      );
+      ..quadraticBezierTo(size.width * 0.48, size.height * 0.1, tip.dx, tip.dy);
     canvas.drawPath(path, wirePaint);
 
+    final dotPaint = Paint()
+      ..color = eyeColor.withValues(alpha: active ? 0.95 : 0.58 + pulse * 0.2)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    canvas.drawCircle(tip, active ? 6 + pulse * 2 : 5.5, dotPaint);
     canvas.drawCircle(
       tip,
-      active ? 6 + pulse * 2 : 5.4,
-      Paint()
-        ..color = eyeColor.withValues(alpha: active ? 0.95 : 0.66)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+      3.2,
+      Paint()..color = Colors.white.withValues(alpha: 0.8),
     );
-    canvas.drawCircle(
-      tip.translate(-1, -1),
-      2.7,
-      Paint()..color = Colors.white.withValues(alpha: 0.86),
-    );
+  }
+
+  void _drawSidePods(
+    Canvas canvas,
+    Size size,
+    Color eyeColor,
+    bool isDark,
+    double pulse,
+    double bodyLift,
+  ) {
+    final podPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: isDark
+            ? [const Color(0xFF172333), const Color(0xFF070A10)]
+            : [const Color(0xFFFFFFFF), const Color(0xFFD8E5EA)],
+      ).createShader(Offset.zero & size);
+    final rim = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..color = eyeColor.withValues(alpha: 0.2 + pulse * 0.08);
+
+    for (final side in [-1, 1]) {
+      final rect = Rect.fromCenter(
+        center: Offset(
+          size.width / 2 + side * size.width * 0.36,
+          size.height * 0.48 + bodyLift,
+        ),
+        width: 42,
+        height: 108,
+      );
+      canvas.drawOval(rect, podPaint);
+      canvas.drawOval(rect.deflate(4), rim);
+    }
   }
 
   void _drawShell(
@@ -263,75 +270,40 @@ class _AliveFacePainter extends CustomPainter {
     final h = size.height;
     final y = bodyLift + 12;
     return Path()
-      ..moveTo(w * 0.35, h * 0.15 + y)
+      ..moveTo(w * 0.5, h * 0.15 + y)
       ..cubicTo(
-        w * 0.44,
-        h * 0.11 + y,
-        w * 0.6,
-        h * 0.11 + y,
-        w * 0.69,
-        h * 0.15 + y,
-      )
-      ..cubicTo(
-        w * 0.79,
-        h * 0.19 + y,
+        w * 0.7,
+        h * 0.13 + y,
         w * 0.82,
-        h * 0.34 + y,
-        w * 0.79,
-        h * 0.54 + y,
+        h * 0.24 + y,
+        w * 0.82,
+        h * 0.42 + y,
       )
       ..cubicTo(
-        w * 0.77,
-        h * 0.75 + y,
-        w * 0.66,
+        w * 0.84,
+        h * 0.63 + y,
+        w * 0.75,
+        h * 0.82 + y,
+        w * 0.53,
         h * 0.85 + y,
-        w * 0.5,
-        h * 0.86 + y,
       )
       ..cubicTo(
         w * 0.34,
-        h * 0.85 + y,
-        w * 0.23,
-        h * 0.75 + y,
-        w * 0.21,
-        h * 0.54 + y,
+        h * 0.88 + y,
+        w * 0.2,
+        h * 0.78 + y,
+        w * 0.18,
+        h * 0.6 + y,
       )
       ..cubicTo(
-        w * 0.18,
-        h * 0.34 + y,
-        w * 0.25,
-        h * 0.19 + y,
-        w * 0.35,
+        w * 0.15,
+        h * 0.38 + y,
+        w * 0.23,
+        h * 0.17 + y,
+        w * 0.5,
         h * 0.15 + y,
       )
       ..close();
-  }
-
-  void _drawDeviceDetails(
-    Canvas canvas,
-    Size size,
-    Color eyeColor,
-    bool isDark,
-    double pulse,
-    double bodyLift,
-  ) {
-    final y = bodyLift + 12;
-    final detailPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round
-      ..color = eyeColor.withValues(alpha: isDark ? 0.18 : 0.14);
-    canvas.drawLine(
-      Offset(size.width * 0.34, size.height * 0.78 + y),
-      Offset(size.width * 0.66, size.height * 0.78 + y),
-      detailPaint,
-    );
-
-    final screwPaint = Paint()
-      ..color = eyeColor.withValues(alpha: 0.16 + pulse * 0.04);
-    for (final x in [size.width * 0.31, size.width * 0.69]) {
-      canvas.drawCircle(Offset(x, size.height * 0.7 + y), 3.2, screwPaint);
-    }
   }
 
   void _drawFacePanel(
@@ -341,31 +313,26 @@ class _AliveFacePainter extends CustomPainter {
     bool isDark,
     double bodyLift,
   ) {
-    final panelRect = Rect.fromCenter(
-      center: Offset(size.width / 2, size.height * 0.4 + bodyLift),
-      width: size.width * 0.62,
-      height: size.height * 0.26,
+    final panel = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(size.width / 2, size.height * 0.42 + bodyLift),
+        width: size.width * 0.58,
+        height: size.height * 0.28,
+      ),
+      const Radius.circular(50),
     );
-    final panel = RRect.fromRectAndRadius(panelRect, const Radius.circular(40));
     canvas.drawRRect(
       panel,
       Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: isDark
-              ? [
-                  const Color(0xFF02060B).withValues(alpha: 0.42),
-                  const Color(0xFF071827).withValues(alpha: 0.16),
-                  const Color(0xFF071827).withValues(alpha: 0.02),
-                ]
-              : [
-                  Colors.white.withValues(alpha: 0.34),
-                  const Color(0xFFEAF9FF).withValues(alpha: 0.1),
-                  const Color(0xFFEAF9FF).withValues(alpha: 0.02),
-                ],
-        ).createShader(panelRect)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+        ..color = (isDark ? const Color(0xFF05070A) : const Color(0xFFF8FCFF))
+            .withValues(alpha: 0.78),
+    );
+    canvas.drawRRect(
+      panel,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.4
+        ..color = eyeColor.withValues(alpha: 0.2),
     );
   }
 
@@ -381,17 +348,17 @@ class _AliveFacePainter extends CustomPainter {
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(size.width * 0.34, size.height * 0.51 + bodyLift),
-        width: 28,
-        height: 10,
+        center: Offset(size.width * 0.29, size.height * 0.51 + bodyLift),
+        width: 32,
+        height: 12,
       ),
       cheekPaint,
     );
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(size.width * 0.66, size.height * 0.51 + bodyLift),
-        width: 28,
-        height: 10,
+        center: Offset(size.width * 0.71, size.height * 0.51 + bodyLift),
+        width: 32,
+        height: 12,
       ),
       cheekPaint,
     );
@@ -547,7 +514,7 @@ class _AliveFacePainter extends CustomPainter {
     RobotExpression expression,
     double bodyLift,
   ) {
-    final y = size.height * 0.3 + bodyLift;
+    final y = size.height * 0.29 + bodyLift;
     final leftAngle = switch (expression) {
       RobotExpression.angry => -0.55,
       RobotExpression.confused => 0.35,
@@ -572,10 +539,10 @@ class _AliveFacePainter extends CustomPainter {
     canvas.translate(center.dx, center.dy);
     canvas.rotate(angle);
     final paint = Paint()
-      ..color = color.withValues(alpha: 0.42)
-      ..strokeWidth = 4
+      ..color = color.withValues(alpha: 0.62)
+      ..strokeWidth = 5
       ..strokeCap = StrokeCap.round;
-    canvas.drawLine(const Offset(-17, 0), const Offset(17, 0), paint);
+    canvas.drawLine(const Offset(-21, 0), const Offset(21, 0), paint);
     canvas.restore();
   }
 
