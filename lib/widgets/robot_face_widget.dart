@@ -24,30 +24,34 @@ class RobotFaceWidget extends StatelessWidget {
             curve: Curves.easeOut,
             scale: state.isPressed ? 1.05 : 1.0,
             child: Container(
-              width: isV2 ? 330 : 300,
-              height: isV2 ? 430 : 400,
-              decoration: BoxDecoration(
-                color: state.config.isDarkTheme
-                    ? Colors.grey[900]
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(isV2 ? 48 : 40),
-                boxShadow: [
-                  if (state.isPressed)
-                    BoxShadow(
-                      color: state.config.eyeColor.withValues(alpha: 0.16),
-                      blurRadius: isV2 ? 28 : 10,
-                      spreadRadius: isV2 ? 5 : 2,
+              width: isV2 ? 360 : 300,
+              height: isV2 ? 440 : 400,
+              decoration: isV2
+                  ? null
+                  : BoxDecoration(
+                      color: state.config.isDarkTheme
+                          ? Colors.grey[900]
+                          : Colors.white,
+                      borderRadius: BorderRadius.circular(40),
+                      boxShadow: [
+                        if (state.isPressed)
+                          BoxShadow(
+                            color: state.config.eyeColor.withValues(
+                              alpha: 0.16,
+                            ),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        BoxShadow(
+                          color: state.config.isDarkTheme
+                              ? Colors.black.withValues(alpha: 0.5)
+                              : Colors.grey.withValues(alpha: 0.2),
+                          blurRadius: 15,
+                          spreadRadius: 1,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                  BoxShadow(
-                    color: state.config.isDarkTheme
-                        ? Colors.black.withValues(alpha: 0.5)
-                        : Colors.grey.withValues(alpha: 0.2),
-                    blurRadius: isV2 ? 22 : 15,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
               child: _buildFaceType(state.config.faceType, state),
             ),
           ),
