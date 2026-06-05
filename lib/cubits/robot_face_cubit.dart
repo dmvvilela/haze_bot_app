@@ -57,7 +57,9 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       final saved = prefs.getString(_aiConsentKey);
       final restoredConsent = switch (saved) {
         'granted' => AiConsent.granted,
-        'declined' => AiConsent.declined,
+        // "Not now" is a temporary choice. Older builds persisted it as
+        // declined, so normalize that back to unknown and let the user retry.
+        'declined' => AiConsent.unknown,
         _ =>
           FlutterGemma.hasActiveModel() ? AiConsent.granted : AiConsent.unknown,
       };
@@ -97,8 +99,8 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
 
   /// User declined: keep Haze on built-in canned lines, never download.
   Future<void> declineAiConsent() async {
-    emit(state.copyWith(aiConsent: AiConsent.declined));
-    await _saveConsent(AiConsent.declined);
+    emit(state.copyWith(aiConsent: AiConsent.unknown));
+    await _saveConsent(AiConsent.unknown);
   }
 
   /// Switch Haze's voice (playful / sarcastic / sleepy / zen).
@@ -118,7 +120,11 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   Future<void> _saveConsent(AiConsent consent) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_aiConsentKey, consent.name);
+      if (consent == AiConsent.unknown) {
+        await prefs.remove(_aiConsentKey);
+      } else {
+        await prefs.setString(_aiConsentKey, consent.name);
+      }
     } catch (e) {
       debugPrint('RobotFaceCubit: failed to save AI consent: $e');
     }

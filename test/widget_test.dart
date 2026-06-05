@@ -84,7 +84,7 @@ void main() {
     cubit.stopTimer();
   });
 
-  testWidgets('declining AI consent still resolves pending action', (
+  testWidgets('skipping AI consent still resolves and can ask later', (
     WidgetTester tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -119,7 +119,22 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(resolved, isTrue);
-    expect(cubit.state.aiConsent.name, 'declined');
+    expect(cubit.state.aiConsent, AiConsent.unknown);
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('haze_ai_consent'), isNull);
+  });
+
+  testWidgets('old declined consent does not block future brain prompts', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'haze_ai_consent': 'declined'});
+
+    final cubit = RobotFaceCubit();
+    addTearDown(cubit.close);
+    await tester.pump();
+
+    expect(cubit.state.aiConsent, AiConsent.unknown);
   });
 
   testWidgets('personality selection is persisted and restored', (
