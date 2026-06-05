@@ -102,14 +102,7 @@ class _AliveFacePainter extends CustomPainter {
     _drawEyes(canvas, size, eyeColor, mouthColor, expression, bodyLift);
     _drawBrows(canvas, size, eyeColor, expression, bodyLift);
     _drawMouth(canvas, size, mouthColor, expression, bodyLift);
-    _drawExpressionAccents(
-      canvas,
-      size,
-      eyeColor,
-      mouthColor,
-      expression,
-      bodyLift,
-    );
+    _drawExpressionAccents(canvas, size, eyeColor, mouthColor, expression);
   }
 
   void _drawGlow(
@@ -704,7 +697,6 @@ class _AliveFacePainter extends CustomPainter {
     Color eyeColor,
     Color mouthColor,
     RobotExpression expression,
-    double bodyLift,
   ) {
     switch (expression) {
       case RobotExpression.sleepy:
@@ -712,7 +704,7 @@ class _AliveFacePainter extends CustomPainter {
         break;
       case RobotExpression.excited:
       case RobotExpression.surprised:
-        _drawSparkTufts(canvas, size, eyeColor, bodyLift);
+        _drawSignalMarks(canvas, size, eyeColor);
         break;
       case RobotExpression.love:
         _drawHeart(
@@ -747,30 +739,22 @@ class _AliveFacePainter extends CustomPainter {
     }
   }
 
-  void _drawSparkTufts(Canvas canvas, Size size, Color color, double bodyLift) {
+  void _drawSignalMarks(Canvas canvas, Size size, Color color) {
     final paint = Paint()
-      ..color = color.withValues(alpha: 0.34 + energy * 0.08)
-      ..strokeWidth = 2.6
+      ..color = color.withValues(alpha: 0.42)
+      ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;
-
-    final tufts = [
-      (baseX: 0.36, lean: -0.7, length: 18.0),
-      (baseX: 0.42, lean: -0.35, length: 16.0),
-      (baseX: 0.58, lean: 0.32, length: 16.0),
-      (baseX: 0.65, lean: 0.72, length: 18.0),
-    ];
-    for (var i = 0; i < tufts.length; i++) {
-      final tuft = tufts[i];
-      final wiggle = math.sin(time * 5 + i) * 2.5;
-      final base = Offset(
-        size.width * tuft.baseX,
-        size.height * 0.17 + bodyLift,
+    for (var i = 0; i < 4; i++) {
+      final angle = -math.pi / 2 + (i - 1.5) * 0.28;
+      final start = Offset(
+        size.width / 2 + math.cos(angle) * 84,
+        size.height * 0.25 + math.sin(angle) * 32,
       );
-      final end = base.translate(
-        tuft.lean * 12 + wiggle,
-        -tuft.length - math.cos(time * 4 + i) * 2,
+      final end = Offset(
+        size.width / 2 + math.cos(angle) * (98 + math.sin(time * 4 + i) * 3),
+        size.height * 0.25 + math.sin(angle) * 42,
       );
-      canvas.drawLine(base, end, paint);
+      canvas.drawLine(start, end, paint);
     }
   }
 
