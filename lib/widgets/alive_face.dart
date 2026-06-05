@@ -94,9 +94,8 @@ class _AliveFacePainter extends CustomPainter {
 
     _drawGlow(canvas, size, eyeColor, mouthColor, active, pulse, pressPulse);
     _drawShadow(canvas, size, bodyLift, isDark);
-    _drawAntenna(canvas, size, eyeColor, bodyLift, active, pulse);
     _drawShell(canvas, size, eyeColor, isDark, bodyLift);
-    _drawSideSeams(canvas, size, eyeColor, pulse, bodyLift);
+    _drawStatusGem(canvas, size, eyeColor, bodyLift, active, pulse);
     _drawFacePanel(canvas, size, eyeColor, isDark, bodyLift);
     _drawCheeks(canvas, size, mouthColor, pulse, bodyLift);
     _drawEyes(canvas, size, eyeColor, mouthColor, expression, bodyLift);
@@ -154,7 +153,7 @@ class _AliveFacePainter extends CustomPainter {
     );
   }
 
-  void _drawAntenna(
+  void _drawStatusGem(
     Canvas canvas,
     Size size,
     Color eyeColor,
@@ -162,60 +161,27 @@ class _AliveFacePainter extends CustomPainter {
     bool active,
     double pulse,
   ) {
-    final base = Offset(size.width / 2, size.height * 0.18 + bodyLift);
-    final tip = Offset(
-      size.width / 2 + math.sin(time * 1.7) * 7,
-      size.height * 0.09 + math.sin(time * 2.1) * 2,
+    final center = Offset(size.width / 2, size.height * 0.18 + bodyLift);
+    final slot = RRect.fromRectAndRadius(
+      Rect.fromCenter(center: center, width: 42, height: 12),
+      const Radius.circular(8),
     );
-    final wirePaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.2
-      ..strokeCap = StrokeCap.round
-      ..color = eyeColor.withValues(alpha: 0.58);
-    final path = Path()
-      ..moveTo(base.dx, base.dy)
-      ..quadraticBezierTo(size.width * 0.48, size.height * 0.1, tip.dx, tip.dy);
-    canvas.drawPath(path, wirePaint);
-
-    final dotPaint = Paint()
-      ..color = eyeColor.withValues(alpha: active ? 0.95 : 0.58 + pulse * 0.2)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
-    canvas.drawCircle(tip, active ? 6 + pulse * 2 : 5.5, dotPaint);
+    canvas.drawRRect(
+      slot,
+      Paint()..color = const Color(0xFF03080D).withValues(alpha: 0.34),
+    );
     canvas.drawCircle(
-      tip,
-      3.2,
-      Paint()..color = Colors.white.withValues(alpha: 0.8),
+      center.translate(math.sin(time * 1.6) * 3, 0),
+      active ? 5.6 + pulse * 1.4 : 4.8,
+      Paint()
+        ..color = eyeColor.withValues(alpha: active ? 0.95 : 0.62)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
     );
-  }
-
-  void _drawSideSeams(
-    Canvas canvas,
-    Size size,
-    Color eyeColor,
-    double pulse,
-    double bodyLift,
-  ) {
-    final seamPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.4
-      ..strokeCap = StrokeCap.round
-      ..color = eyeColor.withValues(alpha: 0.16 + pulse * 0.06)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.8);
-
-    for (final side in [-1, 1]) {
-      final x = side == -1 ? size.width * 0.22 : size.width * 0.78;
-      final path = Path()
-        ..moveTo(x, size.height * 0.38 + bodyLift)
-        ..cubicTo(
-          x + side * 10,
-          size.height * 0.48 + bodyLift,
-          x + side * 6,
-          size.height * 0.58 + bodyLift,
-          x,
-          size.height * 0.66 + bodyLift,
-        );
-      canvas.drawPath(path, seamPaint);
-    }
+    canvas.drawCircle(
+      center.translate(math.sin(time * 1.6) * 3 - 1, -1),
+      2,
+      Paint()..color = Colors.white.withValues(alpha: 0.86),
+    );
   }
 
   void _drawShell(
@@ -310,66 +276,26 @@ class _AliveFacePainter extends CustomPainter {
   ) {
     final panelRect = Rect.fromCenter(
       center: Offset(size.width / 2, size.height * 0.42 + bodyLift),
-      width: size.width * 0.56,
-      height: size.height * 0.26,
+      width: size.width * 0.64,
+      height: size.height * 0.34,
     );
-    final visorPath = Path()
-      ..moveTo(panelRect.left + 26, panelRect.top + 6)
-      ..cubicTo(
-        panelRect.left + 12,
-        panelRect.top + 34,
-        panelRect.left + 16,
-        panelRect.bottom - 22,
-        panelRect.left + 40,
-        panelRect.bottom - 8,
-      )
-      ..quadraticBezierTo(
-        panelRect.center.dx,
-        panelRect.bottom + 8,
-        panelRect.right - 40,
-        panelRect.bottom - 8,
-      )
-      ..cubicTo(
-        panelRect.right - 16,
-        panelRect.bottom - 22,
-        panelRect.right - 12,
-        panelRect.top + 34,
-        panelRect.right - 26,
-        panelRect.top + 6,
-      )
-      ..quadraticBezierTo(
-        panelRect.center.dx,
-        panelRect.top - 8,
-        panelRect.left + 26,
-        panelRect.top + 6,
-      )
-      ..close();
-
-    canvas.drawPath(
-      visorPath,
+    canvas.drawOval(
+      panelRect,
       Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+        ..shader = RadialGradient(
           colors: isDark
               ? [
-                  const Color(0xFF03070C).withValues(alpha: 0.74),
-                  const Color(0xFF081623).withValues(alpha: 0.28),
-                  const Color(0xFF061018).withValues(alpha: 0.06),
+                  const Color(0xFF02060B).withValues(alpha: 0.58),
+                  const Color(0xFF071827).withValues(alpha: 0.2),
+                  Colors.transparent,
                 ]
               : [
-                  const Color(0xFFFFFFFF).withValues(alpha: 0.38),
-                  const Color(0xFFEAF9FF).withValues(alpha: 0.2),
-                  const Color(0xFFEAF9FF).withValues(alpha: 0.04),
+                  Colors.white.withValues(alpha: 0.34),
+                  const Color(0xFFEAF9FF).withValues(alpha: 0.1),
+                  Colors.transparent,
                 ],
-        ).createShader(panelRect),
-    );
-    canvas.drawPath(
-      visorPath.shift(const Offset(0, -1)),
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2
-        ..color = eyeColor.withValues(alpha: 0.1),
+        ).createShader(panelRect)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
     );
   }
 
@@ -385,17 +311,17 @@ class _AliveFacePainter extends CustomPainter {
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(size.width * 0.29, size.height * 0.51 + bodyLift),
-        width: 32,
-        height: 12,
+        center: Offset(size.width * 0.34, size.height * 0.51 + bodyLift),
+        width: 28,
+        height: 10,
       ),
       cheekPaint,
     );
     canvas.drawOval(
       Rect.fromCenter(
-        center: Offset(size.width * 0.71, size.height * 0.51 + bodyLift),
-        width: 32,
-        height: 12,
+        center: Offset(size.width * 0.66, size.height * 0.51 + bodyLift),
+        width: 28,
+        height: 10,
       ),
       cheekPaint,
     );
@@ -551,7 +477,7 @@ class _AliveFacePainter extends CustomPainter {
     RobotExpression expression,
     double bodyLift,
   ) {
-    final y = size.height * 0.29 + bodyLift;
+    final y = size.height * 0.3 + bodyLift;
     final leftAngle = switch (expression) {
       RobotExpression.angry => -0.55,
       RobotExpression.confused => 0.35,
@@ -576,10 +502,10 @@ class _AliveFacePainter extends CustomPainter {
     canvas.translate(center.dx, center.dy);
     canvas.rotate(angle);
     final paint = Paint()
-      ..color = color.withValues(alpha: 0.62)
-      ..strokeWidth = 5
+      ..color = color.withValues(alpha: 0.42)
+      ..strokeWidth = 4
       ..strokeCap = StrokeCap.round;
-    canvas.drawLine(const Offset(-21, 0), const Offset(21, 0), paint);
+    canvas.drawLine(const Offset(-17, 0), const Offset(17, 0), paint);
     canvas.restore();
   }
 
