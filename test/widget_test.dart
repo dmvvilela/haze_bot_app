@@ -52,6 +52,17 @@ void main() {
     expect(find.byIcon(Icons.smart_toy), findsOneWidget);
     expect(find.byIcon(Icons.chat_bubble_outline), findsOneWidget);
     expect(find.byIcon(Icons.timer), findsOneWidget);
+    expect(find.text('V1'), findsOneWidget);
+    expect(find.text('V2'), findsOneWidget);
+
+    await tester.tap(find.text('V2'));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(cubit.state.config.faceType, FaceType.hazeV2);
+    expect(find.bySemanticsLabel('Haze V2 face'), findsOneWidget);
+
+    await tester.tap(find.text('V1'));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(cubit.state.config.faceType, FaceType.classic);
 
     await tester.tap(find.byIcon(Icons.settings));
     await tester.pumpAndSettle();

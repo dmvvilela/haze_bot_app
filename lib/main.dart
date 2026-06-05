@@ -13,6 +13,7 @@ import 'widgets/timer_dialog.dart';
 import 'widgets/talk_dialog.dart';
 import 'widgets/ai_consent_dialog.dart';
 import 'services/haze_brain.dart';
+import 'models/robot_config.dart';
 import 'i18n/strings.g.dart';
 
 void main() async {
@@ -228,6 +229,15 @@ class RobotFaceScreen extends StatelessWidget {
                       child: Container(color: Colors.transparent),
                     ),
                   ),
+                if (state.showControls)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: (state.timerSeconds > 0 || state.isTimerRunning)
+                        ? 96
+                        : 28,
+                    child: _BotVersionSwitch(state: state),
+                  ),
                 if (state.timerSeconds > 0 || state.isTimerRunning)
                   Positioned(
                     left: 20,
@@ -310,6 +320,58 @@ class RobotFaceScreen extends StatelessWidget {
     } else {
       action();
     }
+  }
+}
+
+class _BotVersionSwitch extends StatelessWidget {
+  final RobotFaceState state;
+
+  const _BotVersionSwitch({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final selected = state.config.faceType == FaceType.hazeV2
+        ? FaceType.hazeV2
+        : FaceType.classic;
+
+    return Center(
+      child: Material(
+        elevation: 8,
+        color: colors.surface.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(24),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: SegmentedButton<FaceType>(
+            showSelectedIcon: false,
+            selected: {selected},
+            style: ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 12),
+              ),
+            ),
+            segments: const [
+              ButtonSegment<FaceType>(
+                value: FaceType.classic,
+                icon: Icon(Icons.smart_toy_outlined, size: 18),
+                label: Text('V1'),
+              ),
+              ButtonSegment<FaceType>(
+                value: FaceType.hazeV2,
+                icon: Icon(Icons.auto_awesome, size: 18),
+                label: Text('V2'),
+              ),
+            ],
+            onSelectionChanged: (selection) {
+              final next = selection.first;
+              context.read<RobotFaceCubit>().updateFaceType(next);
+            },
+          ),
+        ),
+      ),
+    );
   }
 }
 

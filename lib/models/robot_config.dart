@@ -33,7 +33,7 @@ enum RobotExpression {
   winking,
 }
 
-enum FaceType { classic, looi, minimal, bean }
+enum FaceType { classic, looi, minimal, bean, hazeV2 }
 
 // Custom color converter for Freezed
 class ColorConverter implements JsonConverter<Color, int> {
@@ -102,6 +102,8 @@ extension FaceTypeExtension on FaceType {
         return 'Minimal';
       case FaceType.bean:
         return 'Bean Face';
+      case FaceType.hazeV2:
+        return 'Haze V2';
     }
   }
 
@@ -115,6 +117,8 @@ extension FaceTypeExtension on FaceType {
         return 'Simple and clean design';
       case FaceType.bean:
         return 'Fall Guys inspired vertical bean eyes';
+      case FaceType.hazeV2:
+        return 'More alive, reactive, and animated';
     }
   }
 }

@@ -58,4 +58,5 @@ const _$FaceTypeEnumMap = {
   FaceType.looi: 'looi',
   FaceType.minimal: 'minimal',
   FaceType.bean: 'bean',
+  FaceType.hazeV2: 'hazeV2',
 };

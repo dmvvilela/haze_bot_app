@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubits/robot_face_cubit.dart';
 import '../models/robot_config.dart';
+import 'alive_face.dart';
 import 'classic_face.dart';
 import 'looi_face.dart';
 import 'minimal_face.dart';
@@ -15,26 +16,33 @@ class RobotFaceWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<RobotFaceCubit, RobotFaceState>(
       builder: (context, state) {
+        final isV2 = state.config.faceType == FaceType.hazeV2;
         return GestureDetector(
           onTap: () => context.read<RobotFaceCubit>().onTap(),
-          child: AnimatedContainer(
+          child: AnimatedScale(
             duration: const Duration(milliseconds: 150),
             curve: Curves.easeOut,
-            transform: Matrix4.identity()..scale(state.isPressed ? 1.05 : 1.0),
+            scale: state.isPressed ? 1.05 : 1.0,
             child: Container(
-              width: 300,
-              height: 400,
+              width: isV2 ? 330 : 300,
+              height: isV2 ? 430 : 400,
               decoration: BoxDecoration(
-                color: state.config.isDarkTheme ? Colors.grey[900] : Colors.white,
-                borderRadius: BorderRadius.circular(40),
+                color: state.config.isDarkTheme
+                    ? Colors.grey[900]
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(isV2 ? 48 : 40),
                 boxShadow: [
-                  // Subtle glow when pressed (dark mode only)
-                  if (state.isPressed && state.config.isDarkTheme)
-                    BoxShadow(color: Colors.white.withOpacity(0.1), blurRadius: 10, spreadRadius: 2),
-                  // Normal shadow for depth
+                  if (state.isPressed)
+                    BoxShadow(
+                      color: state.config.eyeColor.withValues(alpha: 0.16),
+                      blurRadius: isV2 ? 28 : 10,
+                      spreadRadius: isV2 ? 5 : 2,
+                    ),
                   BoxShadow(
-                    color: state.config.isDarkTheme ? Colors.black.withOpacity(0.5) : Colors.grey.withOpacity(0.2),
-                    blurRadius: 15,
+                    color: state.config.isDarkTheme
+                        ? Colors.black.withValues(alpha: 0.5)
+                        : Colors.grey.withValues(alpha: 0.2),
+                    blurRadius: isV2 ? 22 : 15,
                     spreadRadius: 1,
                     offset: const Offset(0, 8),
                   ),
@@ -58,6 +66,8 @@ class RobotFaceWidget extends StatelessWidget {
         return MinimalFace(state: state);
       case FaceType.bean:
         return BeanFace(state: state);
+      case FaceType.hazeV2:
+        return AliveFace(state: state);
     }
   }
 }
