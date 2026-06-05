@@ -15,5 +15,6 @@ class RobotFaceState with _$RobotFaceState {
     @Default(BrainStatus.idle) BrainStatus brainStatus,
     @Default(0) int downloadProgress,
     @Default(AiConsent.unknown) AiConsent aiConsent,
+    @Default(HazePersonality.playful) HazePersonality personality,
   }) = _RobotFaceState;
 }

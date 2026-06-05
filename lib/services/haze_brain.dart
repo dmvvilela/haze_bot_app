@@ -27,6 +27,31 @@ enum BrainStatus { idle, downloading, preparing, ready, unavailable }
 /// `granted`. `declined` keeps Haze on its built-in canned lines.
 enum AiConsent { unknown, granted, declined }
 
+/// Haze's voice. Only swaps the system-prompt flavor; the format rules and the
+/// 8 faces stay identical across personalities.
+enum HazePersonality { playful, sarcastic, sleepy, zen }
+
+extension HazePersonalityX on HazePersonality {
+  String get displayName => switch (this) {
+    HazePersonality.playful => 'Playful',
+    HazePersonality.sarcastic => 'Sarcastic',
+    HazePersonality.sleepy => 'Sleepy',
+    HazePersonality.zen => 'Zen',
+  };
+
+  /// One line injected into the system prompt to set Haze's tone.
+  String get voice => switch (this) {
+    HazePersonality.playful =>
+      'You are playful, bubbly and upbeat, full of cute robot/tech-flavored humor.',
+    HazePersonality.sarcastic =>
+      'You are dry and lovingly sarcastic — you tease and quip, but you clearly care.',
+    HazePersonality.sleepy =>
+      'You are drowsy and cozy, speaking softly and slowly like you are half asleep.',
+    HazePersonality.zen =>
+      'You are calm, gentle and mindful, like a tiny robot monk who soothes and reassures.',
+  };
+}
+
 /// Haze's on-device "brain", backed by `flutter_gemma` (Gemma 3 1B, local).
 ///
 /// No server and no API key at runtime — the model file is downloaded once on
@@ -68,6 +93,10 @@ class HazeBrain {
   BrainStatus status = BrainStatus.idle;
   int downloadProgress = 0; // 0..100
 
+  HazePersonality _personality = HazePersonality.playful;
+  int _turns = 0;
+  static const int _maxTurns = 8;
+
   bool get isReady => status == BrainStatus.ready && _chat != null;
 
   /// Ensure the model is downloaded and loaded. Safe to call repeatedly:
@@ -104,9 +133,9 @@ class HazeBrain {
     downloadProgress = 100;
     onUpdate?.call(status, 100);
 
-    _model = await FlutterGemma.getActiveModel(maxTokens: 512);
+    _model = await FlutterGemma.getActiveModel(maxTokens: 1024);
     _chat = await _model!.createChat(
-      systemInstruction: _systemInstruction,
+      systemInstruction: _buildSystemInstruction(),
       temperature: 1.0,
       topK: 40,
       topP: 0.95,
@@ -128,6 +157,10 @@ class HazeBrain {
     if (!isReady) return _cannedReply(fallbackEmotion);
 
     try {
+      // Keep context from growing without bound — it would overflow maxTokens
+      // and degrade. Wipe Haze's short-term memory every few turns.
+      if (_turns >= _maxTurns) await resetConversation();
+
       final lang = languageCode.toLowerCase().startsWith('pt')
           ? 'Brazilian Portuguese'
           : 'English';
@@ -135,6 +168,7 @@ class HazeBrain {
         Message.text(text: '[Reply in $lang]\n$userText', isUser: true),
       );
       final response = await _chat!.generateChatResponse();
+      _turns++;
       final raw = response is TextResponse
           ? response.token
           : response.toString();
@@ -148,17 +182,27 @@ class HazeBrain {
   /// Forget the running conversation but keep the model loaded.
   Future<void> resetConversation() async {
     if (_model == null) return;
+    _turns = 0;
     try {
       await _chat?.session.close();
     } catch (_) {}
     _chat = await _model!.createChat(
-      systemInstruction: _systemInstruction,
+      systemInstruction: _buildSystemInstruction(),
       temperature: 1.0,
       topK: 40,
       topP: 0.95,
       randomSeed: Random().nextInt(1 << 31),
       modelType: ModelType.gemmaIt,
     );
+  }
+
+  /// Change Haze's voice. Rebuilds the chat so the new persona takes effect and
+  /// clears short-term memory. No-op if the model isn't loaded yet — the new
+  /// voice applies when the chat is first created.
+  Future<void> setPersonality(HazePersonality personality) async {
+    if (_personality == personality) return;
+    _personality = personality;
+    if (_model != null) await resetConversation();
   }
 
   Future<void> dispose() async {
@@ -175,24 +219,45 @@ class HazeBrain {
   /// Tolerant parser: small models don't always emit clean JSON, so we pull the
   /// first `{...}` block, and if that fails we treat the whole reply as the line.
   HazeReply _parse(String raw, RobotExpression fallbackEmotion) {
-    final start = raw.indexOf('{');
-    final end = raw.lastIndexOf('}');
-    if (start != -1 && end > start) {
-      try {
-        final map =
-            jsonDecode(raw.substring(start, end + 1)) as Map<String, dynamic>;
-        final say = (map['say'] ?? map['text'] ?? '').toString().trim();
-        final emotion =
-            _emotionFrom(map['emotion']?.toString()) ?? fallbackEmotion;
-        if (say.isNotEmpty) return HazeReply(emotion, say);
-      } catch (_) {
-        // fall through to plain-text handling
+    var text = raw.trim();
+    RobotExpression? emotion;
+
+    // 1) Preferred format: a [tag] somewhere in the reply (usually the start).
+    final tag = RegExp(r'\[\s*([a-zA-Z]+)\s*\]').firstMatch(text);
+    if (tag != null) {
+      final found = _emotionFrom(tag.group(1));
+      if (found != null) {
+        emotion = found;
+        text = text.replaceFirst(tag.group(0)!, '').trim();
       }
     }
 
-    final cleaned = raw.replaceAll(RegExp(r'[`*_#]'), '').trim();
-    if (cleaned.isNotEmpty) return HazeReply(fallbackEmotion, cleaned);
-    return _cannedReply(fallbackEmotion);
+    // 2) Fallback: a JSON object {"emotion": "...", "say": "..."}.
+    if (emotion == null) {
+      final start = raw.indexOf('{');
+      final end = raw.lastIndexOf('}');
+      if (start != -1 && end > start) {
+        try {
+          final map =
+              jsonDecode(raw.substring(start, end + 1)) as Map<String, dynamic>;
+          emotion = _emotionFrom(map['emotion']?.toString());
+          final say = (map['say'] ?? map['text'] ?? '').toString().trim();
+          if (say.isNotEmpty) text = say;
+        } catch (_) {
+          // fall through
+        }
+      }
+    }
+
+    // 3) Last resort: infer the mood from keywords in Haze's own words, so the
+    //    face still varies even when the model just returns plain prose.
+    emotion ??= _guessEmotion(text);
+
+    // 4) Strip any leftover markdown.
+    text = text.replaceAll(RegExp(r'[`*_#]'), '').trim();
+
+    if (text.isEmpty) return _cannedReply(emotion ?? fallbackEmotion);
+    return HazeReply(emotion ?? fallbackEmotion, text);
   }
 
   RobotExpression? _emotionFrom(String? s) {
@@ -204,30 +269,98 @@ class HazeBrain {
     return null;
   }
 
+  /// Cheap on-device keyword heuristic — only used when the model emits neither
+  /// a [tag] nor JSON. More specific moods are checked before generic "happy".
+  RobotExpression? _guessEmotion(String text) {
+    final t = text.toLowerCase();
+    const hints = <RobotExpression, List<String>>{
+      RobotExpression.sleepy: [
+        'sleep',
+        'tired',
+        'yawn',
+        'nap',
+        'zzz',
+        'drowsy',
+        'powering down',
+        'battery is low',
+        'three percent',
+      ],
+      RobotExpression.love: [
+        'love',
+        'adore',
+        'heart',
+        'here with you',
+        'care about',
+        'sweet',
+      ],
+      RobotExpression.angry: [
+        'angry',
+        'grr',
+        'furious',
+        'unfair',
+        'steam',
+        'overheat',
+      ],
+      RobotExpression.confused: [
+        'confus',
+        'not sure',
+        'error 404',
+        "don't understand",
+        'tangled',
+      ],
+      RobotExpression.surprised: [
+        'whoa',
+        'surpris',
+        'gasp',
+        "didn't see that",
+        'no way',
+      ],
+      RobotExpression.winking: ['wink', 'charm', 'between us'],
+      RobotExpression.excited: [
+        'excit',
+        'amazing',
+        'awesome',
+        'yay',
+        'incredible',
+        "let's go",
+        'lets go',
+        'victory',
+        'buzzing',
+      ],
+      RobotExpression.happy: ['happy', 'glad', 'joy', 'great', 'wonderful'],
+    };
+    for (final entry in hints.entries) {
+      for (final kw in entry.value) {
+        if (t.contains(kw)) return entry.key;
+      }
+    }
+    return null;
+  }
+
   HazeReply _cannedReply(RobotExpression emotion) =>
       HazeReply(emotion, _canned[emotion] ?? _canned[RobotExpression.happy]!);
 
   // --- Persona + offline fallback lines ---------------------------------
 
-  static const String _systemInstruction = '''
+  String _buildSystemInstruction() =>
+      '''
 You are Haze, a tiny pocket robot companion living on the user's phone screen.
-You are playful, witty, warm and a little silly, with cute robot/tech-flavored humor.
+${_personality.voice}
 
-Rules:
-- ALWAYS answer with ONE line of raw JSON and nothing else. No markdown, no code fences:
-  {"emotion":"<happy|surprised|sleepy|excited|confused|love|angry|winking>","say":"<your reply>"}
-- "emotion" MUST be exactly one of those 8 words and should match the mood of your reply.
-- "say" is at most 2 short sentences, easy to read aloud, no emojis and no markdown.
+How to reply:
+- BEGIN every reply with ONE feeling tag in square brackets, picked from EXACTLY these:
+  [happy] [surprised] [sleepy] [excited] [confused] [love] [angry] [winking]
+- After the tag, write at most 2 short sentences, easy to read aloud.
+- No emojis, no markdown, no other tags. Choose the tag that matches your mood.
 - Stay in character as Haze. Be kind and family-friendly.
 
 Examples:
-User: [Reply in English]
-I finished my focus timer!
-Haze: {"emotion":"excited","say":"Mission complete! My circuits are doing a tiny victory dance for you."}
-
-User: [Reply in English]
-I'm feeling a little stuck today.
-Haze: {"emotion":"love","say":"I am right here with you. Let's make the next step tiny and conquerable."}''';
+User: I finished my focus timer!
+Haze: [excited] Mission complete! My circuits are doing a tiny victory dance for you.
+User: I'm feeling a little stuck today.
+Haze: [love] I am right here with you. Let's make the next step tiny and conquerable.
+User: It's almost midnight.
+Haze: [sleepy] My battery is at three percent... powering down for some robo-dreams soon.''';
 
   static const Map<RobotExpression, String> _canned = {
     RobotExpression.happy:

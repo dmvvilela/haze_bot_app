@@ -29,6 +29,7 @@ mixin _$RobotFaceState {
   BrainStatus get brainStatus => throw _privateConstructorUsedError;
   int get downloadProgress => throw _privateConstructorUsedError;
   AiConsent get aiConsent => throw _privateConstructorUsedError;
+  HazePersonality get personality => throw _privateConstructorUsedError;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
@@ -57,6 +58,7 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     BrainStatus brainStatus,
     int downloadProgress,
     AiConsent aiConsent,
+    HazePersonality personality,
   });
 
   $RobotConfigCopyWith<$Res> get config;
@@ -89,6 +91,7 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? brainStatus = null,
     Object? downloadProgress = null,
     Object? aiConsent = null,
+    Object? personality = null,
   }) {
     return _then(
       _value.copyWith(
@@ -140,6 +143,10 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
                 ? _value.aiConsent
                 : aiConsent // ignore: cast_nullable_to_non_nullable
                       as AiConsent,
+            personality: null == personality
+                ? _value.personality
+                : personality // ignore: cast_nullable_to_non_nullable
+                      as HazePersonality,
           )
           as $Val,
     );
@@ -178,6 +185,7 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
     BrainStatus brainStatus,
     int downloadProgress,
     AiConsent aiConsent,
+    HazePersonality personality,
   });
 
   @override
@@ -210,6 +218,7 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? brainStatus = null,
     Object? downloadProgress = null,
     Object? aiConsent = null,
+    Object? personality = null,
   }) {
     return _then(
       _$RobotFaceStateImpl(
@@ -261,6 +270,10 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
             ? _value.aiConsent
             : aiConsent // ignore: cast_nullable_to_non_nullable
                   as AiConsent,
+        personality: null == personality
+            ? _value.personality
+            : personality // ignore: cast_nullable_to_non_nullable
+                  as HazePersonality,
       ),
     );
   }
@@ -282,6 +295,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.brainStatus = BrainStatus.idle,
     this.downloadProgress = 0,
     this.aiConsent = AiConsent.unknown,
+    this.personality = HazePersonality.playful,
   });
 
   @override
@@ -320,10 +334,13 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   @override
   @JsonKey()
   final AiConsent aiConsent;
+  @override
+  @JsonKey()
+  final HazePersonality personality;
 
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality)';
   }
 
   @override
@@ -353,7 +370,9 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
             (identical(other.downloadProgress, downloadProgress) ||
                 other.downloadProgress == downloadProgress) &&
             (identical(other.aiConsent, aiConsent) ||
-                other.aiConsent == aiConsent));
+                other.aiConsent == aiConsent) &&
+            (identical(other.personality, personality) ||
+                other.personality == personality));
   }
 
   @override
@@ -371,6 +390,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     brainStatus,
     downloadProgress,
     aiConsent,
+    personality,
   );
 
   /// Create a copy of RobotFaceState
@@ -399,6 +419,7 @@ abstract class _RobotFaceState implements RobotFaceState {
     final BrainStatus brainStatus,
     final int downloadProgress,
     final AiConsent aiConsent,
+    final HazePersonality personality,
   }) = _$RobotFaceStateImpl;
 
   @override
@@ -425,6 +446,8 @@ abstract class _RobotFaceState implements RobotFaceState {
   int get downloadProgress;
   @override
   AiConsent get aiConsent;
+  @override
+  HazePersonality get personality;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.

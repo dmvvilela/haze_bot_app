@@ -161,6 +161,22 @@ class RobotFaceScreen extends StatelessWidget {
                           onPressed: () =>
                               _withAiConsent(context, () => _showTalk(context)),
                         ),
+                        // Personality picker — swaps Haze's voice
+                        PopupMenuButton<HazePersonality>(
+                          icon: Icon(Icons.theater_comedy),
+                          tooltip: "Haze's mood",
+                          initialValue: state.personality,
+                          onSelected: (p) =>
+                              context.read<RobotFaceCubit>().setPersonality(p),
+                          itemBuilder: (_) => HazePersonality.values
+                              .map(
+                                (p) => PopupMenuItem(
+                                  value: p,
+                                  child: Text(p.displayName),
+                                ),
+                              )
+                              .toList(),
+                        ),
                         IconButton(
                           icon: Icon(Icons.palette),
                           onPressed: () => _showColorPicker(context),

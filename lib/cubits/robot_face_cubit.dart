@@ -71,6 +71,12 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     await _saveConsent(AiConsent.declined);
   }
 
+  /// Switch Haze's voice (playful / sarcastic / sleepy / zen).
+  void setPersonality(HazePersonality personality) {
+    emit(state.copyWith(personality: personality));
+    _brain.setPersonality(personality);
+  }
+
   Future<void> _saveConsent(AiConsent consent) async {
     try {
       final prefs = await SharedPreferences.getInstance();
