@@ -162,6 +162,20 @@ class _AliveFacePainter extends CustomPainter {
     bool active,
     double pulse,
   ) {
+    final tuftPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.3
+      ..strokeCap = StrokeCap.round
+      ..color = eyeColor.withValues(alpha: 0.38);
+    for (final tuft in [
+      (x: 0.46, dx: -5.0, dy: -15.0),
+      (x: 0.53, dx: 1.5, dy: -13.0),
+      (x: 0.6, dx: 6.0, dy: -14.0),
+    ]) {
+      final base = Offset(size.width * tuft.x, size.height * 0.17 + bodyLift);
+      canvas.drawLine(base, base.translate(tuft.dx, tuft.dy), tuftPaint);
+    }
+
     final base = Offset(size.width / 2, size.height * 0.18 + bodyLift);
     final tip = Offset(
       size.width / 2 + math.sin(time * 1.7) * 7,
@@ -313,26 +327,28 @@ class _AliveFacePainter extends CustomPainter {
     bool isDark,
     double bodyLift,
   ) {
-    final panel = RRect.fromRectAndRadius(
-      Rect.fromCenter(
-        center: Offset(size.width / 2, size.height * 0.42 + bodyLift),
-        width: size.width * 0.58,
-        height: size.height * 0.28,
-      ),
-      const Radius.circular(50),
+    final panelRect = Rect.fromCenter(
+      center: Offset(size.width / 2, size.height * 0.43 + bodyLift),
+      width: size.width * 0.62,
+      height: size.height * 0.38,
     );
-    canvas.drawRRect(
-      panel,
+    canvas.drawOval(
+      panelRect,
       Paint()
-        ..color = (isDark ? const Color(0xFF05070A) : const Color(0xFFF8FCFF))
-            .withValues(alpha: 0.78),
-    );
-    canvas.drawRRect(
-      panel,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.4
-        ..color = eyeColor.withValues(alpha: 0.2),
+        ..shader = RadialGradient(
+          colors: isDark
+              ? [
+                  const Color(0xFF02060B).withValues(alpha: 0.58),
+                  const Color(0xFF071827).withValues(alpha: 0.22),
+                  Colors.transparent,
+                ]
+              : [
+                  Colors.white.withValues(alpha: 0.34),
+                  const Color(0xFFEAF9FF).withValues(alpha: 0.12),
+                  Colors.transparent,
+                ],
+        ).createShader(panelRect)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
     );
   }
 
