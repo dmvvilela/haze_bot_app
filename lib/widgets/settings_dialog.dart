@@ -106,6 +106,30 @@ class SettingsDialog extends StatelessWidget {
                         context.read<RobotFaceCubit>().toggleSpeech(),
                   ),
                   if (state.config.speechEnabled) ...[
+                    if (state.supportsGenderedVoiceChoice)
+                      ListTile(
+                        leading: const Icon(Icons.record_voice_over),
+                        title: const Text('Voice style'),
+                        subtitle: const Text('Uses installed local voices'),
+                        trailing: DropdownButton<TtsVoicePreference>(
+                          value: state.ttsVoicePreference,
+                          items: TtsVoicePreference.values
+                              .map(
+                                (preference) => DropdownMenuItem(
+                                  value: preference,
+                                  child: Text(preference.displayName),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (preference) {
+                            if (preference != null) {
+                              context.read<RobotFaceCubit>().setVoicePreference(
+                                preference,
+                              );
+                            }
+                          },
+                        ),
+                      ),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: OutlinedButton.icon(
