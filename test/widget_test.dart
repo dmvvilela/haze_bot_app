@@ -32,7 +32,17 @@ void main() {
     expect(find.byIcon(Icons.chat_bubble_outline), findsOneWidget);
     expect(find.byIcon(Icons.timer), findsOneWidget);
 
+    await tester.tap(find.byIcon(Icons.settings));
+    await tester.pumpAndSettle();
+
+    expect(find.text('AI Brain'), findsOneWidget);
+    expect(find.text('Haze mood'), findsOneWidget);
+    expect(find.text('Playful'), findsWidgets);
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+
     cubit.startTimer(1);
+    await tester.pump();
     await tester.pump();
 
     expect(find.text('01:00'), findsOneWidget);
