@@ -23,6 +23,8 @@ void main() {
 
     expect(state.isSpeaking, isFalse);
     expect(state.isLoadingAI, isFalse);
+    expect(state.ttsVoiceOptions, isEmpty);
+    expect(state.selectedTtsVoiceId, isNull);
   });
 
   testWidgets('Haze app renders main controls', (WidgetTester tester) async {
@@ -66,6 +68,7 @@ void main() {
     expect(find.text('Voice and language'), findsOneWidget);
     expect(find.text('Playful'), findsWidgets);
     expect(find.text('Voice style'), findsNothing);
+    expect(find.text('Voice'), findsNothing);
     await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
 

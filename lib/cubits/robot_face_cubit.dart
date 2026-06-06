@@ -16,9 +16,30 @@ import '../services/timer_service.dart';
 part 'robot_face_state.dart';
 part 'robot_face_cubit.freezed.dart';
 
+@immutable
+class TtsVoiceOption {
+  final String id;
+  final String label;
+
+  const TtsVoiceOption({required this.id, required this.label});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TtsVoiceOption &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          label == other.label;
+
+  @override
+  int get hashCode => Object.hash(id, label);
+}
+
 class RobotFaceCubit extends Cubit<RobotFaceState> {
   static const _aiConsentKey = 'haze_ai_consent';
   static const _personalityKey = 'haze_personality';
+  static const _voiceIdKey = 'haze_tts_voice_id';
+  static const automaticVoiceId = '__automatic_voice__';
 
   final FlutterTts _flutterTts = FlutterTts();
   final HazeBrain _brain = HazeBrain();
@@ -27,6 +48,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   StreamSubscription? _timerStatusSubscription;
   StreamSubscription? _timerCompleteSubscription;
   String? _activeVoiceLocale;
+  String? _activeVoiceId;
 
   RobotFaceCubit() : super(const RobotFaceState()) {
     _initializeTts();
@@ -55,15 +77,22 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       final restoredPersonality = _personalityFromName(
         prefs.getString(_personalityKey),
       );
+      final restoredVoiceId = prefs.getString(_voiceIdKey);
       if (!isClosed) {
         emit(
           state.copyWith(
             aiConsent: restoredConsent,
             personality: restoredPersonality ?? state.personality,
+            selectedTtsVoiceId: restoredVoiceId,
           ),
         );
         if (restoredPersonality != null) {
           await _brain.setPersonality(restoredPersonality);
+        }
+        if (restoredVoiceId != null) {
+          _activeVoiceLocale = null;
+          _activeVoiceId = null;
+          await _applyTtsSettings();
         }
       }
     } catch (e) {
@@ -94,6 +123,15 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     await _brain.setPersonality(personality);
   }
 
+  Future<void> setTtsVoice(String? voiceId) async {
+    final selectedVoiceId = voiceId == automaticVoiceId ? null : voiceId;
+    emit(state.copyWith(selectedTtsVoiceId: selectedVoiceId));
+    await _saveVoiceId(selectedVoiceId);
+    _activeVoiceLocale = null;
+    _activeVoiceId = null;
+    await _applyTtsSettings();
+  }
+
   Future<void> _saveConsent(AiConsent consent) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -113,6 +151,19 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       await prefs.setString(_personalityKey, personality.name);
     } catch (e) {
       debugPrint('RobotFaceCubit: failed to save personality: $e');
+    }
+  }
+
+  Future<void> _saveVoiceId(String? voiceId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (voiceId == null) {
+        await prefs.remove(_voiceIdKey);
+      } else {
+        await prefs.setString(_voiceIdKey, voiceId);
+      }
+    } catch (e) {
+      debugPrint('RobotFaceCubit: failed to save voice choice: $e');
     }
   }
 
@@ -343,7 +394,6 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   Future<void> _selectBestLocalVoice() async {
-    if (_activeVoiceLocale == state.config.language) return;
     try {
       final rawVoices = await _flutterTts.getVoices;
       if (rawVoices is! List) return;
@@ -352,15 +402,90 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
           .map((voice) => voice.map((key, value) => MapEntry('$key', '$value')))
           .where((voice) => voice['locale'] == state.config.language)
           .toList();
-      if (voices.isEmpty) return;
+      final options = _voiceOptionsFor(voices);
+      final selectedVoiceId =
+          options.any((option) => option.id == state.selectedTtsVoiceId)
+          ? state.selectedTtsVoiceId
+          : null;
+      if (state.selectedTtsVoiceId != null && selectedVoiceId == null) {
+        await _saveVoiceId(null);
+      }
 
-      voices.sort((a, b) => _voiceScore(b).compareTo(_voiceScore(a)));
-      await _flutterTts.setVoice(voices.first);
+      if (!isClosed &&
+          (!_voiceOptionsEqual(state.ttsVoiceOptions, options) ||
+              state.selectedTtsVoiceId != selectedVoiceId)) {
+        emit(
+          state.copyWith(
+            ttsVoiceOptions: options,
+            selectedTtsVoiceId: selectedVoiceId,
+          ),
+        );
+      }
+
+      if (voices.isEmpty) return;
+      if (_activeVoiceLocale == state.config.language &&
+          _activeVoiceId == selectedVoiceId) {
+        return;
+      }
+
+      Map<String, String>? selectedVoice;
+      if (selectedVoiceId != null) {
+        for (final voice in voices) {
+          if (_voiceId(voice) == selectedVoiceId) {
+            selectedVoice = voice;
+            break;
+          }
+        }
+      }
+      final voice = selectedVoice ?? _bestVoice(voices);
+      await _flutterTts.setVoice(voice);
       _activeVoiceLocale = state.config.language;
-      debugPrint('Haze TTS: selected voice ${voices.first}');
+      _activeVoiceId = selectedVoiceId;
+      debugPrint('Haze TTS: selected voice $voice');
     } catch (e) {
       debugPrint('Haze TTS: could not select voice: $e');
     }
+  }
+
+  List<TtsVoiceOption> _voiceOptionsFor(List<Map<String, String>> voices) {
+    final seen = <String>{};
+    final options = <TtsVoiceOption>[];
+    for (final voice in voices) {
+      final id = _voiceId(voice);
+      if (!seen.add(id)) continue;
+      options.add(TtsVoiceOption(id: id, label: _voiceLabel(voice)));
+    }
+    options.sort((a, b) => a.label.compareTo(b.label));
+    return options;
+  }
+
+  bool _voiceOptionsEqual(
+    List<TtsVoiceOption> previous,
+    List<TtsVoiceOption> next,
+  ) {
+    if (previous.length != next.length) return false;
+    for (var i = 0; i < previous.length; i++) {
+      if (previous[i] != next[i]) return false;
+    }
+    return true;
+  }
+
+  Map<String, String> _bestVoice(List<Map<String, String>> voices) {
+    voices.sort((a, b) => _voiceScore(b).compareTo(_voiceScore(a)));
+    return voices.first;
+  }
+
+  String _voiceId(Map<String, String> voice) =>
+      '${voice['locale'] ?? ''}|${voice['name'] ?? ''}';
+
+  String _voiceLabel(Map<String, String> voice) {
+    final name = (voice['name'] ?? '').trim();
+    final locale = (voice['locale'] ?? '').trim();
+    if (name.isEmpty) return locale.isEmpty ? 'Installed voice' : locale;
+    if (locale.isEmpty || name.toLowerCase().contains(locale.toLowerCase())) {
+      return name;
+    }
+    return '$name ($locale)';
   }
 
   int _voiceScore(Map<String, String> voice) {

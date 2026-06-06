@@ -31,6 +31,9 @@ mixin _$RobotFaceState {
   int get downloadProgress => throw _privateConstructorUsedError;
   AiConsent get aiConsent => throw _privateConstructorUsedError;
   HazePersonality get personality => throw _privateConstructorUsedError;
+  List<TtsVoiceOption> get ttsVoiceOptions =>
+      throw _privateConstructorUsedError;
+  String? get selectedTtsVoiceId => throw _privateConstructorUsedError;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
@@ -61,6 +64,8 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     int downloadProgress,
     AiConsent aiConsent,
     HazePersonality personality,
+    List<TtsVoiceOption> ttsVoiceOptions,
+    String? selectedTtsVoiceId,
   });
 
   $RobotConfigCopyWith<$Res> get config;
@@ -95,6 +100,8 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? downloadProgress = null,
     Object? aiConsent = null,
     Object? personality = null,
+    Object? ttsVoiceOptions = null,
+    Object? selectedTtsVoiceId = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -154,6 +161,14 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
                 ? _value.personality
                 : personality // ignore: cast_nullable_to_non_nullable
                       as HazePersonality,
+            ttsVoiceOptions: null == ttsVoiceOptions
+                ? _value.ttsVoiceOptions
+                : ttsVoiceOptions // ignore: cast_nullable_to_non_nullable
+                      as List<TtsVoiceOption>,
+            selectedTtsVoiceId: freezed == selectedTtsVoiceId
+                ? _value.selectedTtsVoiceId
+                : selectedTtsVoiceId // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -194,6 +209,8 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
     int downloadProgress,
     AiConsent aiConsent,
     HazePersonality personality,
+    List<TtsVoiceOption> ttsVoiceOptions,
+    String? selectedTtsVoiceId,
   });
 
   @override
@@ -228,6 +245,8 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? downloadProgress = null,
     Object? aiConsent = null,
     Object? personality = null,
+    Object? ttsVoiceOptions = null,
+    Object? selectedTtsVoiceId = freezed,
   }) {
     return _then(
       _$RobotFaceStateImpl(
@@ -287,6 +306,14 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
             ? _value.personality
             : personality // ignore: cast_nullable_to_non_nullable
                   as HazePersonality,
+        ttsVoiceOptions: null == ttsVoiceOptions
+            ? _value._ttsVoiceOptions
+            : ttsVoiceOptions // ignore: cast_nullable_to_non_nullable
+                  as List<TtsVoiceOption>,
+        selectedTtsVoiceId: freezed == selectedTtsVoiceId
+            ? _value.selectedTtsVoiceId
+            : selectedTtsVoiceId // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -310,7 +337,9 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.downloadProgress = 0,
     this.aiConsent = AiConsent.unknown,
     this.personality = HazePersonality.playful,
-  });
+    final List<TtsVoiceOption> ttsVoiceOptions = const [],
+    this.selectedTtsVoiceId,
+  }) : _ttsVoiceOptions = ttsVoiceOptions;
 
   @override
   @JsonKey()
@@ -354,10 +383,21 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   @override
   @JsonKey()
   final HazePersonality personality;
+  final List<TtsVoiceOption> _ttsVoiceOptions;
+  @override
+  @JsonKey()
+  List<TtsVoiceOption> get ttsVoiceOptions {
+    if (_ttsVoiceOptions is EqualUnmodifiableListView) return _ttsVoiceOptions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_ttsVoiceOptions);
+  }
+
+  @override
+  final String? selectedTtsVoiceId;
 
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoiceOptions: $ttsVoiceOptions, selectedTtsVoiceId: $selectedTtsVoiceId)';
   }
 
   @override
@@ -391,7 +431,13 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
             (identical(other.aiConsent, aiConsent) ||
                 other.aiConsent == aiConsent) &&
             (identical(other.personality, personality) ||
-                other.personality == personality));
+                other.personality == personality) &&
+            const DeepCollectionEquality().equals(
+              other._ttsVoiceOptions,
+              _ttsVoiceOptions,
+            ) &&
+            (identical(other.selectedTtsVoiceId, selectedTtsVoiceId) ||
+                other.selectedTtsVoiceId == selectedTtsVoiceId));
   }
 
   @override
@@ -411,6 +457,8 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     downloadProgress,
     aiConsent,
     personality,
+    const DeepCollectionEquality().hash(_ttsVoiceOptions),
+    selectedTtsVoiceId,
   );
 
   /// Create a copy of RobotFaceState
@@ -441,6 +489,8 @@ abstract class _RobotFaceState implements RobotFaceState {
     final int downloadProgress,
     final AiConsent aiConsent,
     final HazePersonality personality,
+    final List<TtsVoiceOption> ttsVoiceOptions,
+    final String? selectedTtsVoiceId,
   }) = _$RobotFaceStateImpl;
 
   @override
@@ -471,6 +521,10 @@ abstract class _RobotFaceState implements RobotFaceState {
   AiConsent get aiConsent;
   @override
   HazePersonality get personality;
+  @override
+  List<TtsVoiceOption> get ttsVoiceOptions;
+  @override
+  String? get selectedTtsVoiceId;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
