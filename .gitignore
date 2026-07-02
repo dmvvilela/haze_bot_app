@@ -46,3 +46,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# --- Mobile release automation ---
+.env.release
+release/fastlane/play-console-key.json
+release/fastlane/report.xml
+release/fastlane/README.md
+release/asc/**
+!release/asc/.gitkeep

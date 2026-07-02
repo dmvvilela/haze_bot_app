@@ -20,6 +20,7 @@ Played through `SoundService` (`lib/services/sound_service.dart`) via the
 | `correct` | "ding-ding!" | success, right answer | feelings game correct pick |
 | `wrong` | soft double-boop | gentle "not quite" (never harsh) | feelings game wrong pick |
 | `win` | rising arpeggio | milestones, celebrations | game streak of 5 |
+| `proud` | satisfied "mm-HMM!" | quiet pride, small milestones | game streak of 3 |
 | `hello` | R2D2 warble | greetings, session start | opening the feelings game |
 | `sing` | little melody 🎵 | pure charm, easter eggs | long-pressing the face |
 | `laugh` | staccato giggle | jokes, funny moments | *(free)* |

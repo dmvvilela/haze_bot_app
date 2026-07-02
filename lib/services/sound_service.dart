@@ -18,6 +18,7 @@ enum HazeSound {
   sleep,
   chime,
   startup,
+  proud,
 }
 
 extension on HazeSound {

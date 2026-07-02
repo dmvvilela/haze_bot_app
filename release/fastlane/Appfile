@@ -1,0 +1,4 @@
+json_key_file("./play-console-key.json")
+package_name("com.d2vsolutions.haze_bot_app")
+
+# iOS is handled by `asc`, not Fastlane — no apple_id/team_id needed here.

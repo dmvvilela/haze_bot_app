@@ -1,0 +1,80 @@
+# Fastlane config for Android-only flows.
+# iOS release is driven by `asc` from release.sh.
+#
+# Most of the time you won't invoke these directly — release.sh calls
+# `fastlane supply` with flags. Keep these lanes as a fallback for ad-hoc ops.
+
+default_platform(:android)
+
+# When a lane is invoked directly (e.g. `fastlane promote_to_production`)
+# Fastlane's cwd handling makes the Appfile's `./play-console-key.json`
+# resolve relative to the parent of `fastlane/`, not the fastlane dir
+# itself — so the key is not found. Passing an absolute path built off
+# `__dir__` sidesteps this. release.sh doesn't hit this because it
+# calls `fastlane supply` with flags from inside the fastlane dir.
+JSON_KEY = File.expand_path("./play-console-key.json", __dir__)
+
+platform :android do
+  desc "Production release to Play Store"
+  lane :release do
+    supply(
+      json_key: JSON_KEY,
+      aab: ENV["AAB_PATH"] || "../../build/app/outputs/bundle/release/app-release.aab",
+      track: "production",
+      metadata_path: "../metadata/android",
+      skip_upload_screenshots: true,
+      skip_upload_images: true
+    )
+  end
+
+  desc "Internal testing track (up to 100 testers, no review, instant rollout)"
+  lane :internal do
+    supply(
+      json_key: JSON_KEY,
+      aab: ENV["AAB_PATH"] || "../../build/app/outputs/bundle/release/app-release.aab",
+      track: "internal",
+      metadata_path: "../metadata/android",
+      skip_upload_screenshots: true,
+      skip_upload_images: true
+    )
+  end
+
+  desc "Closed testing / beta track (larger tester pool, Play reviews)"
+  lane :beta do
+    supply(
+      json_key: JSON_KEY,
+      aab: ENV["AAB_PATH"] || "../../build/app/outputs/bundle/release/app-release.aab",
+      track: "beta",
+      skip_upload_metadata: true,
+      skip_upload_screenshots: true,
+      skip_upload_images: true
+    )
+  end
+
+  desc "Promote the current internal build to production (no rebuild)"
+  lane :promote_to_production do
+    supply(
+      json_key: JSON_KEY,
+      track: "internal",
+      track_promote_to: "production",
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_screenshots: true,
+      skip_upload_images: true,
+      skip_upload_changelogs: true
+    )
+  end
+
+  desc "Sync metadata only (no upload)"
+  lane :sync_metadata do
+    supply(
+      json_key: JSON_KEY,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_screenshots: true,
+      skip_upload_images: true,
+      metadata_path: "../metadata/android"
+    )
+  end
+end

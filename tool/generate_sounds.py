@@ -114,6 +114,14 @@ write("sleep.wav",
       tone(520, 330, 0.45, amp=0.3, release=0.6,
            vib_rate=5, vib_depth=22, harmonic=0.1))
 
+# Satisfied "mm-HMM!" — a proud little hum for 3-in-a-row streaks.
+write("proud.wav",
+      tone(587, 622, 0.12, amp=0.42, harmonic=0.15,
+           vib_rate=6, vib_depth=8) +
+      silence(0.03) +
+      tone(784, 880, 0.30, amp=0.5, release=0.6, harmonic=0.18,
+           vib_rate=7, vib_depth=16))
+
 # Gentle two-tone bell — timer done, notifications.
 write("chime.wav",
       tone(1046, 1046, 0.30, amp=0.42, release=0.75, harmonic=0.35) +

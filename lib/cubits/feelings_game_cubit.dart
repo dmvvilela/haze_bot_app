@@ -105,10 +105,18 @@ class FeelingsGameCubit extends Cubit<FeelingsGameState> {
 
     if (choice == state.target) {
       final streak = state.streak + 1;
-      _robot.sounds.play(
-        streak > 0 && streak % 5 == 0 ? HazeSound.win : HazeSound.correct,
-      );
-      _robot.showExpression(RobotExpression.excited);
+      // Escalating rewards: normal ding, a proud little hum at 3 in a row,
+      // the full arpeggio at every 5 — and the face climbs the same ladder.
+      _robot.sounds.play(switch (streak) {
+        _ when streak % 5 == 0 => HazeSound.win,
+        3 => HazeSound.proud,
+        _ => HazeSound.correct,
+      });
+      _robot.showExpression(switch (streak) {
+        _ when streak % 5 == 0 => RobotExpression.love,
+        _ when streak >= 3 => RobotExpression.excited,
+        _ => RobotExpression.happy,
+      });
       _robot.speakLine(
         '${t.game.correct(name: emotionName(choice))} '
         '${t.game.praise[_random.nextInt(t.game.praise.length)]}',
