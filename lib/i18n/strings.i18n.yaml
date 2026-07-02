@@ -10,6 +10,8 @@ expressions:
   love: I love you!
   angry: I am not happy about this!
   winking: Wink wink!
+  sad: I feel a little sad...
+  scared: Eek! That is scary!
 
 face_types:
   classic:
@@ -34,6 +36,8 @@ emotion_names:
   love: In love
   angry: Angry
   winking: Winking
+  sad: Sad
+  scared: Scared
 
 game:
   title: Feelings Game

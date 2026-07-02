@@ -80,3 +80,46 @@ write("win.wav",
 write("hello.wav",
       tone(850, 1250, 0.30, amp=0.5, vib_rate=11, vib_depth=140,
            release=0.45))
+
+
+def note(freq, dur=0.16, amp=0.5):
+    """One sung note: scoops up into pitch with warm vibrato."""
+    return tone(freq * 0.94, freq, dur, amp=amp, release=0.35,
+                vib_rate=7, vib_depth=freq * 0.015)
+
+
+# Fall-Guys-style happy singing — an original little pentatonic riff.
+write("sing.wav",
+      note(1046) + note(1174) + note(1318) + note(1568, 0.22) +
+      note(1318) + note(1174) + note(1046, 0.30, amp=0.46))
+
+# Staccato robo-giggle: three quick falling blips.
+write("laugh.wav",
+      tone(980, 940, 0.07, amp=0.5) + silence(0.045) +
+      tone(900, 860, 0.07, amp=0.48) + silence(0.045) +
+      tone(830, 780, 0.09, amp=0.45, release=0.6))
+
+# Rising "hmm?" — curiosity, taps on something new.
+write("curious.wav",
+      tone(520, 940, 0.24, amp=0.45, release=0.4, vib_rate=9, vib_depth=25))
+
+# Two-note falling whimper — the sad face, gentle goodbyes.
+write("sad.wav",
+      tone(620, 480, 0.20, amp=0.34, release=0.5, harmonic=0.12) +
+      silence(0.05) +
+      tone(430, 330, 0.28, amp=0.3, release=0.7, harmonic=0.12))
+
+# Soft descending purr — entering sleep mode, goodnight.
+write("sleep.wav",
+      tone(520, 330, 0.45, amp=0.3, release=0.6,
+           vib_rate=5, vib_depth=22, harmonic=0.1))
+
+# Gentle two-tone bell — timer done, notifications.
+write("chime.wav",
+      tone(1046, 1046, 0.30, amp=0.42, release=0.75, harmonic=0.35) +
+      tone(1568, 1568, 0.45, amp=0.45, release=0.85, harmonic=0.35))
+
+# Power-on sweep — app launch, waking up.
+write("startup.wav",
+      tone(320, 1100, 0.40, amp=0.45, release=0.5, harmonic=0.3) +
+      tone(1318, 1318, 0.18, amp=0.4, release=0.7))

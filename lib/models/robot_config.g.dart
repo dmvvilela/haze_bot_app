@@ -53,6 +53,8 @@ const _$RobotExpressionEnumMap = {
   RobotExpression.love: 'love',
   RobotExpression.angry: 'angry',
   RobotExpression.winking: 'winking',
+  RobotExpression.sad: 'sad',
+  RobotExpression.scared: 'scared',
 };
 
 const _$FaceTypeEnumMap = {

@@ -18,6 +18,8 @@ String emotionName(RobotExpression expression) => switch (expression) {
   RobotExpression.love => t.emotion_names.love,
   RobotExpression.angry => t.emotion_names.angry,
   RobotExpression.winking => t.emotion_names.winking,
+  RobotExpression.sad => t.emotion_names.sad,
+  RobotExpression.scared => t.emotion_names.scared,
 };
 
 class FeelingsGameState {

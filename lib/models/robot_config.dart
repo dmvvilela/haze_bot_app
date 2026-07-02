@@ -32,6 +32,8 @@ enum RobotExpression {
   love,
   angry,
   winking,
+  sad,
+  scared,
 }
 
 enum FaceType { classic, looi, minimal, bean, hazeV2, hazeV3 }
@@ -66,6 +68,10 @@ extension RobotExpressionExtension on RobotExpression {
         return 'Angry';
       case RobotExpression.winking:
         return 'Winking';
+      case RobotExpression.sad:
+        return 'Sad';
+      case RobotExpression.scared:
+        return 'Scared';
     }
   }
 
@@ -88,6 +94,10 @@ extension RobotExpressionExtension on RobotExpression {
         return 'I am not happy about this!';
       case RobotExpression.winking:
         return 'Wink wink!';
+      case RobotExpression.sad:
+        return 'I feel a little sad...';
+      case RobotExpression.scared:
+        return 'Eek! That is scary!';
     }
   }
 }

@@ -1,9 +1,24 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 /// Haze's chirps. Synthesized WAVs in assets/sounds/ — regenerate with
-/// `python3 tool/generate_sounds.py`.
-enum HazeSound { poke, correct, wrong, win, hello }
+/// `python3 tool/generate_sounds.py`. See assets/sounds/README.md for the
+/// catalog and guidelines on when to use each.
+enum HazeSound {
+  poke,
+  correct,
+  wrong,
+  win,
+  hello,
+  sing,
+  laugh,
+  curious,
+  sad,
+  sleep,
+  chime,
+  startup,
+}
 
 extension on HazeSound {
   String get asset => 'sounds/$name.wav';
@@ -17,9 +32,10 @@ class SoundService {
   final List<AudioPlayer> _players = [];
   int _next = 0;
   bool enabled = true;
+  bool _unavailable = false;
 
   Future<void> play(HazeSound sound) async {
-    if (!enabled) return;
+    if (!enabled || _unavailable) return;
     try {
       if (_players.isEmpty) {
         for (var i = 0; i < _poolSize; i++) {
@@ -34,6 +50,9 @@ class SoundService {
       await player.play(AssetSource(sound.asset));
     } catch (e) {
       // Sounds are decoration — never let a missing codec/asset break the app.
+      // A MissingPluginException means the native side isn't registered
+      // (fresh plugin without a full rebuild): go quiet instead of retrying.
+      if (e is MissingPluginException) _unavailable = true;
       debugPrint('SoundService: failed to play ${sound.name}: $e');
     }
   }

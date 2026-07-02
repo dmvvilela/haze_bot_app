@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubits/robot_face_cubit.dart';
@@ -58,10 +57,8 @@ class RobotFaceWidget extends StatelessWidget {
               // The face itself paints on a bare CustomPaint, which isn't
               // hit-testable — without this, taps on V2/V3 never land.
               behavior: HitTestBehavior.opaque,
-              onTap: () {
-                HapticFeedback.selectionClick();
-                cubit.onTap();
-              },
+              onTap: cubit.onTap,
+              onLongPress: cubit.sing,
               onPanStart: (details) => lookAt(details.localPosition),
               onPanUpdate: (details) => lookAt(details.localPosition),
               onPanEnd: (_) => cubit.setLookTarget(null),

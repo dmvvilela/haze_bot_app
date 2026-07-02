@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 98 (49 per locale)
+/// Strings: 106 (53 per locale)
 ///
-/// Built on 2026-07-02 at 21:14 UTC
+/// Built on 2026-07-02 at 21:32 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -181,6 +181,8 @@ class _StringsExpressionsEn {
 	String get love => 'I love you!';
 	String get angry => 'I am not happy about this!';
 	String get winking => 'Wink wink!';
+	String get sad => 'I feel a little sad...';
+	String get scared => 'Eek! That is scary!';
 }
 
 // Path: face_types
@@ -211,6 +213,8 @@ class _StringsEmotionNamesEn {
 	String get love => 'In love';
 	String get angry => 'Angry';
 	String get winking => 'Winking';
+	String get sad => 'Sad';
+	String get scared => 'Scared';
 }
 
 // Path: game
@@ -360,6 +364,8 @@ class _StringsExpressionsPt extends _StringsExpressionsEn {
 	@override String get love => 'Eu te amo!';
 	@override String get angry => 'Não estou feliz com isso!';
 	@override String get winking => 'Piscadinha!';
+	@override String get sad => 'Estou um pouco triste...';
+	@override String get scared => 'Ai! Que medo!';
 }
 
 // Path: face_types
@@ -390,6 +396,8 @@ class _StringsEmotionNamesPt extends _StringsEmotionNamesEn {
 	@override String get love => 'Apaixonado';
 	@override String get angry => 'Bravo';
 	@override String get winking => 'Piscando';
+	@override String get sad => 'Triste';
+	@override String get scared => 'Assustado';
 }
 
 // Path: game
@@ -495,6 +503,8 @@ extension on Translations {
 			case 'expressions.love': return 'I love you!';
 			case 'expressions.angry': return 'I am not happy about this!';
 			case 'expressions.winking': return 'Wink wink!';
+			case 'expressions.sad': return 'I feel a little sad...';
+			case 'expressions.scared': return 'Eek! That is scary!';
 			case 'face_types.classic.name': return 'Classic';
 			case 'face_types.classic.description': return 'Full circular eyes with expressive pupils';
 			case 'face_types.looi.name': return 'LOOI Style';
@@ -511,6 +521,8 @@ extension on Translations {
 			case 'emotion_names.love': return 'In love';
 			case 'emotion_names.angry': return 'Angry';
 			case 'emotion_names.winking': return 'Winking';
+			case 'emotion_names.sad': return 'Sad';
+			case 'emotion_names.scared': return 'Scared';
 			case 'game.title': return 'Feelings Game';
 			case 'game.prompt': return 'How does Haze feel?';
 			case 'game.correct': return ({required Object name}) => 'That\'s right — ${name}!';
@@ -552,6 +564,8 @@ extension on _StringsPt {
 			case 'expressions.love': return 'Eu te amo!';
 			case 'expressions.angry': return 'Não estou feliz com isso!';
 			case 'expressions.winking': return 'Piscadinha!';
+			case 'expressions.sad': return 'Estou um pouco triste...';
+			case 'expressions.scared': return 'Ai! Que medo!';
 			case 'face_types.classic.name': return 'Clássico';
 			case 'face_types.classic.description': return 'Olhos circulares completos com pupilas expressivas';
 			case 'face_types.looi.name': return 'Estilo LOOI';
@@ -568,6 +582,8 @@ extension on _StringsPt {
 			case 'emotion_names.love': return 'Apaixonado';
 			case 'emotion_names.angry': return 'Bravo';
 			case 'emotion_names.winking': return 'Piscando';
+			case 'emotion_names.sad': return 'Triste';
+			case 'emotion_names.scared': return 'Assustado';
 			case 'game.title': return 'Jogo dos Sentimentos';
 			case 'game.prompt': return 'Como o Haze está se sentindo?';
 			case 'game.correct': return ({required Object name}) => 'Isso mesmo — ${name}!';

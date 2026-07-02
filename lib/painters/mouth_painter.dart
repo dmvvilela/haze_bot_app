@@ -39,9 +39,11 @@ class MouthPainter extends CustomPainter {
       case RobotExpression.happy:
         _drawHappyMouth(canvas, size, paint, center);
         break;
+      case RobotExpression.scared:
       case RobotExpression.surprised:
         _drawSurprisedMouth(canvas, size, paint, center);
         break;
+      case RobotExpression.sad:
       case RobotExpression.sleepy:
         _drawSleepyMouth(canvas, size, paint, center);
         break;

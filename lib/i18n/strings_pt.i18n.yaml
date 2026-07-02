@@ -10,6 +10,8 @@ expressions:
   love: Eu te amo!
   angry: Não estou feliz com isso!
   winking: Piscadinha!
+  sad: Estou um pouco triste...
+  scared: Ai! Que medo!
 
 face_types:
   classic:
@@ -34,6 +36,8 @@ emotion_names:
   love: Apaixonado
   angry: Bravo
   winking: Piscando
+  sad: Triste
+  scared: Assustado
 
 game:
   title: Jogo dos Sentimentos

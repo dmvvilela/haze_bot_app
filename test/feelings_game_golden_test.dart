@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:haze_bot_app/cubits/feelings_game_cubit.dart';
 import 'package:haze_bot_app/cubits/robot_face_cubit.dart';
 import 'package:haze_bot_app/i18n/strings.g.dart';
-import 'package:haze_bot_app/models/robot_config.dart';
 import 'package:haze_bot_app/widgets/feelings_game_screen.dart';
 
 // Renders the feelings game screen to a golden PNG for design review.

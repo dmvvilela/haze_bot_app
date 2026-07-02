@@ -295,6 +295,10 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         return t.expressions.angry;
       case RobotExpression.winking:
         return t.expressions.winking;
+      case RobotExpression.sad:
+        return t.expressions.sad;
+      case RobotExpression.scared:
+        return t.expressions.scared;
     }
   }
 
@@ -430,6 +434,8 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     RobotExpression.confused => (1.0, 0.9),
     RobotExpression.angry => (0.88, 1.05),
     RobotExpression.winking => (1.1, 0.98),
+    RobotExpression.sad => (0.9, 0.8),
+    RobotExpression.scared => (1.18, 1.18),
   };
 
   Future<void> _speak(String text, {RobotExpression? emotion}) async {
@@ -643,7 +649,15 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   void _onTimerComplete() {
+    // Audible even with speech off — a silent timer isn't a timer.
+    sounds.play(HazeSound.chime);
     _respond(_timerCompletePrompt, bias: _timerPromptBias);
+  }
+
+  /// Easter egg: long-press the face and Haze sings a little tune.
+  void sing() {
+    sounds.play(HazeSound.sing);
+    showExpression(RobotExpression.love);
   }
 
   bool get _usesCalmTimerVoice =>

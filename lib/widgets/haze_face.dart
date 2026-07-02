@@ -150,7 +150,9 @@ class _EyePose {
   final double width; // width multiplier
   final double smile; // bottom lid rises into a happy crescent
   final double droop; // top lid falls straight down (sleepy)
-  final double slant; // top lid cut diagonally, lower at the inner corner (angry)
+  // Diagonal top lid cut: positive = lower at the inner corner (angry),
+  // negative = lower at the outer corner (sad puppy eyes).
+  final double slant;
   final double round; // 0 = soft rect, 1 = capsule/circle
   final double heart; // morph into a heart
   final double arc; // morph into a closed happy arc (wink)
@@ -196,6 +198,8 @@ class _FacePose {
   final double sparkle;
   final double zzz;
   final double hearts;
+  final double tear; // animated teardrop under the left eye
+  final double shiver; // horizontal tremble (scared)
   final Offset gazeBias;
 
   const _FacePose({
@@ -214,6 +218,8 @@ class _FacePose {
     this.sparkle = 0,
     this.zzz = 0,
     this.hearts = 0,
+    this.tear = 0,
+    this.shiver = 0,
     this.gazeBias = Offset.zero,
   });
 
@@ -297,6 +303,25 @@ class _FacePose {
       tilt: 0.04,
       energy: 0.7,
     ),
+    RobotExpression.sad: _FacePose(
+      left: _EyePose(open: 0.72, slant: -0.55, droop: 0.18, round: 0.5),
+      right: _EyePose(open: 0.72, slant: -0.55, droop: 0.18, round: 0.5),
+      mouthCurve: -0.55,
+      mouthWide: 0.7,
+      energy: 0.3,
+      tear: 1,
+      tilt: -0.02,
+      gazeBias: Offset(0, 0.3),
+    ),
+    RobotExpression.scared: _FacePose(
+      left: _EyePose(open: 1.18, width: 0.88, round: 0.85),
+      right: _EyePose(open: 1.18, width: 0.88, round: 0.85),
+      mouthWave: 1,
+      mouthWide: 0.5,
+      energy: 0.9,
+      shiver: 1,
+      gazeBias: Offset(0, -0.18),
+    ),
   };
 
   static _FacePose lerp(_FacePose a, _FacePose b, double t) => _FacePose(
@@ -315,6 +340,8 @@ class _FacePose {
         sparkle: ui.lerpDouble(a.sparkle, b.sparkle, t)!,
         zzz: ui.lerpDouble(a.zzz, b.zzz, t)!,
         hearts: ui.lerpDouble(a.hearts, b.hearts, t)!,
+        tear: ui.lerpDouble(a.tear, b.tear, t)!,
+        shiver: ui.lerpDouble(a.shiver, b.shiver, t)!,
         gazeBias: Offset.lerp(a.gazeBias, b.gazeBias, t)!,
       );
 }
@@ -359,8 +386,9 @@ class _HazeFacePainter extends CustomPainter {
     final bob = math.sin(t * (1.0 + pose.energy)) * (1.5 + pose.energy * 2.5);
     final breath = 1 + 0.008 * math.sin(t * 0.9) + pop * 0.05;
     final sway = pose.tilt + math.sin(t * 0.6) * 0.012;
+    final shiver = math.sin(t * 26) * 1.8 * pose.shiver;
     canvas.save();
-    canvas.translate(200, 240 + bob);
+    canvas.translate(200 + shiver, 240 + bob);
     canvas.rotate(sway);
     canvas.scale(breath);
     canvas.translate(-200, -240);
@@ -495,18 +523,19 @@ class _HazeFacePainter extends CustomPainter {
         path = Path.combine(PathOperation.difference, path, lid);
       }
 
-      // Top lid: straight droop for sleepy, diagonal cut (lower toward the
-      // nose) for angry.
-      if (eye.droop > 0.01 || eye.slant > 0.01) {
+      // Top lid: straight droop for sleepy, diagonal cut toward the nose for
+      // angry (slant > 0) or toward the temple for sad (slant < 0).
+      if (eye.droop > 0.01 || eye.slant.abs() > 0.01) {
         final top = center.dy - h / 2;
         final inner = isLeft ? 1.0 : -1.0;
         final drop = eye.droop * h * 0.62;
-        final slantDrop = eye.slant * h * 0.55;
+        final innerDrop = math.max(0.0, eye.slant) * h * 0.55;
+        final outerDrop = math.max(0.0, -eye.slant) * h * 0.55;
         final lid = Path()
           ..moveTo(center.dx - inner * w, top - 40)
           ..lineTo(center.dx + inner * w, top - 40)
-          ..lineTo(center.dx + inner * w, top + drop + slantDrop)
-          ..lineTo(center.dx - inner * w, top + drop)
+          ..lineTo(center.dx + inner * w, top + drop + innerDrop)
+          ..lineTo(center.dx - inner * w, top + drop + outerDrop)
           ..close();
         path = Path.combine(PathOperation.difference, path, lid);
       }
@@ -712,6 +741,38 @@ class _HazeFacePainter extends CustomPainter {
     if (pose.zzz > 0.02) _drawZs(canvas, pose.zzz);
     if (pose.sparkle > 0.02) _drawSparkles(canvas, pose.sparkle);
     if (pose.hearts > 0.02) _drawMiniHearts(canvas, pose.hearts);
+    if (pose.tear > 0.02) _drawTear(canvas, pose.tear);
+  }
+
+  void _drawTear(Canvas canvas, double alpha) {
+    // One teardrop welling up under the left eye's outer corner, sliding
+    // down and fading, on a slow loop.
+    final phase = (t * 0.55) % 1.0;
+    final grow = math.min(1.0, phase / 0.25);
+    final fade = phase < 0.7 ? 1.0 : 1 - (phase - 0.7) / 0.3;
+    final c = Offset(100 + gaze.dx * 6, 272 + phase * 30);
+    final s = 8.0 * grow;
+    if (s < 1) return;
+    const tearColor = Color(0xFFA8DCFF);
+    final tear = Path()
+      ..moveTo(c.dx, c.dy - s * 1.4)
+      ..quadraticBezierTo(c.dx + s * 0.9, c.dy - s * 0.25, c.dx + s * 0.85, c.dy + s * 0.3)
+      ..arcToPoint(
+        Offset(c.dx - s * 0.85, c.dy + s * 0.3),
+        radius: Radius.circular(s * 0.9),
+        clockwise: true,
+      )
+      ..quadraticBezierTo(c.dx - s * 0.9, c.dy - s * 0.25, c.dx, c.dy - s * 1.4)
+      ..close();
+    canvas.drawPath(
+      tear,
+      Paint()..color = tearColor.withValues(alpha: 0.85 * alpha * fade),
+    );
+    canvas.drawCircle(
+      c.translate(-s * 0.25, -s * 0.1),
+      s * 0.22,
+      Paint()..color = Colors.white.withValues(alpha: 0.8 * alpha * fade),
+    );
   }
 
   void _drawZs(Canvas canvas, double alpha) {

@@ -41,9 +41,11 @@ class LooiFace extends StatelessWidget {
       case RobotExpression.confused:
         eyebrowAngle = isLeft ? 0.2 : -0.2;
         break;
+      case RobotExpression.scared:
       case RobotExpression.surprised:
         eyebrowAngle = isLeft ? 0.4 : -0.4;
         break;
+      case RobotExpression.sad:
       case RobotExpression.sleepy:
         eyebrowAngle = isLeft ? 0.1 : -0.1;
         eyebrowThickness = 3;
@@ -89,9 +91,11 @@ class LooiFace extends StatelessWidget {
         pupilSize = 20;
         pupilOffsetY = -2;
         break;
+      case RobotExpression.scared:
       case RobotExpression.surprised:
         pupilSize = 30;
         break;
+      case RobotExpression.sad:
       case RobotExpression.sleepy:
         pupilSize = 15;
         pupilOffsetY = 8;

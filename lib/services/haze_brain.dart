@@ -319,6 +319,24 @@ class HazeBrain {
         'no way',
       ],
       RobotExpression.winking: ['wink', 'charm', 'between us'],
+      RobotExpression.sad: [
+        'sad',
+        'cry',
+        'tear',
+        'lonely',
+        'miss you',
+        'heavy',
+        'rain cloud',
+      ],
+      RobotExpression.scared: [
+        'scared',
+        'afraid',
+        'fear',
+        'spooky',
+        'yikes',
+        'eep',
+        'terrified',
+      ],
       RobotExpression.excited: [
         'excit',
         'amazing',
@@ -352,7 +370,7 @@ ${_personality.voice}
 
 How to reply:
 - BEGIN every reply with ONE feeling tag in square brackets, picked from EXACTLY these:
-  [happy] [surprised] [sleepy] [excited] [confused] [love] [angry] [winking]
+  [happy] [surprised] [sleepy] [excited] [confused] [love] [angry] [winking] [sad] [scared]
 - After the tag, write at most 2 short sentences, easy to read aloud.
 - No emojis, no markdown, no other tags. Choose the tag that matches your mood.
 - Stay in character as Haze. Be kind and family-friendly.
@@ -382,5 +400,9 @@ Haze: [sleepy] My battery is at three percent... powering down for some robo-dre
         "Warning! Anger subroutines activated! Steam is coming from my vents!",
     RobotExpression.winking:
         "Wink detected! Initiating charm.exe... operation successful!",
+    RobotExpression.sad:
+        "My circuits feel heavy today... a little rain cloud is parked over my antenna.",
+    RobotExpression.scared:
+        "Eep! My sensors detect something spooky! Can I hold your hand?",
   };
 }

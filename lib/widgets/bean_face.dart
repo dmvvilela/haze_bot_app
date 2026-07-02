@@ -49,10 +49,12 @@ class BeanFace extends StatelessWidget {
         pupilHeight = 30;
         pupilOffsetY = -5;
         break;
+      case RobotExpression.scared:
       case RobotExpression.surprised:
         pupilWidth = 25;
         pupilHeight = 45;
         break;
+      case RobotExpression.sad:
       case RobotExpression.sleepy:
         pupilWidth = 15;
         pupilHeight = 20;

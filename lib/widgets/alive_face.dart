@@ -51,6 +51,8 @@ class _AliveFaceState extends State<AliveFace>
             RobotExpression.confused => 0.48,
             RobotExpression.angry => 0.72,
             RobotExpression.sleepy => 0.24,
+            RobotExpression.sad => 0.3,
+            RobotExpression.scared => 0.8,
           };
 
           return Transform.translate(
@@ -593,12 +595,14 @@ class _AliveFacePainter extends CustomPainter {
           center.dy - 2,
         );
         break;
+      case RobotExpression.scared:
       case RobotExpression.surprised:
         canvas.drawOval(
           Rect.fromCenter(center: center, width: 28, height: 38),
           paint,
         );
         return;
+      case RobotExpression.sad:
       case RobotExpression.sleepy:
         path.moveTo(center.dx - 24, center.dy + 4);
         path.quadraticBezierTo(
@@ -699,10 +703,12 @@ class _AliveFacePainter extends CustomPainter {
     RobotExpression expression,
   ) {
     switch (expression) {
+      case RobotExpression.sad:
       case RobotExpression.sleepy:
         _drawSleepMarks(canvas, size, eyeColor);
         break;
       case RobotExpression.excited:
+      case RobotExpression.scared:
       case RobotExpression.surprised:
         _drawSignalMarks(canvas, size, eyeColor);
         break;

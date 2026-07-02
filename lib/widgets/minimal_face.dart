@@ -46,9 +46,11 @@ class MinimalFace extends StatelessWidget {
       case RobotExpression.happy:
         pupilSize = 18;
         break;
+      case RobotExpression.scared:
       case RobotExpression.surprised:
         pupilSize = 25;
         break;
+      case RobotExpression.sad:
       case RobotExpression.sleepy:
         pupilSize = 15;
         pupilOffsetY = 5;
