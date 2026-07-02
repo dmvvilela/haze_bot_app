@@ -35,6 +35,10 @@ mixin _$RobotFaceState {
       throw _privateConstructorUsedError;
   String? get selectedTtsVoiceId => throw _privateConstructorUsedError;
 
+  /// Where the user's finger is on the face (normalized -1..1 from center),
+  /// while they're dragging. The eyes follow it; null returns to idle gaze.
+  Offset? get lookTarget => throw _privateConstructorUsedError;
+
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -66,6 +70,7 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     HazePersonality personality,
     List<TtsVoiceOption> ttsVoiceOptions,
     String? selectedTtsVoiceId,
+    Offset? lookTarget,
   });
 
   $RobotConfigCopyWith<$Res> get config;
@@ -102,6 +107,7 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? personality = null,
     Object? ttsVoiceOptions = null,
     Object? selectedTtsVoiceId = freezed,
+    Object? lookTarget = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -169,6 +175,10 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
                 ? _value.selectedTtsVoiceId
                 : selectedTtsVoiceId // ignore: cast_nullable_to_non_nullable
                       as String?,
+            lookTarget: freezed == lookTarget
+                ? _value.lookTarget
+                : lookTarget // ignore: cast_nullable_to_non_nullable
+                      as Offset?,
           )
           as $Val,
     );
@@ -211,6 +221,7 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
     HazePersonality personality,
     List<TtsVoiceOption> ttsVoiceOptions,
     String? selectedTtsVoiceId,
+    Offset? lookTarget,
   });
 
   @override
@@ -247,6 +258,7 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? personality = null,
     Object? ttsVoiceOptions = null,
     Object? selectedTtsVoiceId = freezed,
+    Object? lookTarget = freezed,
   }) {
     return _then(
       _$RobotFaceStateImpl(
@@ -314,6 +326,10 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
             ? _value.selectedTtsVoiceId
             : selectedTtsVoiceId // ignore: cast_nullable_to_non_nullable
                   as String?,
+        lookTarget: freezed == lookTarget
+            ? _value.lookTarget
+            : lookTarget // ignore: cast_nullable_to_non_nullable
+                  as Offset?,
       ),
     );
   }
@@ -339,6 +355,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.personality = HazePersonality.playful,
     final List<TtsVoiceOption> ttsVoiceOptions = const [],
     this.selectedTtsVoiceId,
+    this.lookTarget,
   }) : _ttsVoiceOptions = ttsVoiceOptions;
 
   @override
@@ -395,9 +412,14 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   @override
   final String? selectedTtsVoiceId;
 
+  /// Where the user's finger is on the face (normalized -1..1 from center),
+  /// while they're dragging. The eyes follow it; null returns to idle gaze.
+  @override
+  final Offset? lookTarget;
+
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoiceOptions: $ttsVoiceOptions, selectedTtsVoiceId: $selectedTtsVoiceId)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoiceOptions: $ttsVoiceOptions, selectedTtsVoiceId: $selectedTtsVoiceId, lookTarget: $lookTarget)';
   }
 
   @override
@@ -437,7 +459,9 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
               _ttsVoiceOptions,
             ) &&
             (identical(other.selectedTtsVoiceId, selectedTtsVoiceId) ||
-                other.selectedTtsVoiceId == selectedTtsVoiceId));
+                other.selectedTtsVoiceId == selectedTtsVoiceId) &&
+            (identical(other.lookTarget, lookTarget) ||
+                other.lookTarget == lookTarget));
   }
 
   @override
@@ -459,6 +483,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     personality,
     const DeepCollectionEquality().hash(_ttsVoiceOptions),
     selectedTtsVoiceId,
+    lookTarget,
   );
 
   /// Create a copy of RobotFaceState
@@ -491,6 +516,7 @@ abstract class _RobotFaceState implements RobotFaceState {
     final HazePersonality personality,
     final List<TtsVoiceOption> ttsVoiceOptions,
     final String? selectedTtsVoiceId,
+    final Offset? lookTarget,
   }) = _$RobotFaceStateImpl;
 
   @override
@@ -525,6 +551,11 @@ abstract class _RobotFaceState implements RobotFaceState {
   List<TtsVoiceOption> get ttsVoiceOptions;
   @override
   String? get selectedTtsVoiceId;
+
+  /// Where the user's finger is on the face (normalized -1..1 from center),
+  /// while they're dragging. The eyes follow it; null returns to idle gaze.
+  @override
+  Offset? get lookTarget;
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.

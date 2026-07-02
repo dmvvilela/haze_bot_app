@@ -48,15 +48,19 @@ void main() {
     expect(find.byIcon(Icons.smart_toy), findsOneWidget);
     expect(find.byIcon(Icons.chat_bubble_outline), findsOneWidget);
     expect(find.byIcon(Icons.timer), findsOneWidget);
-    expect(find.text('V1'), findsOneWidget);
-    expect(find.text('V2'), findsOneWidget);
 
-    await tester.tap(find.text('V2'));
+    // Haze V3 is the default face.
+    expect(cubit.state.config.faceType, FaceType.hazeV3);
+    expect(find.bySemanticsLabel('Haze face'), findsOneWidget);
+
+    // Other faces stay reachable through the face-type picker's cubit path.
+    cubit.updateFaceType(FaceType.hazeV2);
     await tester.pump(const Duration(milliseconds: 200));
-    expect(cubit.state.config.faceType, FaceType.hazeV2);
     expect(find.bySemanticsLabel('Haze V2 face'), findsOneWidget);
 
-    await tester.tap(find.text('V1'));
+    // Switch to the static classic face so pumpAndSettle below can settle
+    // (V2/V3 animate forever).
+    cubit.updateFaceType(FaceType.classic);
     await tester.pump(const Duration(milliseconds: 200));
     expect(cubit.state.config.faceType, FaceType.classic);
 

@@ -5,6 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
+import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:async';
 
@@ -39,6 +40,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   static const _aiConsentKey = 'haze_ai_consent';
   static const _personalityKey = 'haze_personality';
   static const _voiceIdKey = 'haze_tts_voice_id';
+  static const _configKey = 'haze_robot_config';
   static const automaticVoiceId = '__automatic_voice__';
 
   final FlutterTts _flutterTts = FlutterTts();
@@ -59,12 +61,43 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     _restorePreferences();
   }
 
+  /// Every config change (face, colors, theme, speech, language...) is saved,
+  /// so the robot comes back exactly how the user left it.
+  @override
+  void onChange(Change<RobotFaceState> change) {
+    super.onChange(change);
+    if (change.currentState.config != change.nextState.config) {
+      _saveConfig(change.nextState.config);
+    }
+  }
+
+  Future<void> _saveConfig(RobotConfig config) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_configKey, jsonEncode(config.toJson()));
+    } catch (e) {
+      debugPrint('RobotFaceCubit: failed to save config: $e');
+    }
+  }
+
+  RobotConfig? _restoredConfig(SharedPreferences prefs) {
+    final raw = prefs.getString(_configKey);
+    if (raw == null) return null;
+    try {
+      return RobotConfig.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('RobotFaceCubit: failed to restore config: $e');
+      return null;
+    }
+  }
+
   /// Restore the user's explicit AI choice and preferred Haze voice. If an
   /// older build already installed the model before we persisted consent, treat
   /// the active model as granted.
   Future<void> _restorePreferences() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      final restoredConfig = _restoredConfig(prefs);
       final saved = prefs.getString(_aiConsentKey);
       final restoredConsent = switch (saved) {
         'granted' => AiConsent.granted,
@@ -81,15 +114,23 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       if (!isClosed) {
         emit(
           state.copyWith(
+            config: restoredConfig ?? state.config,
             aiConsent: restoredConsent,
             personality: restoredPersonality ?? state.personality,
             selectedTtsVoiceId: restoredVoiceId,
           ),
         );
+        if (restoredConfig != null) {
+          LocaleSettings.setLocale(
+            restoredConfig.language.toLowerCase().startsWith('pt')
+                ? AppLocale.pt
+                : AppLocale.en,
+          );
+        }
         if (restoredPersonality != null) {
           await _brain.setPersonality(restoredPersonality);
         }
-        if (restoredVoiceId != null) {
+        if (restoredVoiceId != null || restoredConfig != null) {
           _activeVoiceLocale = null;
           _activeVoiceId = null;
           await _applyTtsSettings();
@@ -225,7 +266,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     emit(state.copyWith(config: newConfig));
 
     if (state.config.speechEnabled) {
-      _speak(_getSpeechText(expression));
+      _speak(_getSpeechText(expression), emotion: expression);
     }
   }
 
@@ -322,6 +363,13 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     });
   }
 
+  /// The user is dragging a finger over the face — the eyes follow it.
+  /// null when the finger lifts, returning the gaze to its idle wander.
+  void setLookTarget(Offset? target) {
+    if (state.lookTarget == target) return;
+    emit(state.copyWith(lookTarget: target));
+  }
+
   void triggerBlink() {
     emit(state.copyWith(isBlinking: true));
 
@@ -346,11 +394,40 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     });
   }
 
-  Future<void> _speak(String text) async {
+  /// Pitch/rate multipliers so Haze *sounds* like the face it's making —
+  /// sleepy drags, excited rushes, angry drops low. Applied on top of the
+  /// user's base speech settings.
+  (double, double) _emotionVoice(RobotExpression emotion) => switch (emotion) {
+    RobotExpression.happy => (1.06, 1.0),
+    RobotExpression.excited => (1.18, 1.1),
+    RobotExpression.surprised => (1.22, 1.05),
+    RobotExpression.love => (1.08, 0.92),
+    RobotExpression.sleepy => (0.86, 0.75),
+    RobotExpression.confused => (1.0, 0.9),
+    RobotExpression.angry => (0.88, 1.05),
+    RobotExpression.winking => (1.1, 0.98),
+  };
+
+  Future<void> _speak(String text, {RobotExpression? emotion}) async {
     final line = text.trim();
     if (!state.config.speechEnabled || line.isEmpty) return;
     try {
       await _applyTtsSettings();
+      if (emotion != null) {
+        final (pitchFactor, rateFactor) = _emotionVoice(emotion);
+        await _safeTtsCall(
+          () => _flutterTts.setPitch(
+            (state.config.speechPitch * pitchFactor).clamp(0.5, 2.0),
+          ),
+          'set emotion pitch',
+        );
+        await _safeTtsCall(
+          () => _flutterTts.setSpeechRate(
+            (state.config.speechRate * rateFactor).clamp(0.1, 2.0),
+          ),
+          'set emotion rate',
+        );
+      }
       await _flutterTts.stop();
       if (!isClosed) emit(state.copyWith(isSpeaking: true));
       final result = await _flutterTts.speak(line, focus: true);
@@ -623,7 +700,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       );
 
       if (state.config.speechEnabled) {
-        await _speak(reply.say);
+        await _speak(reply.say, emotion: reply.emotion);
       }
     } catch (e) {
       emit(state.copyWith(isLoadingAI: false));

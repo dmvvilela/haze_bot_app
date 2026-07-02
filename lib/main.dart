@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -13,7 +15,6 @@ import 'widgets/timer_dialog.dart';
 import 'widgets/talk_dialog.dart';
 import 'widgets/ai_consent_dialog.dart';
 import 'services/haze_brain.dart';
-import 'models/robot_config.dart';
 import 'i18n/strings.g.dart';
 
 void main() async {
@@ -148,12 +149,9 @@ class RobotFaceScreen extends StatelessWidget {
             ),
             body: Stack(
               children: [
-                // Robot face always centered
-                Padding(
-                  padding: EdgeInsets.only(bottom: AppBar().preferredSize.height),
-                  child: Center(child: const RobotFaceWidget()),
-                ),
-                // Full screen gesture detector only when controls are hidden
+                // With controls hidden, tapping the empty screen brings them
+                // back. This sits UNDER the face so the face stays touchable
+                // (poke to emote, drag so the eyes follow) in ambient mode.
                 if (!state.showControls)
                   Positioned.fill(
                     child: GestureDetector(
@@ -163,12 +161,23 @@ class RobotFaceScreen extends StatelessWidget {
                       child: Container(color: Colors.transparent),
                     ),
                   ),
-                if (state.showControls)
+                // Robot face always centered
+                Padding(
+                  padding: EdgeInsets.only(bottom: AppBar().preferredSize.height),
+                  child: Center(child: const RobotFaceWidget()),
+                ),
+                // Whatever Haze last said, as a fading speech bubble — so its
+                // lines are readable even with the voice turned off.
+                if (state.aiMessage.isNotEmpty)
                   Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: (state.timerSeconds > 0 || state.isTimerRunning) ? 96 : 28,
-                    child: _BotVersionSwitch(state: state),
+                    left: 24,
+                    right: 24,
+                    bottom: (state.timerSeconds > 0 || state.isTimerRunning) ? 104 : 36,
+                    child: _HazeSpeechBubble(
+                      message: state.aiMessage,
+                      speaking: state.isSpeaking,
+                      accent: state.config.eyeColor,
+                    ),
                   ),
                 if (state.timerSeconds > 0 || state.isTimerRunning)
                   Positioned(left: 20, right: 20, bottom: 28, child: _TimerOverlay(state: state)),
@@ -235,39 +244,103 @@ class RobotFaceScreen extends StatelessWidget {
   }
 }
 
-class _BotVersionSwitch extends StatelessWidget {
-  final RobotFaceState state;
+/// Haze's latest line, floated under the face. Slides in on a new message and
+/// fades out on its own once Haze has finished making its point.
+class _HazeSpeechBubble extends StatefulWidget {
+  final String message;
+  final bool speaking;
+  final Color accent;
 
-  const _BotVersionSwitch({required this.state});
+  const _HazeSpeechBubble({
+    required this.message,
+    required this.speaking,
+    required this.accent,
+  });
+
+  @override
+  State<_HazeSpeechBubble> createState() => _HazeSpeechBubbleState();
+}
+
+class _HazeSpeechBubbleState extends State<_HazeSpeechBubble> {
+  Timer? _hideTimer;
+  bool _visible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _show();
+  }
+
+  @override
+  void didUpdateWidget(covariant _HazeSpeechBubble oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.message != oldWidget.message ||
+        (widget.speaking && !oldWidget.speaking)) {
+      _show();
+    }
+  }
+
+  @override
+  void dispose() {
+    _hideTimer?.cancel();
+    super.dispose();
+  }
+
+  void _show() {
+    setState(() => _visible = true);
+    _scheduleHide(const Duration(seconds: 7));
+  }
+
+  void _scheduleHide(Duration delay) {
+    _hideTimer?.cancel();
+    _hideTimer = Timer(delay, () {
+      if (!mounted) return;
+      if (widget.speaking) {
+        // Still talking — check back shortly instead of cutting the line off.
+        _scheduleHide(const Duration(seconds: 2));
+      } else {
+        setState(() => _visible = false);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final selected = state.config.faceType == FaceType.hazeV2 ? FaceType.hazeV2 : FaceType.classic;
-
-    return Center(
-      child: Material(
-        elevation: 8,
-        color: colors.surface.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(24),
-        child: Padding(
-          padding: const EdgeInsets.all(4),
-          child: SegmentedButton<FaceType>(
-            showSelectedIcon: false,
-            selected: {selected},
-            style: ButtonStyle(
-              visualDensity: VisualDensity.compact,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 12)),
+    return IgnorePointer(
+      ignoring: !_visible,
+      child: AnimatedSlide(
+        offset: _visible ? Offset.zero : const Offset(0, 0.3),
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        child: AnimatedOpacity(
+          opacity: _visible ? 1 : 0,
+          duration: const Duration(milliseconds: 250),
+          child: Center(
+            child: GestureDetector(
+              onTap: () => setState(() => _visible = false),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 420),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                decoration: BoxDecoration(
+                  color: colors.surface.withValues(alpha: 0.94),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: widget.accent.withValues(alpha: 0.35)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.25),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  widget.message,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.35),
+                ),
+              ),
             ),
-            segments: const [
-              ButtonSegment<FaceType>(value: FaceType.classic, icon: Icon(Icons.smart_toy_outlined, size: 18), label: Text('V1')),
-              ButtonSegment<FaceType>(value: FaceType.hazeV2, icon: Icon(Icons.auto_awesome, size: 18), label: Text('V2')),
-            ],
-            onSelectionChanged: (selection) {
-              final next = selection.first;
-              context.read<RobotFaceCubit>().updateFaceType(next);
-            },
           ),
         ),
       ),

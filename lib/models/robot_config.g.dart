@@ -21,7 +21,7 @@ _$RobotConfigImpl _$$RobotConfigImplFromJson(Map<String, dynamic> json) =>
             ),
       faceType:
           $enumDecodeNullable(_$FaceTypeEnumMap, json['faceType']) ??
-          FaceType.classic,
+          FaceType.hazeV3,
       speechEnabled: json['speechEnabled'] as bool? ?? false,
       speechRate: (json['speechRate'] as num?)?.toDouble() ?? 0.55,
       speechPitch: (json['speechPitch'] as num?)?.toDouble() ?? 0.95,
@@ -59,4 +59,5 @@ const _$FaceTypeEnumMap = {
   FaceType.minimal: 'minimal',
   FaceType.bean: 'bean',
   FaceType.hazeV2: 'hazeV2',
+  FaceType.hazeV3: 'hazeV3',
 };

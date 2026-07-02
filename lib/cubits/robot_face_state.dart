@@ -19,5 +19,9 @@ class RobotFaceState with _$RobotFaceState {
     @Default(HazePersonality.playful) HazePersonality personality,
     @Default([]) List<TtsVoiceOption> ttsVoiceOptions,
     String? selectedTtsVoiceId,
+
+    /// Where the user's finger is on the face (normalized -1..1 from center),
+    /// while they're dragging. The eyes follow it; null returns to idle gaze.
+    Offset? lookTarget,
   }) = _RobotFaceState;
 }

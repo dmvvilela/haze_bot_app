@@ -228,7 +228,7 @@ class _$RobotConfigImpl implements _RobotConfig {
     this.expression = RobotExpression.happy,
     @ColorConverter() this.eyeColor = Colors.cyan,
     @ColorConverter() this.mouthColor = Colors.pink,
-    this.faceType = FaceType.classic,
+    this.faceType = FaceType.hazeV3,
     this.speechEnabled = false,
     this.speechRate = 0.55,
     this.speechPitch = 0.95,

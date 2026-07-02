@@ -10,7 +10,7 @@ class RobotConfig with _$RobotConfig {
     @Default(RobotExpression.happy) RobotExpression expression,
     @Default(Colors.cyan) @ColorConverter() Color eyeColor,
     @Default(Colors.pink) @ColorConverter() Color mouthColor,
-    @Default(FaceType.classic) FaceType faceType,
+    @Default(FaceType.hazeV3) FaceType faceType,
     @Default(false) bool speechEnabled,
     @Default(0.55) double speechRate,
     @Default(0.95) double speechPitch,
@@ -33,7 +33,7 @@ enum RobotExpression {
   winking,
 }
 
-enum FaceType { classic, looi, minimal, bean, hazeV2 }
+enum FaceType { classic, looi, minimal, bean, hazeV2, hazeV3 }
 
 // Custom color converter for Freezed
 class ColorConverter implements JsonConverter<Color, int> {
@@ -104,6 +104,8 @@ extension FaceTypeExtension on FaceType {
         return 'Bean Face';
       case FaceType.hazeV2:
         return 'Haze V2';
+      case FaceType.hazeV3:
+        return 'Haze V3';
     }
   }
 
@@ -119,6 +121,8 @@ extension FaceTypeExtension on FaceType {
         return 'Fall Guys inspired vertical bean eyes';
       case FaceType.hazeV2:
         return 'More alive, reactive, and animated';
+      case FaceType.hazeV3:
+        return 'Big glowing eyes with fluid, cute emotions';
     }
   }
 }
