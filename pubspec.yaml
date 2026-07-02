@@ -46,7 +46,10 @@ dependencies:
   
   # Text to speech
   flutter_tts: ^4.0.2
-  
+
+  # Short chirp sound effects (synthesized, see tool/generate_sounds.py)
+  audioplayers: ^6.1.0
+
   # Internationalization
   slang: ^3.31.2
   slang_flutter: ^3.31.0
@@ -94,6 +97,7 @@ flutter:
   assets:
     - .env
     - assets/images/
+    - assets/sounds/
     # - assets/fonts/
 
   # An image asset can refer to one or more resolution-specific "variants", see

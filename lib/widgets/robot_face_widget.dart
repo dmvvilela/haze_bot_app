@@ -25,73 +25,85 @@ class RobotFaceWidget extends StatelessWidget {
         // V3 is a full "screen face" — let it take most of the display, the
         // way mall companion robots do.
         final media = MediaQuery.sizeOf(context);
-        final width = isV3
-            ? math.min(media.width * 0.94, 540.0)
-            : (isV2 ? 360.0 : 300.0);
-        final height = isV3
-            ? math.min(media.height * 0.68, 640.0)
-            : (isV2 ? 440.0 : 400.0);
-        final cubit = context.read<RobotFaceCubit>();
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // Size against whatever box we're given (main screen body, game
+            // screen slot, ...) instead of assuming the whole display.
+            final maxW = constraints.hasBoundedWidth
+                ? constraints.maxWidth
+                : media.width;
+            final maxH = constraints.hasBoundedHeight
+                ? constraints.maxHeight
+                : media.height;
+            final width = isV3
+                ? math.min(maxW * 0.94, 540.0)
+                : math.min(isV2 ? 360.0 : 300.0, maxW);
+            final height = isV3
+                ? math.min(maxH * 0.8, 640.0)
+                : math.min(isV2 ? 440.0 : 400.0, maxH);
+            final cubit = context.read<RobotFaceCubit>();
 
-        // Convert a touch position into a normalized look direction so the
-        // eyes can track the user's finger.
-        void lookAt(Offset local) {
-          cubit.setLookTarget(
-            Offset(
-              ((local.dx / width) - 0.5) * 2.4,
-              ((local.dy / height) - 0.5) * 2.2,
-            ),
-          );
-        }
+            // Convert a touch position into a normalized look direction so
+            // the eyes can track the user's finger.
+            void lookAt(Offset local) {
+              cubit.setLookTarget(
+                Offset(
+                  ((local.dx / width) - 0.5) * 2.4,
+                  ((local.dy / height) - 0.5) * 2.2,
+                ),
+              );
+            }
 
-        return GestureDetector(
-          // The face itself paints on a bare CustomPaint, which isn't
-          // hit-testable — without this, taps on V2/V3 never land.
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            HapticFeedback.selectionClick();
-            cubit.onTap();
-          },
-          onPanStart: (details) => lookAt(details.localPosition),
-          onPanUpdate: (details) => lookAt(details.localPosition),
-          onPanEnd: (_) => cubit.setLookTarget(null),
-          onPanCancel: () => cubit.setLookTarget(null),
-          child: AnimatedScale(
-            duration: const Duration(milliseconds: 150),
-            curve: Curves.easeOut,
-            scale: state.isPressed ? 1.05 : 1.0,
-            child: Container(
-              width: width,
-              height: height,
-              decoration: (isV2 || isV3)
-                  ? null
-                  : BoxDecoration(
-                      color: state.config.isDarkTheme
-                          ? Colors.grey[900]
-                          : Colors.white,
-                      borderRadius: BorderRadius.circular(40),
-                      boxShadow: [
-                        if (state.isPressed)
-                          BoxShadow(
-                            color: state.config.eyeColor.withValues(
-                              alpha: 0.16,
-                            ),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                          ),
-                        BoxShadow(
+            return GestureDetector(
+              // The face itself paints on a bare CustomPaint, which isn't
+              // hit-testable — without this, taps on V2/V3 never land.
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                HapticFeedback.selectionClick();
+                cubit.onTap();
+              },
+              onPanStart: (details) => lookAt(details.localPosition),
+              onPanUpdate: (details) => lookAt(details.localPosition),
+              onPanEnd: (_) => cubit.setLookTarget(null),
+              onPanCancel: () => cubit.setLookTarget(null),
+              child: AnimatedScale(
+                duration: const Duration(milliseconds: 150),
+                curve: Curves.easeOut,
+                scale: state.isPressed ? 1.05 : 1.0,
+                child: Container(
+                  width: width,
+                  height: height,
+                  decoration: (isV2 || isV3)
+                      ? null
+                      : BoxDecoration(
                           color: state.config.isDarkTheme
-                              ? Colors.black.withValues(alpha: 0.5)
-                              : Colors.grey.withValues(alpha: 0.2),
-                          blurRadius: 15,
-                          spreadRadius: 1,
-                          offset: const Offset(0, 8),
+                              ? Colors.grey[900]
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(40),
+                          boxShadow: [
+                            if (state.isPressed)
+                              BoxShadow(
+                                color: state.config.eyeColor.withValues(
+                                  alpha: 0.16,
+                                ),
+                                blurRadius: 10,
+                                spreadRadius: 2,
+                              ),
+                            BoxShadow(
+                              color: state.config.isDarkTheme
+                                  ? Colors.black.withValues(alpha: 0.5)
+                                  : Colors.grey.withValues(alpha: 0.2),
+                              blurRadius: 15,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-              child: _buildFaceType(state.config.faceType, state),
-            ),
-          ),
+                  child: _buildFaceType(state.config.faceType, state),
+                ),
+              ),
+            );
+          },
         );
       },
     );

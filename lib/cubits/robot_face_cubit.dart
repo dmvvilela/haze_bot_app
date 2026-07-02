@@ -12,6 +12,7 @@ import 'dart:async';
 import '../models/robot_config.dart';
 import '../i18n/strings.g.dart';
 import '../services/haze_brain.dart';
+import '../services/sound_service.dart';
 import '../services/timer_service.dart';
 
 part 'robot_face_state.dart';
@@ -46,6 +47,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   final FlutterTts _flutterTts = FlutterTts();
   final HazeBrain _brain = HazeBrain();
   final TimerService _timerService = TimerService();
+  final SoundService sounds = SoundService();
   StreamSubscription? _timerSubscription;
   StreamSubscription? _timerStatusSubscription;
   StreamSubscription? _timerCompleteSubscription;
@@ -67,6 +69,10 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   void onChange(Change<RobotFaceState> change) {
     super.onChange(change);
     if (change.currentState.config != change.nextState.config) {
+      if (change.currentState.config.soundEnabled !=
+          change.nextState.config.soundEnabled) {
+        sounds.enabled = change.nextState.config.soundEnabled;
+      }
       _saveConfig(change.nextState.config);
     }
   }
@@ -352,7 +358,25 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     updateScreenAwakeBasedOnControls();
   }
 
+  /// Change Haze's face without speaking about it — used by the feelings
+  /// game, where announcing the emotion would give the answer away.
+  void showExpression(RobotExpression expression) {
+    emit(state.copyWith(config: state.config.copyWith(expression: expression)));
+  }
+
+  /// Speak an arbitrary line acted with [emotion] (no-op with speech off).
+  Future<void> speakLine(String text, {RobotExpression? emotion}) =>
+      _speak(text, emotion: emotion);
+
+  void toggleSound() {
+    final newConfig = state.config.copyWith(
+      soundEnabled: !state.config.soundEnabled,
+    );
+    emit(state.copyWith(config: newConfig));
+  }
+
   void onTap() {
+    sounds.play(HazeSound.poke);
     emit(state.copyWith(isPressed: true));
     cycleExpression();
 
@@ -735,6 +759,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       await _flutterTts.stop();
     } catch (_) {}
     await _brain.dispose();
+    await sounds.dispose();
     _timerService.dispose();
     await _timerSubscription?.cancel();
     await _timerStatusSubscription?.cancel();

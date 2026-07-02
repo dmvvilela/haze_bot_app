@@ -80,6 +80,43 @@ void main() {
     );
   });
 
+  testWidgets('haze face — light theme', (tester) async {
+    tester.view.physicalSize = const Size(900, 1100);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: const Color(0xFFF5F5F5),
+          body: Center(
+            child: RepaintBoundary(
+              key: _faceKey,
+              child: SizedBox(
+                width: 640,
+                height: 768,
+                child: HazeFace(
+                  state: RobotFaceState(
+                    config: RobotConfig(
+                      faceType: FaceType.hazeV3,
+                      isDarkTheme: false,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await _settle(tester);
+    await expectLater(
+      find.byKey(_faceKey),
+      matchesGoldenFile('goldens/haze_light_theme.png'),
+    );
+  });
+
   testWidgets('haze face — thinking', (tester) async {
     tester.view.physicalSize = const Size(900, 1100);
     tester.view.devicePixelRatio = 1.0;

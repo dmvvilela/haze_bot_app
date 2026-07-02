@@ -6,7 +6,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'cubits/feelings_game_cubit.dart';
 import 'cubits/robot_face_cubit.dart';
+import 'widgets/feelings_game_screen.dart';
 import 'widgets/robot_face_widget.dart';
 import 'widgets/color_picker_dialog.dart';
 import 'widgets/face_type_picker_dialog.dart';
@@ -99,6 +101,8 @@ class RobotFaceScreen extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // Feelings game — Haze acts, the player names the emotion
+                        IconButton(icon: Icon(Icons.emoji_emotions_outlined), tooltip: t.game.play, onPressed: () => _showGame(context)),
                         // Timer button with indicator
                         Stack(
                           children: [
@@ -204,6 +208,21 @@ class RobotFaceScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showGame(BuildContext context) {
+    final cubit = context.read<RobotFaceCubit>();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: cubit),
+            BlocProvider(create: (_) => FeelingsGameCubit(cubit)),
+          ],
+          child: const FeelingsGameScreen(),
+        ),
+      ),
     );
   }
 

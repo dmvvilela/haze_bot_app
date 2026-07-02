@@ -25,6 +25,29 @@ face_types:
     name: Rosto Feijão
     description: Olhos verticais inspirados no Fall Guys
 
+emotion_names:
+  happy: Feliz
+  surprised: Surpreso
+  sleepy: Sonolento
+  excited: Animado
+  confused: Confuso
+  love: Apaixonado
+  angry: Bravo
+  winking: Piscando
+
+game:
+  title: Jogo dos Sentimentos
+  prompt: Como o Haze está se sentindo?
+  correct: "Isso mesmo — $name!"
+  praise:
+    - Muito bem!
+    - Você acertou!
+    - Incrível!
+  try_again: Hmm, olhe de novo...
+  score: Pontos
+  streak: Sequência
+  play: Jogo dos sentimentos
+
 ui:
   choose_colors: Escolher Cores
   choose_face_type: Escolher Tipo de Rosto

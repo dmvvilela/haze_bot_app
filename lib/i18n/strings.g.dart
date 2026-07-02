@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 62 (31 per locale)
+/// Strings: 98 (49 per locale)
 ///
-/// Built on 2025-06-15 at 05:35 UTC
+/// Built on 2026-07-02 at 21:14 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -151,6 +151,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsAppEn app = _StringsAppEn._(_root);
 	late final _StringsExpressionsEn expressions = _StringsExpressionsEn._(_root);
 	late final _StringsFaceTypesEn face_types = _StringsFaceTypesEn._(_root);
+	late final _StringsEmotionNamesEn emotion_names = _StringsEmotionNamesEn._(_root);
+	late final _StringsGameEn game = _StringsGameEn._(_root);
 	late final _StringsUiEn ui = _StringsUiEn._(_root);
 }
 
@@ -192,6 +194,44 @@ class _StringsFaceTypesEn {
 	late final _StringsFaceTypesLooiEn looi = _StringsFaceTypesLooiEn._(_root);
 	late final _StringsFaceTypesMinimalEn minimal = _StringsFaceTypesMinimalEn._(_root);
 	late final _StringsFaceTypesBeanEn bean = _StringsFaceTypesBeanEn._(_root);
+}
+
+// Path: emotion_names
+class _StringsEmotionNamesEn {
+	_StringsEmotionNamesEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get happy => 'Happy';
+	String get surprised => 'Surprised';
+	String get sleepy => 'Sleepy';
+	String get excited => 'Excited';
+	String get confused => 'Confused';
+	String get love => 'In love';
+	String get angry => 'Angry';
+	String get winking => 'Winking';
+}
+
+// Path: game
+class _StringsGameEn {
+	_StringsGameEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get title => 'Feelings Game';
+	String get prompt => 'How does Haze feel?';
+	String correct({required Object name}) => 'That\'s right — ${name}!';
+	List<String> get praise => [
+		'Great job!',
+		'You got it!',
+		'Amazing!',
+	];
+	String get try_again => 'Hmm, look again...';
+	String get score => 'Score';
+	String get streak => 'Streak';
+	String get play => 'Feelings game';
 }
 
 // Path: ui
@@ -290,6 +330,8 @@ class _StringsPt extends Translations {
 	@override late final _StringsAppPt app = _StringsAppPt._(_root);
 	@override late final _StringsExpressionsPt expressions = _StringsExpressionsPt._(_root);
 	@override late final _StringsFaceTypesPt face_types = _StringsFaceTypesPt._(_root);
+	@override late final _StringsEmotionNamesPt emotion_names = _StringsEmotionNamesPt._(_root);
+	@override late final _StringsGamePt game = _StringsGamePt._(_root);
 	@override late final _StringsUiPt ui = _StringsUiPt._(_root);
 }
 
@@ -331,6 +373,44 @@ class _StringsFaceTypesPt extends _StringsFaceTypesEn {
 	@override late final _StringsFaceTypesLooiPt looi = _StringsFaceTypesLooiPt._(_root);
 	@override late final _StringsFaceTypesMinimalPt minimal = _StringsFaceTypesMinimalPt._(_root);
 	@override late final _StringsFaceTypesBeanPt bean = _StringsFaceTypesBeanPt._(_root);
+}
+
+// Path: emotion_names
+class _StringsEmotionNamesPt extends _StringsEmotionNamesEn {
+	_StringsEmotionNamesPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get happy => 'Feliz';
+	@override String get surprised => 'Surpreso';
+	@override String get sleepy => 'Sonolento';
+	@override String get excited => 'Animado';
+	@override String get confused => 'Confuso';
+	@override String get love => 'Apaixonado';
+	@override String get angry => 'Bravo';
+	@override String get winking => 'Piscando';
+}
+
+// Path: game
+class _StringsGamePt extends _StringsGameEn {
+	_StringsGamePt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Jogo dos Sentimentos';
+	@override String get prompt => 'Como o Haze está se sentindo?';
+	@override String correct({required Object name}) => 'Isso mesmo — ${name}!';
+	@override List<String> get praise => [
+		'Muito bem!',
+		'Você acertou!',
+		'Incrível!',
+	];
+	@override String get try_again => 'Hmm, olhe de novo...';
+	@override String get score => 'Pontos';
+	@override String get streak => 'Sequência';
+	@override String get play => 'Jogo dos sentimentos';
 }
 
 // Path: ui
@@ -423,6 +503,24 @@ extension on Translations {
 			case 'face_types.minimal.description': return 'Simple and clean design';
 			case 'face_types.bean.name': return 'Bean Face';
 			case 'face_types.bean.description': return 'Fall Guys inspired vertical bean eyes';
+			case 'emotion_names.happy': return 'Happy';
+			case 'emotion_names.surprised': return 'Surprised';
+			case 'emotion_names.sleepy': return 'Sleepy';
+			case 'emotion_names.excited': return 'Excited';
+			case 'emotion_names.confused': return 'Confused';
+			case 'emotion_names.love': return 'In love';
+			case 'emotion_names.angry': return 'Angry';
+			case 'emotion_names.winking': return 'Winking';
+			case 'game.title': return 'Feelings Game';
+			case 'game.prompt': return 'How does Haze feel?';
+			case 'game.correct': return ({required Object name}) => 'That\'s right — ${name}!';
+			case 'game.praise.0': return 'Great job!';
+			case 'game.praise.1': return 'You got it!';
+			case 'game.praise.2': return 'Amazing!';
+			case 'game.try_again': return 'Hmm, look again...';
+			case 'game.score': return 'Score';
+			case 'game.streak': return 'Streak';
+			case 'game.play': return 'Feelings game';
 			case 'ui.choose_colors': return 'Choose Colors';
 			case 'ui.choose_face_type': return 'Choose Face Type';
 			case 'ui.settings': return 'Settings';
@@ -462,6 +560,24 @@ extension on _StringsPt {
 			case 'face_types.minimal.description': return 'Design simples e limpo';
 			case 'face_types.bean.name': return 'Rosto Feijão';
 			case 'face_types.bean.description': return 'Olhos verticais inspirados no Fall Guys';
+			case 'emotion_names.happy': return 'Feliz';
+			case 'emotion_names.surprised': return 'Surpreso';
+			case 'emotion_names.sleepy': return 'Sonolento';
+			case 'emotion_names.excited': return 'Animado';
+			case 'emotion_names.confused': return 'Confuso';
+			case 'emotion_names.love': return 'Apaixonado';
+			case 'emotion_names.angry': return 'Bravo';
+			case 'emotion_names.winking': return 'Piscando';
+			case 'game.title': return 'Jogo dos Sentimentos';
+			case 'game.prompt': return 'Como o Haze está se sentindo?';
+			case 'game.correct': return ({required Object name}) => 'Isso mesmo — ${name}!';
+			case 'game.praise.0': return 'Muito bem!';
+			case 'game.praise.1': return 'Você acertou!';
+			case 'game.praise.2': return 'Incrível!';
+			case 'game.try_again': return 'Hmm, olhe de novo...';
+			case 'game.score': return 'Pontos';
+			case 'game.streak': return 'Sequência';
+			case 'game.play': return 'Jogo dos sentimentos';
 			case 'ui.choose_colors': return 'Escolher Cores';
 			case 'ui.choose_face_type': return 'Escolher Tipo de Rosto';
 			case 'ui.settings': return 'Configurações';

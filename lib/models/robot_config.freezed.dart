@@ -28,6 +28,7 @@ mixin _$RobotConfig {
   Color get mouthColor => throw _privateConstructorUsedError;
   FaceType get faceType => throw _privateConstructorUsedError;
   bool get speechEnabled => throw _privateConstructorUsedError;
+  bool get soundEnabled => throw _privateConstructorUsedError;
   double get speechRate => throw _privateConstructorUsedError;
   double get speechPitch => throw _privateConstructorUsedError;
   String get language => throw _privateConstructorUsedError;
@@ -56,6 +57,7 @@ abstract class $RobotConfigCopyWith<$Res> {
     @ColorConverter() Color mouthColor,
     FaceType faceType,
     bool speechEnabled,
+    bool soundEnabled,
     double speechRate,
     double speechPitch,
     String language,
@@ -83,6 +85,7 @@ class _$RobotConfigCopyWithImpl<$Res, $Val extends RobotConfig>
     Object? mouthColor = null,
     Object? faceType = null,
     Object? speechEnabled = null,
+    Object? soundEnabled = null,
     Object? speechRate = null,
     Object? speechPitch = null,
     Object? language = null,
@@ -109,6 +112,10 @@ class _$RobotConfigCopyWithImpl<$Res, $Val extends RobotConfig>
             speechEnabled: null == speechEnabled
                 ? _value.speechEnabled
                 : speechEnabled // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            soundEnabled: null == soundEnabled
+                ? _value.soundEnabled
+                : soundEnabled // ignore: cast_nullable_to_non_nullable
                       as bool,
             speechRate: null == speechRate
                 ? _value.speechRate
@@ -147,6 +154,7 @@ abstract class _$$RobotConfigImplCopyWith<$Res>
     @ColorConverter() Color mouthColor,
     FaceType faceType,
     bool speechEnabled,
+    bool soundEnabled,
     double speechRate,
     double speechPitch,
     String language,
@@ -173,6 +181,7 @@ class __$$RobotConfigImplCopyWithImpl<$Res>
     Object? mouthColor = null,
     Object? faceType = null,
     Object? speechEnabled = null,
+    Object? soundEnabled = null,
     Object? speechRate = null,
     Object? speechPitch = null,
     Object? language = null,
@@ -199,6 +208,10 @@ class __$$RobotConfigImplCopyWithImpl<$Res>
         speechEnabled: null == speechEnabled
             ? _value.speechEnabled
             : speechEnabled // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        soundEnabled: null == soundEnabled
+            ? _value.soundEnabled
+            : soundEnabled // ignore: cast_nullable_to_non_nullable
                   as bool,
         speechRate: null == speechRate
             ? _value.speechRate
@@ -230,6 +243,7 @@ class _$RobotConfigImpl implements _RobotConfig {
     @ColorConverter() this.mouthColor = Colors.pink,
     this.faceType = FaceType.hazeV3,
     this.speechEnabled = false,
+    this.soundEnabled = true,
     this.speechRate = 0.55,
     this.speechPitch = 0.95,
     this.language = 'en-US',
@@ -258,6 +272,9 @@ class _$RobotConfigImpl implements _RobotConfig {
   final bool speechEnabled;
   @override
   @JsonKey()
+  final bool soundEnabled;
+  @override
+  @JsonKey()
   final double speechRate;
   @override
   @JsonKey()
@@ -271,7 +288,7 @@ class _$RobotConfigImpl implements _RobotConfig {
 
   @override
   String toString() {
-    return 'RobotConfig(expression: $expression, eyeColor: $eyeColor, mouthColor: $mouthColor, faceType: $faceType, speechEnabled: $speechEnabled, speechRate: $speechRate, speechPitch: $speechPitch, language: $language, isDarkTheme: $isDarkTheme)';
+    return 'RobotConfig(expression: $expression, eyeColor: $eyeColor, mouthColor: $mouthColor, faceType: $faceType, speechEnabled: $speechEnabled, soundEnabled: $soundEnabled, speechRate: $speechRate, speechPitch: $speechPitch, language: $language, isDarkTheme: $isDarkTheme)';
   }
 
   @override
@@ -289,6 +306,8 @@ class _$RobotConfigImpl implements _RobotConfig {
                 other.faceType == faceType) &&
             (identical(other.speechEnabled, speechEnabled) ||
                 other.speechEnabled == speechEnabled) &&
+            (identical(other.soundEnabled, soundEnabled) ||
+                other.soundEnabled == soundEnabled) &&
             (identical(other.speechRate, speechRate) ||
                 other.speechRate == speechRate) &&
             (identical(other.speechPitch, speechPitch) ||
@@ -308,6 +327,7 @@ class _$RobotConfigImpl implements _RobotConfig {
     mouthColor,
     faceType,
     speechEnabled,
+    soundEnabled,
     speechRate,
     speechPitch,
     language,
@@ -335,6 +355,7 @@ abstract class _RobotConfig implements RobotConfig {
     @ColorConverter() final Color mouthColor,
     final FaceType faceType,
     final bool speechEnabled,
+    final bool soundEnabled,
     final double speechRate,
     final double speechPitch,
     final String language,
@@ -356,6 +377,8 @@ abstract class _RobotConfig implements RobotConfig {
   FaceType get faceType;
   @override
   bool get speechEnabled;
+  @override
+  bool get soundEnabled;
   @override
   double get speechRate;
   @override

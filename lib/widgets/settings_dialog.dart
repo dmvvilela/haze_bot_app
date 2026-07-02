@@ -100,6 +100,14 @@ class SettingsDialog extends StatelessWidget {
                   const SizedBox(height: 12),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
+                    title: const Text('Sound effects'),
+                    subtitle: const Text('Chirps when you poke or play with Haze'),
+                    value: state.config.soundEnabled,
+                    onChanged: (_) =>
+                        context.read<RobotFaceCubit>().toggleSound(),
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
                     title: Text(t.ui.speech_enabled),
                     subtitle: Text(t.ui.speech_description),
                     value: state.config.speechEnabled,

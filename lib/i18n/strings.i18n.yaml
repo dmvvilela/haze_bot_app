@@ -25,6 +25,29 @@ face_types:
     name: Bean Face
     description: Fall Guys inspired vertical bean eyes
 
+emotion_names:
+  happy: Happy
+  surprised: Surprised
+  sleepy: Sleepy
+  excited: Excited
+  confused: Confused
+  love: In love
+  angry: Angry
+  winking: Winking
+
+game:
+  title: Feelings Game
+  prompt: How does Haze feel?
+  correct: "That's right — $name!"
+  praise:
+    - Great job!
+    - You got it!
+    - Amazing!
+  try_again: Hmm, look again...
+  score: Score
+  streak: Streak
+  play: Feelings game
+
 ui:
   choose_colors: Choose Colors
   choose_face_type: Choose Face Type
