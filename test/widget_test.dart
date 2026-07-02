@@ -64,7 +64,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
     expect(cubit.state.config.faceType, FaceType.classic);
 
-    await tester.tap(find.byIcon(Icons.settings));
+    // Settings now lives in the overflow menu.
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
 
     expect(find.text('AI Brain'), findsOneWidget);

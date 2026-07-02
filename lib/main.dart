@@ -65,6 +65,15 @@ class HazeBotApp extends StatelessWidget {
   }
 }
 
+enum _MenuAction { colors, faceStyle, theme, settings }
+
+PopupMenuItem<_MenuAction> _menuItem(_MenuAction action, IconData icon, String label) {
+  return PopupMenuItem(
+    value: action,
+    child: Row(children: [Icon(icon, size: 20), const SizedBox(width: 12), Text(label)]),
+  );
+}
+
 class RobotFaceScreen extends StatelessWidget {
   const RobotFaceScreen({super.key});
 
@@ -124,21 +133,34 @@ class RobotFaceScreen extends StatelessWidget {
                           icon: Icon(Icons.chat_bubble_outline),
                           onPressed: () => _withAiConsent(context, () => _showTalk(context)),
                         ),
-                        // Personality picker — swaps Haze's voice
-                        PopupMenuButton<HazePersonality>(
-                          icon: Icon(Icons.theater_comedy),
-                          tooltip: "Haze's mood",
-                          initialValue: state.personality,
-                          onSelected: (p) => context.read<RobotFaceCubit>().setPersonality(p),
-                          itemBuilder: (_) =>
-                              HazePersonality.values.map((p) => PopupMenuItem(value: p, child: Text(p.displayName))).toList(),
-                        ),
-                        IconButton(icon: Icon(Icons.palette), onPressed: () => _showColorPicker(context)),
-                        IconButton(icon: Icon(Icons.face), onPressed: () => _showFaceTypePicker(context)),
-                        IconButton(icon: Icon(Icons.settings), onPressed: () => _showSettings(context)),
-                        IconButton(
-                          icon: Icon(state.config.isDarkTheme ? Icons.light_mode : Icons.dark_mode),
-                          onPressed: () => context.read<RobotFaceCubit>().toggleTheme(),
+                        // Everything else lives in the overflow menu — nine
+                        // inline actions overflowed the app bar on phones.
+                        PopupMenuButton<_MenuAction>(
+                          icon: const Icon(Icons.more_vert),
+                          tooltip: 'More',
+                          onSelected: (action) {
+                            final cubit = context.read<RobotFaceCubit>();
+                            switch (action) {
+                              case _MenuAction.colors:
+                                _showColorPicker(context);
+                              case _MenuAction.faceStyle:
+                                _showFaceTypePicker(context);
+                              case _MenuAction.theme:
+                                cubit.toggleTheme();
+                              case _MenuAction.settings:
+                                _showSettings(context);
+                            }
+                          },
+                          itemBuilder: (_) => [
+                            _menuItem(_MenuAction.colors, Icons.palette, 'Colors'),
+                            _menuItem(_MenuAction.faceStyle, Icons.face, 'Face style'),
+                            _menuItem(
+                              _MenuAction.theme,
+                              state.config.isDarkTheme ? Icons.light_mode : Icons.dark_mode,
+                              state.config.isDarkTheme ? 'Light theme' : 'Dark theme',
+                            ),
+                            _menuItem(_MenuAction.settings, Icons.settings, 'Settings'),
+                          ],
                         ),
                         IconButton(icon: Icon(Icons.visibility_off), onPressed: () => context.read<RobotFaceCubit>().toggleControls()),
                       ],
@@ -173,11 +195,7 @@ class RobotFaceScreen extends StatelessWidget {
                     left: 24,
                     right: 24,
                     bottom: (state.timerSeconds > 0 || state.isTimerRunning) ? 104 : 36,
-                    child: _HazeSpeechBubble(
-                      message: state.aiMessage,
-                      speaking: state.isSpeaking,
-                      accent: state.config.eyeColor,
-                    ),
+                    child: _HazeSpeechBubble(message: state.aiMessage, speaking: state.isSpeaking, accent: state.config.eyeColor),
                   ),
                 if (state.timerSeconds > 0 || state.isTimerRunning)
                   Positioned(left: 20, right: 20, bottom: 28, child: _TimerOverlay(state: state)),
@@ -251,11 +269,7 @@ class _HazeSpeechBubble extends StatefulWidget {
   final bool speaking;
   final Color accent;
 
-  const _HazeSpeechBubble({
-    required this.message,
-    required this.speaking,
-    required this.accent,
-  });
+  const _HazeSpeechBubble({required this.message, required this.speaking, required this.accent});
 
   @override
   State<_HazeSpeechBubble> createState() => _HazeSpeechBubbleState();
@@ -274,8 +288,7 @@ class _HazeSpeechBubbleState extends State<_HazeSpeechBubble> {
   @override
   void didUpdateWidget(covariant _HazeSpeechBubble oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.message != oldWidget.message ||
-        (widget.speaking && !oldWidget.speaking)) {
+    if (widget.message != oldWidget.message || (widget.speaking && !oldWidget.speaking)) {
       _show();
     }
   }
@@ -326,13 +339,7 @@ class _HazeSpeechBubbleState extends State<_HazeSpeechBubble> {
                   color: colors.surface.withValues(alpha: 0.94),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: widget.accent.withValues(alpha: 0.35)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.25),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 16, offset: const Offset(0, 6))],
                 ),
                 child: Text(
                   widget.message,
