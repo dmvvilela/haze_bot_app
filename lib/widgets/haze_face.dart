@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -19,7 +20,11 @@ import '../models/robot_config.dart';
 class HazeFace extends StatefulWidget {
   final RobotFaceState state;
 
-  const HazeFace({super.key, required this.state});
+  /// Live loudness (0..1) of audio playing through the robot voice pipe.
+  /// Null (e.g. in golden tests) falls back to the pseudo-syllable mouth.
+  final ValueListenable<double>? voiceLevel;
+
+  const HazeFace({super.key, required this.state, this.voiceLevel});
 
   @override
   State<HazeFace> createState() => _HazeFaceState();
@@ -122,6 +127,9 @@ class _HazeFaceState extends State<HazeFace>
   @override
   Widget build(BuildContext context) {
     final close = _blinkClose;
+    // The ticker rebuilds every frame, so reading the current loudness here
+    // keeps the mouth in sync with the real sound without extra plumbing.
+    final voiceLevel = widget.voiceLevel?.value ?? 0;
     return Semantics(
       label: 'Haze face',
       child: CustomPaint(
@@ -137,6 +145,7 @@ class _HazeFaceState extends State<HazeFace>
           isDark: widget.state.config.isDarkTheme,
           speaking: widget.state.isSpeaking,
           thinking: widget.state.isLoadingAI,
+          voiceLevel: voiceLevel,
         ),
         child: const SizedBox.expand(),
       ),
@@ -360,6 +369,7 @@ class _HazeFacePainter extends CustomPainter {
   final bool isDark;
   final bool speaking;
   final bool thinking;
+  final double voiceLevel;
 
   _HazeFacePainter({
     required this.pose,
@@ -373,6 +383,7 @@ class _HazeFacePainter extends CustomPainter {
     required this.isDark,
     required this.speaking,
     required this.thinking,
+    this.voiceLevel = 0,
   });
 
   @override
@@ -648,11 +659,14 @@ class _HazeFacePainter extends CustomPainter {
     final c = Offset(200 + pose.smirk * 6 + gaze.dx * 6, 332 + gaze.dy * 6);
 
     if (speaking) {
-      // Pseudo-syllable envelope: two detuned sines make it read as speech
-      // rather than a metronome.
+      // The real loudness of the audio when it plays through SoLoud;
+      // otherwise the pseudo-syllable envelope — two detuned sines make it
+      // read as speech rather than a metronome.
       final a = (math.sin(t * 10.5) + 1) / 2;
       final b = (math.sin(t * 23.7 + 1.3) + 1) / 2;
-      final open01 = (0.3 + 0.7 * a) * (0.5 + 0.5 * b);
+      final open01 = voiceLevel > 0.001
+          ? voiceLevel.clamp(0.0, 1.0)
+          : (0.3 + 0.7 * a) * (0.5 + 0.5 * b);
       final mh = 8 + open01 * 30;
       final mw = 52 - open01 * 16;
       final rect = RRect.fromRectAndRadius(

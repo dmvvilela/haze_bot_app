@@ -96,7 +96,7 @@ class RobotFaceWidget extends StatelessWidget {
                             ),
                           ],
                         ),
-                  child: _buildFaceType(state.config.faceType, state),
+                  child: _buildFaceType(state.config.faceType, state, cubit),
                 ),
               ),
             );
@@ -106,7 +106,11 @@ class RobotFaceWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildFaceType(FaceType faceType, RobotFaceState state) {
+  Widget _buildFaceType(
+    FaceType faceType,
+    RobotFaceState state,
+    RobotFaceCubit cubit,
+  ) {
     switch (faceType) {
       case FaceType.classic:
         return ClassicFace(state: state);
@@ -117,9 +121,9 @@ class RobotFaceWidget extends StatelessWidget {
       case FaceType.bean:
         return BeanFace(state: state);
       case FaceType.hazeV2:
-        return AliveFace(state: state);
+        return AliveFace(state: state, voiceLevel: cubit.voice.level);
       case FaceType.hazeV3:
-        return HazeFace(state: state);
+        return HazeFace(state: state, voiceLevel: cubit.voice.level);
     }
   }
 }

@@ -1,0 +1,7 @@
+# Copy to android/key.properties (gitignored) and fill in.
+# storeFile must be an ABSOLUTE path to the .jks/.keystore on disk.
+
+storePassword=
+keyPassword=
+keyAlias=
+storeFile=

@@ -44,4 +44,58 @@ post_install do |installer|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
     end
   end
+
+  # MediaPipeTasksGenAIC (flutter_gemma) and flutter_soloud both declare the
+  # SDK-conditioned OTHER_LDFLAGS[sdk=...] for the app target. CocoaPods
+  # treats conditional settings as singular — "Can't merge user_target_xcconfig
+  # ... has different values" — and DROPS the setting, losing the -force_load
+  # each library needs to get its FFI symbols into the app binary. Symptom:
+  # "Failed to lookup symbol 'isInited'" at runtime. Re-merge them here by
+  # collecting the flags from every pod spec and appending the combined line
+  # to the generated Pods-Runner xcconfigs (last definition wins in xcconfig).
+  ldflags_keys = ['OTHER_LDFLAGS[sdk=iphoneos*]', 'OTHER_LDFLAGS[sdk=iphonesimulator*]']
+  merged = Hash.new { |hash, key| hash[key] = ['$(inherited)'] }
+  installer.pod_targets.flat_map(&:specs).uniq.each do |spec|
+    user_xcconfig = spec.attributes_hash['user_target_xcconfig'] || {}
+    ldflags_keys.each do |key|
+      value = user_xcconfig[key]&.gsub('$(inherited)', '')&.strip
+      merged[key] << value unless value.nil? || value.empty?
+    end
+  end
+  additions = merged.select { |_, values| values.size > 2 }
+                    .map { |key, values| "#{key} = #{values.join(' ')}" }
+  unless additions.empty?
+    banner = '// Merged by Podfile post_install (see comment there)'
+    Dir.glob(File.join(installer.sandbox.target_support_files_root.to_s,
+                       'Pods-Runner', '*.xcconfig')).each do |path|
+      content = File.read(path)
+      next if content.include?(banner)
+      File.write(path, "#{content}\n#{banner}\n#{additions.join("\n")}\n")
+    end
+    Pod::UI.puts "Merged conditional OTHER_LDFLAGS from #{merged.values.flatten.size - 2} pod entries into Pods-Runner xcconfigs"
+  end
+
+  # Both MediaPipeTasksGenAIC and flutter_soloud's static libs bundle pffft
+  # (same upstream FFT library, same C API). Force-loading both (above) makes
+  # the linker see 15 duplicate pffft symbols. Strip MediaPipe's pffft.o —
+  # its references resolve against SoLoud's identical force-loaded copy.
+  # Idempotent: skipped once the object is gone; reapplied after pod updates.
+  Dir.glob(File.join(installer.sandbox.root.to_s,
+                     'MediaPipeTasksGenAIC/frameworks/genai_libraries/*.a')).each do |archive|
+    next unless system("nm -arch arm64 '#{archive}' 2>/dev/null | grep -q 'T _pffft_new_setup'")
+    archs = `lipo -archs '#{archive}' 2>/dev/null`.split
+    if archs.length <= 1
+      system("ar -d '#{archive}' pffft.o && ranlib '#{archive}'")
+    else
+      slices = archs.map do |arch|
+        slice = "#{archive}.#{arch}"
+        system("lipo '#{archive}' -thin #{arch} -output '#{slice}'")
+        system("ar -d '#{slice}' pffft.o && ranlib '#{slice}'")
+        slice
+      end
+      system("lipo -create #{slices.map { |s| "'#{s}'" }.join(' ')} -output '#{archive}'")
+      slices.each { |s| File.delete(s) if File.exist?(s) }
+    end
+    Pod::UI.puts "Stripped duplicate pffft.o from #{File.basename(archive)}"
+  end
 end

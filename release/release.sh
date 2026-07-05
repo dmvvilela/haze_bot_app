@@ -89,9 +89,18 @@ banner() {
 # Pre-flight ----------------------------------------------------------
 preflight() {
   step "Pre-flight"
-  command -v asc >/dev/null     || fail "asc not installed (brew install asc)"
+  if ! $ANDROID_ONLY; then
+    command -v asc >/dev/null || fail "asc not installed (brew install asc)"
+  fi
   command -v fastlane >/dev/null || fail "fastlane not installed (brew install fastlane)"
   command -v flutter >/dev/null  || fail "flutter not installed"
+
+  if $ANDROID_ONLY; then
+    [ -f release/fastlane/play-console-key.json ] \
+      || fail "release/fastlane/play-console-key.json not found — copy your Play service account key there"
+    [ -f android/key.properties ] \
+      || fail "android/key.properties not found — copy key.properties.example and fill in your upload keystore"
+  fi
 
   if [ -n "$(git status --porcelain 2>/dev/null || true)" ]; then
     warn "Working tree is dirty"

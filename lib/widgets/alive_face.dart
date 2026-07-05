@@ -1,14 +1,20 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../cubits/robot_face_cubit.dart';
 import '../models/robot_config.dart';
+import '../services/robot_voice_service.dart';
 
 class AliveFace extends StatefulWidget {
   final RobotFaceState state;
 
-  const AliveFace({super.key, required this.state});
+  /// Live loudness (0..1) of audio playing through the robot voice pipe.
+  /// Null falls back to the sine-wave talking mouth.
+  final ValueListenable<double>? voiceLevel;
+
+  const AliveFace({super.key, required this.state, this.voiceLevel});
 
   @override
   State<AliveFace> createState() => _AliveFaceState();
@@ -55,6 +61,10 @@ class _AliveFaceState extends State<AliveFace>
             RobotExpression.scared => 0.8,
           };
 
+          // The _life ticker repaints every frame, so reading the current
+          // loudness here keeps the mouth in sync without extra plumbing.
+          final voiceLevel = widget.voiceLevel?.value ?? 0;
+
           return Transform.translate(
             offset: Offset(0, math.sin(t) * (3 + energy * 3)),
             child: CustomPaint(
@@ -62,6 +72,7 @@ class _AliveFaceState extends State<AliveFace>
                 state: widget.state,
                 time: t,
                 energy: energy,
+                voiceLevel: voiceLevel,
               ),
               child: const SizedBox.expand(),
             ),
@@ -76,11 +87,13 @@ class _AliveFacePainter extends CustomPainter {
   final RobotFaceState state;
   final double time;
   final double energy;
+  final double voiceLevel;
 
   _AliveFacePainter({
     required this.state,
     required this.time,
     required this.energy,
+    this.voiceLevel = 0,
   });
 
   @override
@@ -658,7 +671,12 @@ class _AliveFacePainter extends CustomPainter {
   }
 
   void _drawTalkingMouth(Canvas canvas, Offset center, Color mouthColor) {
-    final syllable = (math.sin(time * 11) + 1) / 2;
+    // Prefer the real amplitude of the audio (SoLoud playback); the sine
+    // "fake syllables" remain as fallback for plain platform TTS, where the
+    // audio never passes through the app.
+    final syllable = voiceLevel > 0.001
+        ? voiceLevel.clamp(0.0, 1.0)
+        : (math.sin(time * 11) + 1) / 2;
     final open = 8 + syllable * 18;
     final width = 30 + (1 - syllable) * 14;
     final fillPaint = Paint()
@@ -702,6 +720,12 @@ class _AliveFacePainter extends CustomPainter {
     Color mouthColor,
     RobotExpression expression,
   ) {
+    // While Haze is listening for a mimic, flash the signal marks so it
+    // visibly has its "ears up" no matter the current expression.
+    if (state.mimicStatus == MimicStatus.listening) {
+      _drawSignalMarks(canvas, size, eyeColor);
+    }
+
     switch (expression) {
       case RobotExpression.sad:
       case RobotExpression.sleepy:

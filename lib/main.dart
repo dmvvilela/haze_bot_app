@@ -16,7 +16,9 @@ import 'widgets/settings_dialog.dart';
 import 'widgets/timer_dialog.dart';
 import 'widgets/talk_dialog.dart';
 import 'widgets/ai_consent_dialog.dart';
+import 'widgets/voice_waveform.dart';
 import 'services/haze_brain.dart';
+import 'services/robot_voice_service.dart';
 import 'i18n/strings.g.dart';
 
 void main() async {
@@ -101,6 +103,17 @@ class RobotFaceScreen extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // Mimic — Haze listens, then repeats it in a silly voice
+                        IconButton(
+                          icon: Icon(switch (state.mimicStatus) {
+                            MimicStatus.idle => Icons.mic_none,
+                            MimicStatus.listening => Icons.mic,
+                            MimicStatus.replaying => Icons.graphic_eq,
+                          }),
+                          color: state.mimicStatus == MimicStatus.listening ? Colors.redAccent : null,
+                          tooltip: 'Mimic',
+                          onPressed: () => context.read<RobotFaceCubit>().toggleMimic(),
+                        ),
                         // Feelings game — Haze acts, the player names the emotion
                         IconButton(icon: Icon(Icons.emoji_emotions_outlined), tooltip: t.game.play, onPressed: () => _showGame(context)),
                         // Timer button with indicator
@@ -203,6 +216,17 @@ class RobotFaceScreen extends StatelessWidget {
                   ),
                 if (state.timerSeconds > 0 || state.isTimerRunning)
                   Positioned(left: 20, right: 20, bottom: 28, child: _TimerOverlay(state: state)),
+                // Live waveform of Haze's ears (listening) or voice (talking).
+                if (state.mimicStatus != MimicStatus.idle || state.isSpeaking)
+                  Positioned(
+                    left: 60,
+                    right: 60,
+                    top: 12,
+                    child: VoiceWaveform(
+                      voice: context.read<RobotFaceCubit>().voice,
+                      color: state.mimicStatus == MimicStatus.listening ? Colors.redAccent : state.config.eyeColor,
+                    ),
+                  ),
               ],
             ),
           ),

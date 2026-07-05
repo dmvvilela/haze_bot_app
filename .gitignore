@@ -48,6 +48,8 @@ app.*.map.json
 /android/app/release
 
 # --- Mobile release automation ---
+key.properties
+android/key.properties
 .env.release
 release/fastlane/play-console-key.json
 release/fastlane/report.xml

@@ -26,6 +26,7 @@ mixin _$RobotFaceState {
   String get aiMessage => throw _privateConstructorUsedError;
   bool get isLoadingAI => throw _privateConstructorUsedError;
   bool get isSpeaking => throw _privateConstructorUsedError;
+  MimicStatus get mimicStatus => throw _privateConstructorUsedError;
   bool get keepScreenAwake => throw _privateConstructorUsedError;
   BrainStatus get brainStatus => throw _privateConstructorUsedError;
   int get downloadProgress => throw _privateConstructorUsedError;
@@ -63,6 +64,7 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     String aiMessage,
     bool isLoadingAI,
     bool isSpeaking,
+    MimicStatus mimicStatus,
     bool keepScreenAwake,
     BrainStatus brainStatus,
     int downloadProgress,
@@ -100,6 +102,7 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? aiMessage = null,
     Object? isLoadingAI = null,
     Object? isSpeaking = null,
+    Object? mimicStatus = null,
     Object? keepScreenAwake = null,
     Object? brainStatus = null,
     Object? downloadProgress = null,
@@ -147,6 +150,10 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
                 ? _value.isSpeaking
                 : isSpeaking // ignore: cast_nullable_to_non_nullable
                       as bool,
+            mimicStatus: null == mimicStatus
+                ? _value.mimicStatus
+                : mimicStatus // ignore: cast_nullable_to_non_nullable
+                      as MimicStatus,
             keepScreenAwake: null == keepScreenAwake
                 ? _value.keepScreenAwake
                 : keepScreenAwake // ignore: cast_nullable_to_non_nullable
@@ -214,6 +221,7 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
     String aiMessage,
     bool isLoadingAI,
     bool isSpeaking,
+    MimicStatus mimicStatus,
     bool keepScreenAwake,
     BrainStatus brainStatus,
     int downloadProgress,
@@ -251,6 +259,7 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? aiMessage = null,
     Object? isLoadingAI = null,
     Object? isSpeaking = null,
+    Object? mimicStatus = null,
     Object? keepScreenAwake = null,
     Object? brainStatus = null,
     Object? downloadProgress = null,
@@ -298,6 +307,10 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
             ? _value.isSpeaking
             : isSpeaking // ignore: cast_nullable_to_non_nullable
                   as bool,
+        mimicStatus: null == mimicStatus
+            ? _value.mimicStatus
+            : mimicStatus // ignore: cast_nullable_to_non_nullable
+                  as MimicStatus,
         keepScreenAwake: null == keepScreenAwake
             ? _value.keepScreenAwake
             : keepScreenAwake // ignore: cast_nullable_to_non_nullable
@@ -348,6 +361,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.aiMessage = '',
     this.isLoadingAI = false,
     this.isSpeaking = false,
+    this.mimicStatus = MimicStatus.idle,
     this.keepScreenAwake = false,
     this.brainStatus = BrainStatus.idle,
     this.downloadProgress = 0,
@@ -387,6 +401,9 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   final bool isSpeaking;
   @override
   @JsonKey()
+  final MimicStatus mimicStatus;
+  @override
+  @JsonKey()
   final bool keepScreenAwake;
   @override
   @JsonKey()
@@ -419,7 +436,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
 
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoiceOptions: $ttsVoiceOptions, selectedTtsVoiceId: $selectedTtsVoiceId, lookTarget: $lookTarget)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, mimicStatus: $mimicStatus, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoiceOptions: $ttsVoiceOptions, selectedTtsVoiceId: $selectedTtsVoiceId, lookTarget: $lookTarget)';
   }
 
   @override
@@ -444,6 +461,8 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
                 other.isLoadingAI == isLoadingAI) &&
             (identical(other.isSpeaking, isSpeaking) ||
                 other.isSpeaking == isSpeaking) &&
+            (identical(other.mimicStatus, mimicStatus) ||
+                other.mimicStatus == mimicStatus) &&
             (identical(other.keepScreenAwake, keepScreenAwake) ||
                 other.keepScreenAwake == keepScreenAwake) &&
             (identical(other.brainStatus, brainStatus) ||
@@ -476,6 +495,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     aiMessage,
     isLoadingAI,
     isSpeaking,
+    mimicStatus,
     keepScreenAwake,
     brainStatus,
     downloadProgress,
@@ -509,6 +529,7 @@ abstract class _RobotFaceState implements RobotFaceState {
     final String aiMessage,
     final bool isLoadingAI,
     final bool isSpeaking,
+    final MimicStatus mimicStatus,
     final bool keepScreenAwake,
     final BrainStatus brainStatus,
     final int downloadProgress,
@@ -537,6 +558,8 @@ abstract class _RobotFaceState implements RobotFaceState {
   bool get isLoadingAI;
   @override
   bool get isSpeaking;
+  @override
+  MimicStatus get mimicStatus;
   @override
   bool get keepScreenAwake;
   @override

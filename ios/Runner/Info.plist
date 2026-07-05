@@ -68,5 +68,7 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Haze listens for a few seconds so it can repeat what you said in a funny robot voice. Recordings stay on this device and are deleted right after playback.</string>
 </dict>
 </plist>

@@ -6,12 +6,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math;
 import 'dart:async';
 
 import '../models/robot_config.dart';
 import '../i18n/strings.g.dart';
 import '../services/haze_brain.dart';
+import '../services/robot_voice_service.dart';
 import '../services/sound_service.dart';
 import '../services/timer_service.dart';
 
@@ -48,6 +50,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   final HazeBrain _brain = HazeBrain();
   final TimerService _timerService = TimerService();
   final SoundService sounds = SoundService();
+  final RobotVoiceService voice = RobotVoiceService();
   StreamSubscription? _timerSubscription;
   StreamSubscription? _timerStatusSubscription;
   StreamSubscription? _timerCompleteSubscription;
@@ -232,6 +235,10 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     await _safeTtsCall(
       () => _flutterTts.awaitSpeakCompletion(true),
       'await completion',
+    );
+    await _safeTtsCall(
+      () => _flutterTts.awaitSynthCompletion(true),
+      'await synth completion',
     );
     await _safeTtsCall(() => _flutterTts.setVolume(1.0), 'set volume');
     await _safeTtsCall(
@@ -459,15 +466,73 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         );
       }
       await _flutterTts.stop();
+      await voice.stopPlayback();
       if (!isClosed) emit(state.copyWith(isSpeaking: true));
-      final result = await _flutterTts.speak(line, focus: true);
-      if (result != 1) {
-        debugPrint('Haze TTS: speak returned $result');
+      final spokeRobotic = await _speakRobotic(line);
+      if (!spokeRobotic) {
+        final result = await _flutterTts.speak(line, focus: true);
+        if (result != 1) {
+          debugPrint('Haze TTS: speak returned $result');
+        }
       }
     } catch (e) {
       debugPrint('Haze TTS: failed to speak: $e');
     } finally {
       if (!isClosed) emit(state.copyWith(isSpeaking: false));
+    }
+  }
+
+  /// Haze's signature voice: platform TTS synthesized to a WAV, then replayed
+  /// through SoLoud with the robotize filter — which also lets the mouth and
+  /// waveform track the real audio. Returns false to fall back to plain TTS
+  /// (unsupported platform or any step failing), so speech never breaks.
+  Future<bool> _speakRobotic(String line) async {
+    if (!voice.isTtsCaptureSupported) return false;
+    // Unique file per utterance: iOS AVAudioFile appends into an existing
+    // file, and SoLoud keys loaded sources by path — reusing one path could
+    // replay stale audio. Deleted right after playback.
+    final path =
+        '${Directory.systemTemp.path}/haze_tts_${DateTime.now().microsecondsSinceEpoch}.wav';
+    try {
+      final result = await _flutterTts.synthesizeToFile(line, path, true);
+      if (result != 1) return false;
+      return await voice.playWavFile(path, preset: VoicePreset.robot);
+    } catch (e) {
+      debugPrint('Haze TTS: robot voice failed, falling back: $e');
+      return false;
+    } finally {
+      File(path).delete().ignore();
+    }
+  }
+
+  /// The talking-cactus feature: tap once and Haze listens, stops on its own
+  /// when you go quiet, then repeats what it heard in a silly voice with the
+  /// mouth synced to the recording. Tapping again while active cancels.
+  Future<void> toggleMimic() async {
+    switch (state.mimicStatus) {
+      case MimicStatus.listening:
+        await voice.stopListening();
+      case MimicStatus.replaying:
+        await voice.stopPlayback();
+      case MimicStatus.idle:
+        await _flutterTts.stop();
+        await voice.stopPlayback();
+        final listening = await voice.startListening();
+        if (!listening || isClosed) return;
+        emit(state.copyWith(mimicStatus: MimicStatus.listening));
+        final wav = await voice.onCaptured;
+        if (isClosed) return;
+        if (wav == null) {
+          emit(state.copyWith(mimicStatus: MimicStatus.idle));
+          return;
+        }
+        emit(state.copyWith(mimicStatus: MimicStatus.replaying, isSpeaking: true));
+        await voice.playWavBytes(wav, preset: VoicePreset.chipmunk);
+        if (!isClosed) {
+          emit(
+            state.copyWith(mimicStatus: MimicStatus.idle, isSpeaking: false),
+          );
+        }
     }
   }
 
@@ -772,6 +837,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     try {
       await _flutterTts.stop();
     } catch (_) {}
+    await voice.dispose();
     await _brain.dispose();
     await sounds.dispose();
     _timerService.dispose();

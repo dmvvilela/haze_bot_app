@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Required to download Haze's on-device model on first run -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Mimic mode: record a short clip so Haze can repeat it in a silly voice.
+         Audio stays in memory and is never stored or uploaded. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <application
         android:label="Haze Bot"
         android:name="${applicationName}"
