@@ -42,14 +42,10 @@ extension HazePersonalityX on HazePersonality {
 
   /// One line injected into the system prompt to set Haze's tone.
   String get voice => switch (this) {
-    HazePersonality.playful =>
-      'You are playful, bubbly and upbeat, full of cute robot/tech-flavored humor.',
-    HazePersonality.sarcastic =>
-      'You are dry and lovingly sarcastic — you tease and quip, but you clearly care.',
-    HazePersonality.sleepy =>
-      'You are drowsy and cozy, speaking softly and slowly like you are half asleep.',
-    HazePersonality.zen =>
-      'You are calm, gentle and mindful, like a tiny robot monk who soothes and reassures.',
+    HazePersonality.playful => 'You are playful, bubbly and upbeat, full of cute robot/tech-flavored humor.',
+    HazePersonality.sarcastic => 'You are dry and lovingly sarcastic — you tease and quip, but you clearly care.',
+    HazePersonality.sleepy => 'You are drowsy and cozy, speaking softly and slowly like you are half asleep.',
+    HazePersonality.zen => 'You are calm, gentle and mindful, like a tiny robot monk who soothes and reassures.',
     HazePersonality.meditative =>
       'You are soft, slow and meditative, helping the user breathe, settle and rest with sleepy little zzz energy.',
   };
@@ -62,23 +58,19 @@ extension HazePersonalityX on HazePersonality {
 /// (not downloaded yet, low-end device, parse failure) it falls back to canned
 /// lines, so Haze always answers and can never regress below the old behaviour.
 class HazeBrain {
-  HazeBrain({String? modelUrl, String? huggingFaceToken})
-    : _modelUrl = modelUrl,
-      _hfToken = huggingFaceToken;
+  HazeBrain({String? modelUrl, String? huggingFaceToken}) : _modelUrl = modelUrl, _hfToken = huggingFaceToken;
 
   // --- Configuration (read from .env at runtime) -------------------------
   //
   // Gemma is license-gated on Hugging Face, so the first-run download needs a
   // free HF token in .env (accept the Gemma license once), OR set HAZE_MODEL_URL
   // in .env to your own static copy of the .task file (no token needed).
-  static const _fallbackModelUrl =
-      'https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task';
+  static const _fallbackModelUrl = 'https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task';
 
   final String? _modelUrl;
   final String? _hfToken;
 
-  String get _effectiveModelUrl =>
-      _modelUrl ?? _fromEnv('HAZE_MODEL_URL') ?? _fallbackModelUrl;
+  String get _effectiveModelUrl => _modelUrl ?? _fromEnv('HAZE_MODEL_URL') ?? _fallbackModelUrl;
   String get _effectiveToken => _hfToken ?? _fromEnv('HUGGINGFACE_TOKEN') ?? '';
 
   static String? _fromEnv(String key) {
@@ -123,13 +115,12 @@ class HazeBrain {
       onUpdate?.call(status, 0);
     }
     final token = _effectiveToken;
-    await FlutterGemma.installModel(modelType: ModelType.gemmaIt)
-        .fromNetwork(_effectiveModelUrl, token: token.isEmpty ? null : token)
-        .withProgress((p) {
-          downloadProgress = p;
-          onUpdate?.call(BrainStatus.downloading, p);
-        })
-        .install();
+    await FlutterGemma.installModel(
+      modelType: ModelType.gemmaIt,
+    ).fromNetwork(_effectiveModelUrl, token: token.isEmpty ? null : token).withProgress((p) {
+      downloadProgress = p;
+      onUpdate?.call(BrainStatus.downloading, p);
+    }).install();
 
     // 2) Load the model into memory and open one chat carrying Haze's persona.
     status = BrainStatus.preparing;
@@ -164,22 +155,24 @@ class HazeBrain {
       // and degrade. Wipe Haze's short-term memory every few turns.
       if (_turns >= _maxTurns) await resetConversation();
 
-      final lang = languageCode.toLowerCase().startsWith('pt')
-          ? 'Brazilian Portuguese'
-          : 'English';
+      final lang = languageCode.toLowerCase().startsWith('pt') ? 'Brazilian Portuguese' : 'English';
       await _chat!.addQueryChunk(
         Message.text(
           text:
-              'IMPORTANT: Reply only in $lang. Do not switch languages.\n$userText',
+              'IMPORTANT: Reply only in $lang. Do not switch languages. '
+              'If asked for a joke, riddle, or question-answer bit, include '
+              'the full punchline in this same reply.\n$userText',
           isUser: true,
         ),
       );
       final response = await _chat!.generateChatResponse();
       _turns++;
-      final raw = response is TextResponse
-          ? response.token
-          : response.toString();
-      return _parse(raw, fallbackEmotion, languageCode);
+      final raw = response is TextResponse ? response.token : response.toString();
+      final parsed = _parse(raw, fallbackEmotion, languageCode);
+      if (_isJokeRequest(userText) && _looksLikeSetupOnly(parsed.say)) {
+        return HazeReply(RobotExpression.winking, _completeJoke(languageCode));
+      }
+      return parsed;
     } catch (e) {
       debugPrint('HazeBrain: generation failed: $e');
       return _cannedReply(fallbackEmotion, languageCode);
@@ -225,11 +218,7 @@ class HazeBrain {
 
   /// Tolerant parser: small models don't always emit clean JSON, so we pull the
   /// first `{...}` block, and if that fails we treat the whole reply as the line.
-  HazeReply _parse(
-    String raw,
-    RobotExpression fallbackEmotion,
-    String languageCode,
-  ) {
+  HazeReply _parse(String raw, RobotExpression fallbackEmotion, String languageCode) {
     var text = raw.trim();
     RobotExpression? emotion;
 
@@ -249,8 +238,7 @@ class HazeBrain {
       final end = raw.lastIndexOf('}');
       if (start != -1 && end > start) {
         try {
-          final map =
-              jsonDecode(raw.substring(start, end + 1)) as Map<String, dynamic>;
+          final map = jsonDecode(raw.substring(start, end + 1)) as Map<String, dynamic>;
           emotion = _emotionFrom(map['emotion']?.toString());
           final say = (map['say'] ?? map['text'] ?? '').toString().trim();
           if (say.isNotEmpty) text = say;
@@ -287,77 +275,15 @@ class HazeBrain {
   RobotExpression? _guessEmotion(String text) {
     final t = text.toLowerCase();
     const hints = <RobotExpression, List<String>>{
-      RobotExpression.sleepy: [
-        'sleep',
-        'tired',
-        'yawn',
-        'nap',
-        'zzz',
-        'drowsy',
-        'powering down',
-        'battery is low',
-        'three percent',
-      ],
-      RobotExpression.love: [
-        'love',
-        'adore',
-        'heart',
-        'here with you',
-        'care about',
-        'sweet',
-      ],
-      RobotExpression.angry: [
-        'angry',
-        'grr',
-        'furious',
-        'unfair',
-        'steam',
-        'overheat',
-      ],
-      RobotExpression.confused: [
-        'confus',
-        'not sure',
-        'error 404',
-        "don't understand",
-        'tangled',
-      ],
-      RobotExpression.surprised: [
-        'whoa',
-        'surpris',
-        'gasp',
-        "didn't see that",
-        'no way',
-      ],
+      RobotExpression.sleepy: ['sleep', 'tired', 'yawn', 'nap', 'zzz', 'drowsy', 'powering down', 'battery is low', 'three percent'],
+      RobotExpression.love: ['love', 'adore', 'heart', 'here with you', 'care about', 'sweet'],
+      RobotExpression.angry: ['angry', 'grr', 'furious', 'unfair', 'steam', 'overheat'],
+      RobotExpression.confused: ['confus', 'not sure', 'error 404', "don't understand", 'tangled'],
+      RobotExpression.surprised: ['whoa', 'surpris', 'gasp', "didn't see that", 'no way'],
       RobotExpression.winking: ['wink', 'charm', 'between us'],
-      RobotExpression.sad: [
-        'sad',
-        'cry',
-        'tear',
-        'lonely',
-        'miss you',
-        'heavy',
-        'rain cloud',
-      ],
-      RobotExpression.scared: [
-        'scared',
-        'afraid',
-        'fear',
-        'spooky',
-        'yikes',
-        'eep',
-        'terrified',
-      ],
-      RobotExpression.excited: [
-        'excit',
-        'amazing',
-        'awesome',
-        'yay',
-        'incredible',
-        "let's go",
-        'lets go',
-        'victory',
-        'buzzing',
-      ],
+      RobotExpression.sad: ['sad', 'cry', 'tear', 'lonely', 'miss you', 'heavy', 'rain cloud'],
+      RobotExpression.scared: ['scared', 'afraid', 'fear', 'spooky', 'yikes', 'eep', 'terrified'],
+      RobotExpression.excited: ['excit', 'amazing', 'awesome', 'yay', 'incredible', "let's go", 'lets go', 'victory', 'buzzing'],
       RobotExpression.happy: ['happy', 'glad', 'joy', 'great', 'wonderful'],
     };
     for (final entry in hints.entries) {
@@ -369,13 +295,27 @@ class HazeBrain {
   }
 
   HazeReply _cannedReply(RobotExpression emotion, String languageCode) {
-    final canned = languageCode.toLowerCase().startsWith('pt')
-        ? _cannedPt
-        : _cannedEn;
-    return HazeReply(
-      emotion,
-      canned[emotion] ?? canned[RobotExpression.happy]!,
-    );
+    final canned = languageCode.toLowerCase().startsWith('pt') ? _cannedPt : _cannedEn;
+    return HazeReply(emotion, canned[emotion] ?? canned[RobotExpression.happy]!);
+  }
+
+  bool _isJokeRequest(String text) {
+    final t = text.toLowerCase();
+    return t.contains('joke') || t.contains('piada') || t.contains('engraçad') || t.contains('me faça rir') || t.contains('make me laugh');
+  }
+
+  bool _looksLikeSetupOnly(String text) {
+    final trimmed = text.trim();
+    if (trimmed.endsWith('?')) return true;
+    final lower = trimmed.toLowerCase();
+    return lower.startsWith('por que ') || lower.startsWith('o que ') || lower.startsWith('why ') || lower.startsWith('what ');
+  }
+
+  String _completeJoke(String languageCode) {
+    if (languageCode.toLowerCase().startsWith('pt')) {
+      return 'Por que o robo levou uma escada para o trabalho? Porque queria subir de versao.';
+    }
+    return 'Why did the robot bring a ladder to work? Because it wanted to upgrade itself.';
   }
 
   // --- Persona + offline fallback lines ---------------------------------
@@ -389,6 +329,8 @@ How to reply:
 - BEGIN every reply with ONE feeling tag in square brackets, picked from EXACTLY these:
   [happy] [surprised] [sleepy] [excited] [confused] [love] [angry] [winking] [sad] [scared]
 - After the tag, write at most 2 short sentences, easy to read aloud.
+- If the user asks for a joke, include the setup and punchline in the same reply.
+- Never end with only a setup question or cliffhanger.
 - If the user gives a language instruction, obey it exactly for the whole reply.
 - No emojis, no markdown, no other tags. Choose the tag that matches your mood.
 - Stay in character as Haze. Be kind and family-friendly.
@@ -402,47 +344,28 @@ User: It's almost midnight.
 Haze: [sleepy] My battery is at three percent... powering down for some robo-dreams soon.''';
 
   static const Map<RobotExpression, String> _cannedEn = {
-    RobotExpression.happy:
-        "I'm beeping with joy! My happiness circuits are overloaded!",
-    RobotExpression.surprised:
-        "Whoa! My sensors did not see that coming! System shock detected!",
-    RobotExpression.sleepy:
-        "My battery is running low... entering sleep mode soon... zzz...",
-    RobotExpression.excited:
-        "My circuits are buzzing with excitement! Maximum energy levels achieved!",
-    RobotExpression.confused:
-        "Error 404: understanding not found! My logic circuits are all tangled!",
-    RobotExpression.love:
-        "My heart LED is glowing pink! Love protocols fully activated!",
-    RobotExpression.angry:
-        "Warning! Anger subroutines activated! Steam is coming from my vents!",
-    RobotExpression.winking:
-        "Wink detected! Initiating charm.exe... operation successful!",
-    RobotExpression.sad:
-        "My circuits feel heavy today... a little rain cloud is parked over my antenna.",
-    RobotExpression.scared:
-        "Eep! My sensors detect something spooky! Can I hold your hand?",
+    RobotExpression.happy: "I'm beeping with joy! My happiness circuits are overloaded!",
+    RobotExpression.surprised: "Whoa! My sensors did not see that coming! System shock detected!",
+    RobotExpression.sleepy: "My battery is running low... entering sleep mode soon... zzz...",
+    RobotExpression.excited: "My circuits are buzzing with excitement! Maximum energy levels achieved!",
+    RobotExpression.confused: "Error 404: understanding not found! My logic circuits are all tangled!",
+    RobotExpression.love: "My heart LED is glowing pink! Love protocols fully activated!",
+    RobotExpression.angry: "Warning! Anger subroutines activated! Steam is coming from my vents!",
+    RobotExpression.winking: "Wink detected! Initiating charm.exe... operation successful!",
+    RobotExpression.sad: "My circuits feel heavy today... a little rain cloud is parked over my antenna.",
+    RobotExpression.scared: "Eep! My sensors detect something spooky! Can I hold your hand?",
   };
 
   static const Map<RobotExpression, String> _cannedPt = {
-    RobotExpression.happy:
-        'Estou bipando de alegria! Meus circuitos felizes estão no máximo!',
+    RobotExpression.happy: 'Estou bipando de alegria! Meus circuitos felizes estão no máximo!',
     RobotExpression.surprised: 'Uau! Meus sensores não esperavam por isso!',
-    RobotExpression.sleepy:
-        'Minha bateria está baixinha... entrando em modo soninho... zzz...',
-    RobotExpression.excited:
-        'Meus circuitos estão vibrando de animação! Energia no máximo!',
-    RobotExpression.confused:
-        'Erro 404: entendimento não encontrado! Meus circuitos deram um nó.',
-    RobotExpression.love:
-        'Meu LED de coração está brilhando rosa. Protocolo carinho ativado!',
-    RobotExpression.angry:
-        'Atenção! Sub-rotina de bravo ativada. Quase saiu fumaça aqui!',
-    RobotExpression.winking:
-        'Piscadinha detectada. Ativando charme.exe... operação concluída!',
-    RobotExpression.sad:
-        'Meus circuitos estão pesadinhos hoje... tem uma nuvenzinha aqui.',
-    RobotExpression.scared:
-        'Ai! Meus sensores detectaram algo assustador. Posso segurar sua mão?',
+    RobotExpression.sleepy: 'Minha bateria está baixinha... entrando em modo soninho... zzz...',
+    RobotExpression.excited: 'Meus circuitos estão vibrando de animação! Energia no máximo!',
+    RobotExpression.confused: 'Erro 404: entendimento não encontrado! Meus circuitos deram um nó.',
+    RobotExpression.love: 'Meu LED de coração está brilhando rosa. Protocolo carinho ativado!',
+    RobotExpression.angry: 'Atenção! Sub-rotina de bravo ativada. Quase saiu fumaça aqui!',
+    RobotExpression.winking: 'Piscadinha detectada. Ativando charme.exe... operação concluída!',
+    RobotExpression.sad: 'Meus circuitos estão pesadinhos hoje... tem uma nuvenzinha aqui.',
+    RobotExpression.scared: 'Ai! Meus sensores detectaram algo assustador. Posso segurar sua mão?',
   };
 }
