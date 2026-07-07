@@ -16,6 +16,7 @@ void main() {
 
     expect(config.speechRate, 0.55);
     expect(config.speechPitch, 0.95);
+    expect(config.robotVoiceEnabled, isTrue);
   });
 
   test('Robot interaction defaults are idle', () {

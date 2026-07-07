@@ -23,6 +23,7 @@ _$RobotConfigImpl _$$RobotConfigImplFromJson(Map<String, dynamic> json) =>
           $enumDecodeNullable(_$FaceTypeEnumMap, json['faceType']) ??
           FaceType.hazeV3,
       speechEnabled: json['speechEnabled'] as bool? ?? false,
+      robotVoiceEnabled: json['robotVoiceEnabled'] as bool? ?? true,
       soundEnabled: json['soundEnabled'] as bool? ?? true,
       speechRate: (json['speechRate'] as num?)?.toDouble() ?? 0.55,
       speechPitch: (json['speechPitch'] as num?)?.toDouble() ?? 0.95,
@@ -37,6 +38,7 @@ Map<String, dynamic> _$$RobotConfigImplToJson(_$RobotConfigImpl instance) =>
       'mouthColor': const ColorConverter().toJson(instance.mouthColor),
       'faceType': _$FaceTypeEnumMap[instance.faceType]!,
       'speechEnabled': instance.speechEnabled,
+      'robotVoiceEnabled': instance.robotVoiceEnabled,
       'soundEnabled': instance.soundEnabled,
       'speechRate': instance.speechRate,
       'speechPitch': instance.speechPitch,

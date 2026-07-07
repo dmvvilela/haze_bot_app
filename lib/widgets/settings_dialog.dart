@@ -122,6 +122,14 @@ class SettingsDialog extends StatelessWidget {
                         context.read<RobotFaceCubit>().toggleSpeech(),
                   ),
                   if (state.config.speechEnabled) ...[
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Robot voice'),
+                      subtitle: const Text('Adds the local robot texture'),
+                      value: state.config.robotVoiceEnabled,
+                      onChanged: (_) =>
+                          context.read<RobotFaceCubit>().toggleRobotVoice(),
+                    ),
                     if (showVoicePicker) ...[
                       DropdownButtonFormField<String>(
                         key: ValueKey(

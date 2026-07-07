@@ -12,6 +12,7 @@ class RobotConfig with _$RobotConfig {
     @Default(Colors.pink) @ColorConverter() Color mouthColor,
     @Default(FaceType.hazeV3) FaceType faceType,
     @Default(false) bool speechEnabled,
+    @Default(true) bool robotVoiceEnabled,
     @Default(true) bool soundEnabled,
     @Default(0.55) double speechRate,
     @Default(0.95) double speechPitch,
