@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubits/robot_face_cubit.dart';
 import '../models/robot_config.dart';
+import '../services/robot_voice_service.dart';
 import 'alive_face.dart';
 import 'classic_face.dart';
 import 'haze_face.dart';
@@ -121,9 +122,23 @@ class RobotFaceWidget extends StatelessWidget {
       case FaceType.bean:
         return BeanFace(state: state);
       case FaceType.hazeV2:
-        return AliveFace(state: state, voiceLevel: cubit.voice.level);
+        return AliveFace(
+          state: state,
+          voiceLevel:
+              state.config.robotVoiceEnabled ||
+                  state.mimicStatus != MimicStatus.idle
+              ? cubit.voice.level
+              : null,
+        );
       case FaceType.hazeV3:
-        return HazeFace(state: state, voiceLevel: cubit.voice.level);
+        return HazeFace(
+          state: state,
+          voiceLevel:
+              state.config.robotVoiceEnabled ||
+                  state.mimicStatus != MimicStatus.idle
+              ? cubit.voice.level
+              : null,
+        );
     }
   }
 }

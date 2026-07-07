@@ -19,10 +19,7 @@ class VoiceWaveform extends StatelessWidget {
       child: AnimatedBuilder(
         animation: voice.level,
         builder: (context, _) => CustomPaint(
-          painter: _WaveformPainter(
-            levels: voice.levelHistory,
-            color: color,
-          ),
+          painter: _WaveformPainter(levels: voice.levelHistory, color: color),
           child: const SizedBox.expand(),
         ),
       ),
@@ -50,7 +47,11 @@ class _WaveformPainter extends CustomPainter {
       paint.color = color.withValues(alpha: 0.15 + age * 0.75);
       final barHalf = 2 + levels[i].clamp(0.0, 1.0) * (midY - 3);
       final x = step * (i + 0.5);
-      canvas.drawLine(Offset(x, midY - barHalf), Offset(x, midY + barHalf), paint);
+      canvas.drawLine(
+        Offset(x, midY - barHalf),
+        Offset(x, midY + barHalf),
+        paint,
+      );
     }
   }
 
