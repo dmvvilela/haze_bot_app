@@ -34,6 +34,7 @@ class RobotVoiceService {
   // widget tests — and ask the OS for a recorder nobody may ever use.
   AudioRecorder? _recorder;
   bool _engineReady = false;
+  bool _engineUnavailable = false;
   int _clipCounter = 0;
 
   StreamSubscription<Uint8List>? _micSubscription;
@@ -47,16 +48,23 @@ class RobotVoiceService {
   SoundHandle? _playingHandle;
   AudioSource? _playingSource;
 
-  /// TTS-through-SoLoud needs `synthesizeToFile`, which flutter_tts only
-  /// implements on Android and iOS. Elsewhere the cubit falls back to plain
-  /// platform TTS (voice works, just not robotic).
-  bool get isTtsCaptureSupported =>
-      !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+  /// TTS-through-SoLoud needs `synthesizeToFile` to produce audio SoLoud can
+  /// decode. Android writes PCM WAV; iOS writes AVAudioFile output that may be
+  /// CAF or float WAV, which SoLoud rejects.
+  bool get isTtsCaptureSupported => !kIsWeb && Platform.isAndroid;
 
-  Future<void> _ensureEngine() async {
-    if (_engineReady) return;
-    await SoLoud.instance.init();
-    _engineReady = true;
+  Future<bool> _ensureEngine() async {
+    if (_engineReady) return true;
+    if (_engineUnavailable) return false;
+    try {
+      await SoLoud.instance.init();
+      _engineReady = true;
+      return true;
+    } catch (e) {
+      _engineUnavailable = true;
+      debugPrint('RobotVoice: SoLoud unavailable, using platform audio: $e');
+      return false;
+    }
   }
 
   // ---------------------------------------------------------------- capture
@@ -70,11 +78,7 @@ class RobotVoiceService {
       final recorder = _recorder ??= AudioRecorder();
       if (!await recorder.hasPermission()) return false;
       final stream = await recorder.startStream(
-        const RecordConfig(
-          encoder: AudioEncoder.pcm16bits,
-          sampleRate: _sampleRate,
-          numChannels: 1,
-        ),
+        const RecordConfig(encoder: AudioEncoder.pcm16bits, sampleRate: _sampleRate, numChannels: 1),
       );
       _micBytes = BytesBuilder(copy: false);
       _capture = Completer<Uint8List?>();
@@ -103,8 +107,7 @@ class RobotVoiceService {
 
   /// Completes with the finished recording, or null when it was cancelled or
   /// nothing loud enough was heard.
-  Future<Uint8List?> get onCaptured =>
-      _capture?.future ?? Future.value(null);
+  Future<Uint8List?> get onCaptured => _capture?.future ?? Future.value(null);
 
   Future<void> stopListening({bool cancel = false}) async {
     final subscription = _micSubscription;
@@ -142,9 +145,7 @@ class RobotVoiceService {
     if (rms > speechFloor) {
       _heardSpeech = true;
       _lastLoudAt = now;
-    } else if (_heardSpeech &&
-        _lastLoudAt != null &&
-        now.difference(_lastLoudAt!) > _silenceStopAfter) {
+    } else if (_heardSpeech && _lastLoudAt != null && now.difference(_lastLoudAt!) > _silenceStopAfter) {
       stopListening();
     }
   }
@@ -153,13 +154,16 @@ class RobotVoiceService {
 
   /// Plays WAV bytes through the funny-voice pipe. Resolves when the clip
   /// finishes (or is stopped). Returns false when the engine refused the clip.
-  Future<bool> playWavBytes(Uint8List wav, {required VoicePreset preset}) =>
-      _play(loadPath: null, wavBytes: wav, preset: preset);
+  Future<bool> playWavBytes(Uint8List wav, {required VoicePreset preset}) => _play(loadPath: null, wavBytes: wav, preset: preset);
 
   /// Same pipe, for clips flutter_tts already wrote to disk.
   Future<bool> playWavFile(String path, {required VoicePreset preset}) async {
     try {
       final bytes = await File(path).readAsBytes();
+      if (!_isPcmWav(bytes)) {
+        debugPrint('RobotVoice: synthesized audio is not PCM WAV; falling back');
+        return false;
+      }
       return await _play(loadPath: path, wavBytes: bytes, preset: preset);
     } catch (e) {
       debugPrint('RobotVoice: failed to read $path: $e');
@@ -167,20 +171,13 @@ class RobotVoiceService {
     }
   }
 
-  Future<bool> _play({
-    required String? loadPath,
-    required Uint8List wavBytes,
-    required VoicePreset preset,
-  }) async {
+  Future<bool> _play({required String? loadPath, required Uint8List wavBytes, required VoicePreset preset}) async {
     try {
-      await _ensureEngine();
+      if (!await _ensureEngine()) return false;
       await stopPlayback();
 
       final envelope = _envelopeFromWav(wavBytes);
-      final source = await SoLoud.instance.loadMem(
-        loadPath ?? 'haze_clip_${_clipCounter++}.wav',
-        wavBytes,
-      );
+      final source = await SoLoud.instance.loadMem(loadPath ?? 'haze_clip_${_clipCounter++}.wav', wavBytes);
       _playingSource = source;
 
       if (preset == VoicePreset.robot) {
@@ -203,19 +200,16 @@ class RobotVoiceService {
       }
 
       final done = Completer<void>();
-      _playbackTicker = Timer.periodic(
-        const Duration(milliseconds: _envelopeWindowMs),
-        (_) {
-          final h = _playingHandle;
-          if (h == null || !SoLoud.instance.getIsValidVoiceHandle(h)) {
-            if (!done.isCompleted) done.complete();
-            return;
-          }
-          final position = SoLoud.instance.getPosition(h);
-          final index = position.inMilliseconds ~/ _envelopeWindowMs;
-          _pushLevel(index < envelope.length ? envelope[index] : 0);
-        },
-      );
+      _playbackTicker = Timer.periodic(const Duration(milliseconds: _envelopeWindowMs), (_) {
+        final h = _playingHandle;
+        if (h == null || !SoLoud.instance.getIsValidVoiceHandle(h)) {
+          if (!done.isCompleted) done.complete();
+          return;
+        }
+        final position = SoLoud.instance.getPosition(h);
+        final index = position.inMilliseconds ~/ _envelopeWindowMs;
+        _pushLevel(index < envelope.length ? envelope[index] : 0);
+      });
       await done.future;
       await stopPlayback();
       return true;
@@ -263,8 +257,7 @@ class RobotVoiceService {
   void _pushLevel(double value) {
     // Fast attack, gentle release: the mouth snaps open on a syllable but
     // eases shut, which reads far more natural than raw 30ms RMS steps.
-    final smoothed =
-        value > level.value ? value : level.value * 0.55 + value * 0.45;
+    final smoothed = value > level.value ? value : level.value * 0.55 + value * 0.45;
     level.value = smoothed;
     levelHistory.add(smoothed);
     if (levelHistory.length > historyLength) levelHistory.removeAt(0);
@@ -280,6 +273,30 @@ class RobotVoiceService {
       sum += s * s;
     }
     return math.sqrt(sum / count);
+  }
+
+  static bool _isPcmWav(Uint8List bytes) {
+    if (bytes.length < 44) return false;
+    final data = bytes.buffer.asByteData(bytes.offsetInBytes, bytes.length);
+    if (data.getUint32(0, Endian.big) != 0x52494646 || // RIFF
+        data.getUint32(8, Endian.big) != 0x57415645) {
+      // WAVE
+      return false;
+    }
+    var offset = 12;
+    while (offset + 8 <= bytes.length) {
+      final chunkId = data.getUint32(offset, Endian.big);
+      final chunkSize = data.getUint32(offset + 4, Endian.little);
+      offset += 8;
+      if (chunkId == 0x666d7420 && offset + 16 <= bytes.length) {
+        // fmt
+        final audioFormat = data.getUint16(offset, Endian.little);
+        final bitsPerSample = data.getUint16(offset + 14, Endian.little);
+        return audioFormat == 1 && (bitsPerSample == 8 || bitsPerSample == 16);
+      }
+      offset += chunkSize + (chunkSize.isOdd ? 1 : 0);
+    }
+    return false;
   }
 
   static Uint8List _pcm16ToWav(Uint8List pcm, int sampleRate) {
@@ -346,8 +363,7 @@ class RobotVoiceService {
       final bytesPerSample = bitsPerSample ~/ 8;
       final frameBytes = bytesPerSample * channels;
       final totalFrames = dataLength ~/ frameBytes;
-      final framesPerWindow =
-          math.max(1, sampleRate * _envelopeWindowMs ~/ 1000);
+      final framesPerWindow = math.max(1, sampleRate * _envelopeWindowMs ~/ 1000);
       final isFloat = audioFormat == 3;
 
       final envelope = <double>[];
