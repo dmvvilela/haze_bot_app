@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,6 +13,10 @@ class SettingsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<RobotFaceCubit, RobotFaceState>(
       builder: (context, state) {
+        final showVoicePicker =
+            !kIsWeb &&
+            defaultTargetPlatform == TargetPlatform.iOS &&
+            state.ttsVoiceOptions.length > 1;
         return AlertDialog(
           title: Text(t.ui.settings),
           content: SizedBox(
@@ -101,7 +106,9 @@ class SettingsDialog extends StatelessWidget {
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
                     title: const Text('Sound effects'),
-                    subtitle: const Text('Chirps when you poke or play with Haze'),
+                    subtitle: const Text(
+                      'Chirps when you poke or play with Haze',
+                    ),
                     value: state.config.soundEnabled,
                     onChanged: (_) =>
                         context.read<RobotFaceCubit>().toggleSound(),
@@ -115,8 +122,12 @@ class SettingsDialog extends StatelessWidget {
                         context.read<RobotFaceCubit>().toggleSpeech(),
                   ),
                   if (state.config.speechEnabled) ...[
-                    if (state.ttsVoiceOptions.length > 1) ...[
+                    if (showVoicePicker) ...[
                       DropdownButtonFormField<String>(
+                        key: ValueKey(
+                          state.selectedTtsVoiceId ??
+                              RobotFaceCubit.automaticVoiceId,
+                        ),
                         initialValue:
                             state.selectedTtsVoiceId ??
                             RobotFaceCubit.automaticVoiceId,

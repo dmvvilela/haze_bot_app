@@ -29,11 +29,7 @@ class TtsVoiceOption {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TtsVoiceOption &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          label == other.label;
+      identical(this, other) || other is TtsVoiceOption && runtimeType == other.runtimeType && id == other.id && label == other.label;
 
   @override
   int get hashCode => Object.hash(id, label);
@@ -72,8 +68,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   void onChange(Change<RobotFaceState> change) {
     super.onChange(change);
     if (change.currentState.config != change.nextState.config) {
-      if (change.currentState.config.soundEnabled !=
-          change.nextState.config.soundEnabled) {
+      if (change.currentState.config.soundEnabled != change.nextState.config.soundEnabled) {
         sounds.enabled = change.nextState.config.soundEnabled;
       }
       _saveConfig(change.nextState.config);
@@ -113,12 +108,9 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         // "Not now" is a temporary choice. Older builds persisted it as
         // declined, so normalize that back to unknown and let the user retry.
         'declined' => AiConsent.unknown,
-        _ =>
-          FlutterGemma.hasActiveModel() ? AiConsent.granted : AiConsent.unknown,
+        _ => FlutterGemma.hasActiveModel() ? AiConsent.granted : AiConsent.unknown,
       };
-      final restoredPersonality = _personalityFromName(
-        prefs.getString(_personalityKey),
-      );
+      final restoredPersonality = _personalityFromName(prefs.getString(_personalityKey));
       final restoredVoiceId = prefs.getString(_voiceIdKey);
       if (!isClosed) {
         emit(
@@ -130,11 +122,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
           ),
         );
         if (restoredConfig != null) {
-          LocaleSettings.setLocale(
-            restoredConfig.language.toLowerCase().startsWith('pt')
-                ? AppLocale.pt
-                : AppLocale.en,
-          );
+          LocaleSettings.setLocale(restoredConfig.language.toLowerCase().startsWith('pt') ? AppLocale.pt : AppLocale.en);
         }
         if (restoredPersonality != null) {
           await _brain.setPersonality(restoredPersonality);
@@ -232,29 +220,16 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     _flutterTts.setErrorHandler((message) {
       debugPrint('Haze TTS: error: $message');
     });
-    await _safeTtsCall(
-      () => _flutterTts.awaitSpeakCompletion(true),
-      'await completion',
-    );
-    await _safeTtsCall(
-      () => _flutterTts.awaitSynthCompletion(true),
-      'await synth completion',
-    );
+    await _safeTtsCall(() => _flutterTts.awaitSpeakCompletion(true), 'await completion');
+    await _safeTtsCall(() => _flutterTts.awaitSynthCompletion(true), 'await synth completion');
     await _safeTtsCall(() => _flutterTts.setVolume(1.0), 'set volume');
+    await _safeTtsCall(() => _flutterTts.setSharedInstance(true), 'share audio');
     await _safeTtsCall(
-      () => _flutterTts.setSharedInstance(true),
-      'share audio',
-    );
-    await _safeTtsCall(
-      () => _flutterTts.setIosAudioCategory(
-        IosTextToSpeechAudioCategory.playback,
-        [
-          IosTextToSpeechAudioCategoryOptions.mixWithOthers,
-          IosTextToSpeechAudioCategoryOptions.allowBluetooth,
-          IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
-        ],
-        IosTextToSpeechAudioMode.voicePrompt,
-      ),
+      () => _flutterTts.setIosAudioCategory(IosTextToSpeechAudioCategory.playback, [
+        IosTextToSpeechAudioCategoryOptions.mixWithOthers,
+        IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+        IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+      ], IosTextToSpeechAudioMode.voicePrompt),
       'set iOS audio category',
     );
     await _applyTtsSettings();
@@ -332,9 +307,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   void toggleSpeech() {
-    final newConfig = state.config.copyWith(
-      speechEnabled: !state.config.speechEnabled,
-    );
+    final newConfig = state.config.copyWith(speechEnabled: !state.config.speechEnabled);
     emit(state.copyWith(config: newConfig));
   }
 
@@ -358,9 +331,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   void toggleTheme() {
-    final newConfig = state.config.copyWith(
-      isDarkTheme: !state.config.isDarkTheme,
-    );
+    final newConfig = state.config.copyWith(isDarkTheme: !state.config.isDarkTheme);
     emit(state.copyWith(config: newConfig));
   }
 
@@ -376,13 +347,10 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   /// Speak an arbitrary line acted with [emotion] (no-op with speech off).
-  Future<void> speakLine(String text, {RobotExpression? emotion}) =>
-      _speak(text, emotion: emotion);
+  Future<void> speakLine(String text, {RobotExpression? emotion}) => _speak(text, emotion: emotion);
 
   void toggleSound() {
-    final newConfig = state.config.copyWith(
-      soundEnabled: !state.config.soundEnabled,
-    );
+    final newConfig = state.config.copyWith(soundEnabled: !state.config.soundEnabled);
     emit(state.copyWith(config: newConfig));
   }
 
@@ -452,18 +420,8 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       await _applyTtsSettings();
       if (emotion != null) {
         final (pitchFactor, rateFactor) = _emotionVoice(emotion);
-        await _safeTtsCall(
-          () => _flutterTts.setPitch(
-            (state.config.speechPitch * pitchFactor).clamp(0.5, 2.0),
-          ),
-          'set emotion pitch',
-        );
-        await _safeTtsCall(
-          () => _flutterTts.setSpeechRate(
-            (state.config.speechRate * rateFactor).clamp(0.1, 2.0),
-          ),
-          'set emotion rate',
-        );
+        await _safeTtsCall(() => _flutterTts.setPitch((state.config.speechPitch * pitchFactor).clamp(0.5, 2.0)), 'set emotion pitch');
+        await _safeTtsCall(() => _flutterTts.setSpeechRate((state.config.speechRate * rateFactor).clamp(0.1, 2.0)), 'set emotion rate');
       }
       await _flutterTts.stop();
       await voice.stopPlayback();
@@ -491,12 +449,17 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     // Unique file per utterance: iOS AVAudioFile appends into an existing
     // file, and SoLoud keys loaded sources by path — reusing one path could
     // replay stale audio. Deleted right after playback.
-    final path =
-        '${Directory.systemTemp.path}/haze_tts_${DateTime.now().microsecondsSinceEpoch}.wav';
+    final extension = Platform.isIOS ? 'caf' : 'wav';
+    final path = '${Directory.systemTemp.path}/haze_tts_${DateTime.now().microsecondsSinceEpoch}.$extension';
     try {
       final result = await _flutterTts.synthesizeToFile(line, path, true);
-      if (result != 1) return false;
-      return await voice.playWavFile(path, preset: VoicePreset.robot);
+      if (result != 1) {
+        debugPrint('Haze TTS: synthesizeToFile returned $result');
+        return false;
+      }
+      final played = await voice.playWavFile(path, preset: VoicePreset.robot);
+      debugPrint(played ? 'Haze TTS: robot playback used' : 'Haze TTS: robot playback fell back');
+      return played;
     } catch (e) {
       debugPrint('Haze TTS: robot voice failed, falling back: $e');
       return false;
@@ -529,9 +492,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         emit(state.copyWith(mimicStatus: MimicStatus.replaying, isSpeaking: true));
         await voice.playWavBytes(wav, preset: VoicePreset.chipmunk);
         if (!isClosed) {
-          emit(
-            state.copyWith(mimicStatus: MimicStatus.idle, isSpeaking: false),
-          );
+          emit(state.copyWith(mimicStatus: MimicStatus.idle, isSpeaking: false));
         }
     }
   }
@@ -539,29 +500,16 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   Future<void> previewVoice() => _speak(_voicePreviewLine);
 
   String get _voicePreviewLine => switch (state.personality) {
-    HazePersonality.sleepy =>
-      'Haze voice check... sleepy circuits online... zzz.',
-    HazePersonality.zen || HazePersonality.meditative =>
-      'Haze voice check. Breathe in gently, and let the little robot hum settle.',
-    HazePersonality.sarcastic =>
-      'Haze voice check. Miraculously, the tiny speaker has opinions.',
-    HazePersonality.playful =>
-      'Haze voice check! Beep boop, local voice systems are online.',
+    HazePersonality.sleepy => 'Haze voice check... sleepy circuits online... zzz.',
+    HazePersonality.zen || HazePersonality.meditative => 'Haze voice check. Breathe in gently, and let the little robot hum settle.',
+    HazePersonality.sarcastic => 'Haze voice check. Miraculously, the tiny speaker has opinions.',
+    HazePersonality.playful => 'Haze voice check! Beep boop, local voice systems are online.',
   };
 
   Future<void> _applyTtsSettings() async {
-    await _safeTtsCall(
-      () => _flutterTts.setLanguage(state.config.language),
-      'set language',
-    );
-    await _safeTtsCall(
-      () => _flutterTts.setSpeechRate(state.config.speechRate),
-      'set speech rate',
-    );
-    await _safeTtsCall(
-      () => _flutterTts.setPitch(state.config.speechPitch),
-      'set speech pitch',
-    );
+    await _safeTtsCall(() => _flutterTts.setLanguage(state.config.language), 'set language');
+    await _safeTtsCall(() => _flutterTts.setSpeechRate(state.config.speechRate), 'set speech rate');
+    await _safeTtsCall(() => _flutterTts.setPitch(state.config.speechPitch), 'set speech pitch');
     await _selectBestLocalVoice();
   }
 
@@ -574,46 +522,51 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
           .map((voice) => voice.map((key, value) => MapEntry('$key', '$value')))
           .where((voice) => voice['locale'] == state.config.language)
           .toList();
-      final options = _voiceOptionsFor(voices);
-      final selectedVoiceId =
-          options.any((option) => option.id == state.selectedTtsVoiceId)
-          ? state.selectedTtsVoiceId
-          : null;
+      final pickerVoices = _pickerVoicesFor(voices);
+      final options = _voiceOptionsFor(pickerVoices);
+      final selectedVoiceId = options.any((option) => option.id == state.selectedTtsVoiceId) ? state.selectedTtsVoiceId : null;
       if (state.selectedTtsVoiceId != null && selectedVoiceId == null) {
         await _saveVoiceId(null);
       }
 
-      if (!isClosed &&
-          (!_voiceOptionsEqual(state.ttsVoiceOptions, options) ||
-              state.selectedTtsVoiceId != selectedVoiceId)) {
-        emit(
-          state.copyWith(
-            ttsVoiceOptions: options,
-            selectedTtsVoiceId: selectedVoiceId,
-          ),
-        );
+      if (!isClosed && (!_voiceOptionsEqual(state.ttsVoiceOptions, options) || state.selectedTtsVoiceId != selectedVoiceId)) {
+        emit(state.copyWith(ttsVoiceOptions: options, selectedTtsVoiceId: selectedVoiceId));
       }
 
       if (voices.isEmpty) return;
-      if (_activeVoiceLocale == state.config.language &&
-          _activeVoiceId == selectedVoiceId) {
+      if (_activeVoiceLocale == state.config.language && _activeVoiceId == selectedVoiceId) {
         return;
       }
 
       Map<String, String>? selectedVoice;
       if (selectedVoiceId != null) {
-        for (final voice in voices) {
+        for (final voice in pickerVoices) {
           if (_voiceId(voice) == selectedVoiceId) {
             selectedVoice = voice;
             break;
           }
         }
       }
-      final voice = selectedVoice ?? _bestVoice(voices);
-      await _flutterTts.setVoice(voice);
+      final voice = selectedVoice ?? _bestVoice(pickerVoices);
+      final result = await _flutterTts.setVoice(voice);
+      if (result != 1) {
+        debugPrint('Haze TTS: setVoice returned $result for $voice');
+        if (selectedVoice != null) {
+          await _saveVoiceId(null);
+          if (!isClosed) {
+            emit(state.copyWith(selectedTtsVoiceId: null));
+          }
+        }
+        _activeVoiceLocale = null;
+        _activeVoiceId = null;
+        return;
+      }
       _activeVoiceLocale = state.config.language;
       _activeVoiceId = selectedVoiceId;
-      debugPrint('Haze TTS: selected voice $voice');
+      debugPrint(
+        'Haze TTS: selected voice ${voice['name']} '
+        '(${voice['locale']}, ${voice['identifier'] ?? 'no identifier'})',
+      );
     } catch (e) {
       debugPrint('Haze TTS: could not select voice: $e');
     }
@@ -631,10 +584,12 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     return options;
   }
 
-  bool _voiceOptionsEqual(
-    List<TtsVoiceOption> previous,
-    List<TtsVoiceOption> next,
-  ) {
+  List<Map<String, String>> _pickerVoicesFor(List<Map<String, String>> voices) {
+    final normalVoices = voices.where(_isNormalSpeechVoice).toList();
+    return normalVoices.isEmpty ? voices : normalVoices;
+  }
+
+  bool _voiceOptionsEqual(List<TtsVoiceOption> previous, List<TtsVoiceOption> next) {
     if (previous.length != next.length) return false;
     for (var i = 0; i < previous.length; i++) {
       if (previous[i] != next[i]) return false;
@@ -648,7 +603,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   String _voiceId(Map<String, String> voice) =>
-      '${voice['locale'] ?? ''}|${voice['name'] ?? ''}';
+      voice['identifier']?.trim().isNotEmpty == true ? voice['identifier']!.trim() : '${voice['locale'] ?? ''}|${voice['name'] ?? ''}';
 
   String _voiceLabel(Map<String, String> voice) {
     final name = (voice['name'] ?? '').trim();
@@ -670,24 +625,45 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       score += 12;
     }
     if (quality.contains('default')) score += 4;
-    for (final preferred in [
-      'samantha',
-      'ava',
-      'allison',
-      'karen',
-      'daniel',
-      'luciana',
-    ]) {
+    for (final preferred in ['samantha', 'ava', 'allison', 'karen', 'daniel', 'luciana']) {
       if (name.contains(preferred)) score += 8;
     }
     if (name.contains('compact')) score -= 3;
     return score;
   }
 
-  Future<void> _safeTtsCall(
-    Future<dynamic> Function() action,
-    String label,
-  ) async {
+  bool _isNormalSpeechVoice(Map<String, String> voice) {
+    final name = (voice['name'] ?? '').trim().toLowerCase();
+    final identifier = (voice['identifier'] ?? '').trim().toLowerCase();
+    final gender = (voice['gender'] ?? '').trim().toLowerCase();
+    const noveltyVoiceNames = {
+      'albert',
+      'bad news',
+      'bahh',
+      'bells',
+      'boing',
+      'bubbles',
+      'cello',
+      'deranged',
+      'good news',
+      'hysterical',
+      'jester',
+      'organ',
+      'princess',
+      'superstar',
+      'trinoids',
+      'whisper',
+      'wobble',
+      'zarvox',
+    };
+    if (noveltyVoiceNames.contains(name)) return false;
+    if (identifier.contains('.speech.synthesis.voice.') && gender == 'unspecified') {
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _safeTtsCall(Future<dynamic> Function() action, String label) async {
     try {
       await action();
     } catch (e) {
@@ -730,8 +706,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       state.personality == HazePersonality.zen ||
       state.personality == HazePersonality.meditative;
 
-  RobotExpression get _timerPromptBias =>
-      _usesCalmTimerVoice ? RobotExpression.sleepy : RobotExpression.excited;
+  RobotExpression get _timerPromptBias => _usesCalmTimerVoice ? RobotExpression.sleepy : RobotExpression.excited;
 
   String _timerStartPrompt(int minutes) => _usesCalmTimerVoice
       ? '(The user just started a $minutes-minute calm focus or meditation timer. Invite them to breathe, settle in, and go gently in one soft sentence.)'
@@ -774,33 +749,19 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
 
   /// Shared path for every Haze utterance: make sure the brain is ready, ask it
   /// for a {emotion, say}, drive the face, remember the line, then speak.
-  Future<void> _respond(
-    String userText, {
-    RobotExpression bias = RobotExpression.happy,
-  }) async {
+  Future<void> _respond(String userText, {RobotExpression bias = RobotExpression.happy}) async {
     emit(state.copyWith(isLoadingAI: true));
     // Only ever download / load the model once the user has opted in. Without
     // consent the brain stays unloaded and respond() returns a canned line.
-    if (state.aiConsent == AiConsent.granted &&
-        state.brainStatus != BrainStatus.unavailable) {
+    if (state.aiConsent == AiConsent.granted && state.brainStatus != BrainStatus.unavailable) {
       await prepareBrain();
     }
 
     try {
-      final reply = await _brain.respond(
-        userText: userText,
-        languageCode: state.config.language,
-        fallbackEmotion: bias,
-      );
+      final reply = await _brain.respond(userText: userText, languageCode: state.config.language, fallbackEmotion: bias);
 
       final newConfig = state.config.copyWith(expression: reply.emotion);
-      emit(
-        state.copyWith(
-          config: newConfig,
-          aiMessage: reply.say,
-          isLoadingAI: false,
-        ),
-      );
+      emit(state.copyWith(config: newConfig, aiMessage: reply.say, isLoadingAI: false));
 
       if (state.config.speechEnabled) {
         await _speak(reply.say, emotion: reply.emotion);
