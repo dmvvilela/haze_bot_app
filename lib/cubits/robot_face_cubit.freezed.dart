@@ -26,6 +26,7 @@ mixin _$RobotFaceState {
   String get aiMessage => throw _privateConstructorUsedError;
   bool get isLoadingAI => throw _privateConstructorUsedError;
   bool get isSpeaking => throw _privateConstructorUsedError;
+  bool get showChatComposer => throw _privateConstructorUsedError;
   MimicStatus get mimicStatus => throw _privateConstructorUsedError;
   bool get keepScreenAwake => throw _privateConstructorUsedError;
   BrainStatus get brainStatus => throw _privateConstructorUsedError;
@@ -64,6 +65,7 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     String aiMessage,
     bool isLoadingAI,
     bool isSpeaking,
+    bool showChatComposer,
     MimicStatus mimicStatus,
     bool keepScreenAwake,
     BrainStatus brainStatus,
@@ -102,6 +104,7 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? aiMessage = null,
     Object? isLoadingAI = null,
     Object? isSpeaking = null,
+    Object? showChatComposer = null,
     Object? mimicStatus = null,
     Object? keepScreenAwake = null,
     Object? brainStatus = null,
@@ -149,6 +152,10 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
             isSpeaking: null == isSpeaking
                 ? _value.isSpeaking
                 : isSpeaking // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            showChatComposer: null == showChatComposer
+                ? _value.showChatComposer
+                : showChatComposer // ignore: cast_nullable_to_non_nullable
                       as bool,
             mimicStatus: null == mimicStatus
                 ? _value.mimicStatus
@@ -221,6 +228,7 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
     String aiMessage,
     bool isLoadingAI,
     bool isSpeaking,
+    bool showChatComposer,
     MimicStatus mimicStatus,
     bool keepScreenAwake,
     BrainStatus brainStatus,
@@ -259,6 +267,7 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? aiMessage = null,
     Object? isLoadingAI = null,
     Object? isSpeaking = null,
+    Object? showChatComposer = null,
     Object? mimicStatus = null,
     Object? keepScreenAwake = null,
     Object? brainStatus = null,
@@ -306,6 +315,10 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
         isSpeaking: null == isSpeaking
             ? _value.isSpeaking
             : isSpeaking // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        showChatComposer: null == showChatComposer
+            ? _value.showChatComposer
+            : showChatComposer // ignore: cast_nullable_to_non_nullable
                   as bool,
         mimicStatus: null == mimicStatus
             ? _value.mimicStatus
@@ -361,6 +374,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.aiMessage = '',
     this.isLoadingAI = false,
     this.isSpeaking = false,
+    this.showChatComposer = false,
     this.mimicStatus = MimicStatus.idle,
     this.keepScreenAwake = false,
     this.brainStatus = BrainStatus.idle,
@@ -401,6 +415,9 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   final bool isSpeaking;
   @override
   @JsonKey()
+  final bool showChatComposer;
+  @override
+  @JsonKey()
   final MimicStatus mimicStatus;
   @override
   @JsonKey()
@@ -436,7 +453,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
 
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, mimicStatus: $mimicStatus, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoiceOptions: $ttsVoiceOptions, selectedTtsVoiceId: $selectedTtsVoiceId, lookTarget: $lookTarget)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, showChatComposer: $showChatComposer, mimicStatus: $mimicStatus, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoiceOptions: $ttsVoiceOptions, selectedTtsVoiceId: $selectedTtsVoiceId, lookTarget: $lookTarget)';
   }
 
   @override
@@ -461,6 +478,8 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
                 other.isLoadingAI == isLoadingAI) &&
             (identical(other.isSpeaking, isSpeaking) ||
                 other.isSpeaking == isSpeaking) &&
+            (identical(other.showChatComposer, showChatComposer) ||
+                other.showChatComposer == showChatComposer) &&
             (identical(other.mimicStatus, mimicStatus) ||
                 other.mimicStatus == mimicStatus) &&
             (identical(other.keepScreenAwake, keepScreenAwake) ||
@@ -484,7 +503,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     config,
     isPressed,
@@ -495,6 +514,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     aiMessage,
     isLoadingAI,
     isSpeaking,
+    showChatComposer,
     mimicStatus,
     keepScreenAwake,
     brainStatus,
@@ -504,7 +524,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     const DeepCollectionEquality().hash(_ttsVoiceOptions),
     selectedTtsVoiceId,
     lookTarget,
-  );
+  ]);
 
   /// Create a copy of RobotFaceState
   /// with the given fields replaced by the non-null parameter values.
@@ -529,6 +549,7 @@ abstract class _RobotFaceState implements RobotFaceState {
     final String aiMessage,
     final bool isLoadingAI,
     final bool isSpeaking,
+    final bool showChatComposer,
     final MimicStatus mimicStatus,
     final bool keepScreenAwake,
     final BrainStatus brainStatus,
@@ -558,6 +579,8 @@ abstract class _RobotFaceState implements RobotFaceState {
   bool get isLoadingAI;
   @override
   bool get isSpeaking;
+  @override
+  bool get showChatComposer;
   @override
   MimicStatus get mimicStatus;
   @override

@@ -12,6 +12,7 @@ class RobotFaceState with _$RobotFaceState {
     @Default('') String aiMessage,
     @Default(false) bool isLoadingAI,
     @Default(false) bool isSpeaking,
+    @Default(false) bool showChatComposer,
     @Default(MimicStatus.idle) MimicStatus mimicStatus,
     @Default(false) bool keepScreenAwake,
     @Default(BrainStatus.idle) BrainStatus brainStatus,

@@ -3,18 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubits/robot_face_cubit.dart';
 import '../services/haze_brain.dart';
-import 'ai_consent_dialog.dart';
 
-/// Lets the user actually talk to Haze. The reply is spoken (if speech is on),
-/// drives Haze's face, and is also shown here as a little chat bubble.
-class TalkDialog extends StatefulWidget {
-  const TalkDialog({super.key});
+/// Inline chat composer for talking to Haze without leaving the main face.
+class TalkComposer extends StatefulWidget {
+  const TalkComposer({super.key});
 
   @override
-  State<TalkDialog> createState() => _TalkDialogState();
+  State<TalkComposer> createState() => _TalkComposerState();
 }
 
-class _TalkDialogState extends State<TalkDialog> {
+class _TalkComposerState extends State<TalkComposer> {
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -34,101 +32,82 @@ class _TalkDialogState extends State<TalkDialog> {
   Widget build(BuildContext context) {
     return BlocBuilder<RobotFaceCubit, RobotFaceState>(
       builder: (context, state) {
-        final downloading = state.brainStatus == BrainStatus.downloading;
+        final isPt = state.config.language.toLowerCase().startsWith('pt');
         final unavailable = state.brainStatus == BrainStatus.unavailable;
+        final colors = Theme.of(context).colorScheme;
 
-        return AlertDialog(
-          title: Row(
-            children: [
-              Icon(Icons.smart_toy, color: Theme.of(context).primaryColor),
-              const SizedBox(width: 8),
-              const Text('Talk to Haze'),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Not opted in yet: offer to enable the on-device brain. Until
-              // then Haze answers with its built-in canned lines.
-              if (state.aiConsent != AiConsent.granted) ...[
-                FilledButton.tonalIcon(
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (_) => BlocProvider.value(
-                      value: context.read<RobotFaceCubit>(),
-                      child: const AiConsentDialog(),
+        return Material(
+          elevation: 12,
+          color: colors.surface.withValues(alpha: 0.96),
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.chat_bubble_outline, color: colors.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        isPt ? 'Conversar com Haze' : 'Talk to Haze',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: isPt ? 'Fechar' : 'Close',
+                      icon: const Icon(Icons.close),
+                      onPressed: context
+                          .read<RobotFaceCubit>()
+                          .toggleChatComposer,
+                    ),
+                  ],
+                ),
+                if (unavailable)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      isPt
+                          ? 'O cérebro local não carregou. Usando respostas prontas por enquanto.'
+                          : "Haze's local brain could not load. Using built-in replies for now.",
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
-                  icon: const Icon(Icons.auto_awesome),
-                  label: const Text("Enable Haze's AI brain"),
-                ),
-                const SizedBox(height: 12),
-              ],
-
-              // Haze's latest line (or a hint while the brain wakes up).
-              if (state.aiMessage.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(state.aiMessage),
-                ),
-
-              if (downloading) ...[
-                const SizedBox(height: 12),
-                Text('Waking Haze up… ${state.downloadProgress}%'),
-                const SizedBox(height: 8),
-                LinearProgressIndicator(
-                  value: state.downloadProgress > 0
-                      ? state.downloadProgress / 100
-                      : null,
-                ),
-              ],
-
-              if (unavailable) ...[
-                const SizedBox(height: 12),
-                const Text(
-                  "Haze's brain couldn't load on this device — using built-in "
-                  'replies for now.',
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
-
-              const SizedBox(height: 16),
-              TextField(
-                controller: _controller,
-                autofocus: true,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _send(context),
-                decoration: InputDecoration(
-                  hintText: 'Say something to Haze…',
-                  border: const OutlineInputBorder(),
-                  suffixIcon: state.isLoadingAI
-                      ? const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                TextField(
+                  controller: _controller,
+                  autofocus: true,
+                  enabled: !state.isLoadingAI,
+                  minLines: 1,
+                  maxLines: 3,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: (_) => _send(context),
+                  decoration: InputDecoration(
+                    hintText: isPt
+                        ? 'Digite uma mensagem para o Haze...'
+                        : 'Say something to Haze...',
+                    border: const OutlineInputBorder(),
+                    isDense: true,
+                    suffixIcon: state.isLoadingAI
+                        ? const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : IconButton(
+                            tooltip: isPt ? 'Enviar' : 'Send',
+                            icon: const Icon(Icons.send),
+                            onPressed: () => _send(context),
                           ),
-                        )
-                      : IconButton(
-                          icon: const Icon(Icons.send),
-                          onPressed: () => _send(context),
-                        ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
+              ],
             ),
-          ],
+          ),
         );
       },
     );

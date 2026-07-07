@@ -182,6 +182,14 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     await _applyTtsSettings();
   }
 
+  void showChatComposer() {
+    emit(state.copyWith(showChatComposer: true));
+  }
+
+  void toggleChatComposer() {
+    emit(state.copyWith(showChatComposer: !state.showChatComposer));
+  }
+
   Future<void> _saveConsent(AiConsent consent) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -452,9 +460,15 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     RobotExpression.scared => (1.18, 1.18),
   };
 
-  Future<void> _speak(String text, {RobotExpression? emotion}) async {
+  Future<void> _speak(
+    String text, {
+    RobotExpression? emotion,
+    bool ignoreSpeechEnabled = false,
+  }) async {
     final line = text.trim();
-    if (!state.config.speechEnabled || line.isEmpty) return;
+    if ((!ignoreSpeechEnabled && !state.config.speechEnabled) || line.isEmpty) {
+      return;
+    }
     try {
       await _applyTtsSettings();
       if (emotion != null) {
@@ -835,7 +849,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   Future<void> talkToHaze(String text) {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return Future.value();
-    return _respond(trimmed);
+    return _respond(trimmed, speakEvenIfSpeechDisabled: true);
   }
 
   /// "Say something" button: Haze comments on the face it currently shows.
@@ -853,6 +867,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   Future<void> _respond(
     String userText, {
     RobotExpression bias = RobotExpression.happy,
+    bool speakEvenIfSpeechDisabled = false,
   }) async {
     emit(state.copyWith(isLoadingAI: true));
     // Only ever download / load the model once the user has opted in. Without
@@ -878,8 +893,12 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         ),
       );
 
-      if (state.config.speechEnabled) {
-        await _speak(reply.say, emotion: reply.emotion);
+      if (state.config.speechEnabled || speakEvenIfSpeechDisabled) {
+        await _speak(
+          reply.say,
+          emotion: reply.emotion,
+          ignoreSpeechEnabled: speakEvenIfSpeechDisabled,
+        );
       }
     } catch (e) {
       emit(state.copyWith(isLoadingAI: false));

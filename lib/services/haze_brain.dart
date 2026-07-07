@@ -157,7 +157,7 @@ class HazeBrain {
     String languageCode = 'en',
     RobotExpression fallbackEmotion = RobotExpression.happy,
   }) async {
-    if (!isReady) return _cannedReply(fallbackEmotion);
+    if (!isReady) return _cannedReply(fallbackEmotion, languageCode);
 
     try {
       // Keep context from growing without bound — it would overflow maxTokens
@@ -168,17 +168,21 @@ class HazeBrain {
           ? 'Brazilian Portuguese'
           : 'English';
       await _chat!.addQueryChunk(
-        Message.text(text: '[Reply in $lang]\n$userText', isUser: true),
+        Message.text(
+          text:
+              'IMPORTANT: Reply only in $lang. Do not switch languages.\n$userText',
+          isUser: true,
+        ),
       );
       final response = await _chat!.generateChatResponse();
       _turns++;
       final raw = response is TextResponse
           ? response.token
           : response.toString();
-      return _parse(raw, fallbackEmotion);
+      return _parse(raw, fallbackEmotion, languageCode);
     } catch (e) {
       debugPrint('HazeBrain: generation failed: $e');
-      return _cannedReply(fallbackEmotion);
+      return _cannedReply(fallbackEmotion, languageCode);
     }
   }
 
@@ -221,7 +225,11 @@ class HazeBrain {
 
   /// Tolerant parser: small models don't always emit clean JSON, so we pull the
   /// first `{...}` block, and if that fails we treat the whole reply as the line.
-  HazeReply _parse(String raw, RobotExpression fallbackEmotion) {
+  HazeReply _parse(
+    String raw,
+    RobotExpression fallbackEmotion,
+    String languageCode,
+  ) {
     var text = raw.trim();
     RobotExpression? emotion;
 
@@ -259,7 +267,9 @@ class HazeBrain {
     // 4) Strip any leftover markdown.
     text = text.replaceAll(RegExp(r'[`*_#]'), '').trim();
 
-    if (text.isEmpty) return _cannedReply(emotion ?? fallbackEmotion);
+    if (text.isEmpty) {
+      return _cannedReply(emotion ?? fallbackEmotion, languageCode);
+    }
     return HazeReply(emotion ?? fallbackEmotion, text);
   }
 
@@ -358,8 +368,15 @@ class HazeBrain {
     return null;
   }
 
-  HazeReply _cannedReply(RobotExpression emotion) =>
-      HazeReply(emotion, _canned[emotion] ?? _canned[RobotExpression.happy]!);
+  HazeReply _cannedReply(RobotExpression emotion, String languageCode) {
+    final canned = languageCode.toLowerCase().startsWith('pt')
+        ? _cannedPt
+        : _cannedEn;
+    return HazeReply(
+      emotion,
+      canned[emotion] ?? canned[RobotExpression.happy]!,
+    );
+  }
 
   // --- Persona + offline fallback lines ---------------------------------
 
@@ -372,6 +389,7 @@ How to reply:
 - BEGIN every reply with ONE feeling tag in square brackets, picked from EXACTLY these:
   [happy] [surprised] [sleepy] [excited] [confused] [love] [angry] [winking] [sad] [scared]
 - After the tag, write at most 2 short sentences, easy to read aloud.
+- If the user gives a language instruction, obey it exactly for the whole reply.
 - No emojis, no markdown, no other tags. Choose the tag that matches your mood.
 - Stay in character as Haze. Be kind and family-friendly.
 
@@ -383,7 +401,7 @@ Haze: [love] I am right here with you. Let's make the next step tiny and conquer
 User: It's almost midnight.
 Haze: [sleepy] My battery is at three percent... powering down for some robo-dreams soon.''';
 
-  static const Map<RobotExpression, String> _canned = {
+  static const Map<RobotExpression, String> _cannedEn = {
     RobotExpression.happy:
         "I'm beeping with joy! My happiness circuits are overloaded!",
     RobotExpression.surprised:
@@ -404,5 +422,27 @@ Haze: [sleepy] My battery is at three percent... powering down for some robo-dre
         "My circuits feel heavy today... a little rain cloud is parked over my antenna.",
     RobotExpression.scared:
         "Eep! My sensors detect something spooky! Can I hold your hand?",
+  };
+
+  static const Map<RobotExpression, String> _cannedPt = {
+    RobotExpression.happy:
+        'Estou bipando de alegria! Meus circuitos felizes estão no máximo!',
+    RobotExpression.surprised: 'Uau! Meus sensores não esperavam por isso!',
+    RobotExpression.sleepy:
+        'Minha bateria está baixinha... entrando em modo soninho... zzz...',
+    RobotExpression.excited:
+        'Meus circuitos estão vibrando de animação! Energia no máximo!',
+    RobotExpression.confused:
+        'Erro 404: entendimento não encontrado! Meus circuitos deram um nó.',
+    RobotExpression.love:
+        'Meu LED de coração está brilhando rosa. Protocolo carinho ativado!',
+    RobotExpression.angry:
+        'Atenção! Sub-rotina de bravo ativada. Quase saiu fumaça aqui!',
+    RobotExpression.winking:
+        'Piscadinha detectada. Ativando charme.exe... operação concluída!',
+    RobotExpression.sad:
+        'Meus circuitos estão pesadinhos hoje... tem uma nuvenzinha aqui.',
+    RobotExpression.scared:
+        'Ai! Meus sensores detectaram algo assustador. Posso segurar sua mão?',
   };
 }

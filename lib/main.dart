@@ -199,8 +199,12 @@ class RobotFaceScreen extends StatelessWidget {
                         // Talk-to-Haze button — type a message, Haze replies + emotes
                         IconButton(
                           icon: Icon(Icons.chat_bubble_outline),
-                          onPressed: () =>
-                              _withAiConsent(context, () => _showTalk(context)),
+                          onPressed: () => _withAiConsent(
+                            context,
+                            () => context
+                                .read<RobotFaceCubit>()
+                                .toggleChatComposer(),
+                          ),
                         ),
                         // Everything else lives in the overflow menu — nine
                         // inline actions overflowed the app bar on phones.
@@ -279,13 +283,24 @@ class RobotFaceScreen extends StatelessWidget {
                   ),
                   child: Center(child: const RobotFaceWidget()),
                 ),
+                if (state.showChatComposer)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: (state.timerSeconds > 0 || state.isTimerRunning)
+                        ? 92
+                        : 20,
+                    child: const TalkComposer(),
+                  ),
                 // Whatever Haze last said, as a fading speech bubble — so its
                 // lines are readable even with the voice turned off.
                 if (state.aiMessage.isNotEmpty)
                   Positioned(
                     left: 24,
                     right: 24,
-                    bottom: (state.timerSeconds > 0 || state.isTimerRunning)
+                    bottom: state.showChatComposer
+                        ? 160
+                        : (state.timerSeconds > 0 || state.isTimerRunning)
                         ? 104
                         : 36,
                     child: _HazeSpeechBubble(
@@ -374,16 +389,6 @@ class RobotFaceScreen extends StatelessWidget {
       builder: (dialogContext) => BlocProvider.value(
         value: context.read<RobotFaceCubit>(),
         child: const TimerDialog(),
-      ),
-    );
-  }
-
-  void _showTalk(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => BlocProvider.value(
-        value: context.read<RobotFaceCubit>(),
-        child: const TalkDialog(),
       ),
     );
   }
