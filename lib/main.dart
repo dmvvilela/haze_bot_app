@@ -33,9 +33,15 @@ void main() async {
 
   // Initialize on-device AI. The (optional) HuggingFace token used for the
   // gated Gemma model download is read from .env.
-  await FlutterGemma.initialize(huggingFaceToken: dotenv.isInitialized ? dotenv.maybeGet('HUGGINGFACE_TOKEN') : null);
+  await FlutterGemma.initialize(
+    huggingFaceToken: dotenv.isInitialized
+        ? dotenv.maybeGet('HUGGINGFACE_TOKEN')
+        : null,
+  );
 
-  LocaleSettings.setLocale(AppLocale.en); // Start with English to match robot config default
+  LocaleSettings.setLocale(
+    AppLocale.en,
+  ); // Start with English to match robot config default
   runApp(TranslationProvider(child: const HazeBotApp()));
 }
 
@@ -47,12 +53,18 @@ class HazeBotApp extends StatelessWidget {
     return MaterialApp(
       title: t.app.title,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.light),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.light,
+        ),
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.grey[100],
       ),
       darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.black,
       ),
@@ -63,7 +75,12 @@ class HazeBotApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: BlocProvider(create: (context) => RobotFaceCubit()..startBlinking(), child: const RobotFaceScreen()),
+      home: BlocProvider(
+        create: (context) => RobotFaceCubit()
+          ..startBlinking()
+          ..startSecretInteractions(),
+        child: const RobotFaceScreen(),
+      ),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -71,10 +88,16 @@ class HazeBotApp extends StatelessWidget {
 
 enum _MenuAction { colors, faceStyle, theme, settings }
 
-PopupMenuItem<_MenuAction> _menuItem(_MenuAction action, IconData icon, String label) {
+PopupMenuItem<_MenuAction> _menuItem(
+  _MenuAction action,
+  IconData icon,
+  String label,
+) {
   return PopupMenuItem(
     value: action,
-    child: Row(children: [Icon(icon, size: 20), const SizedBox(width: 12), Text(label)]),
+    child: Row(
+      children: [Icon(icon, size: 20), const SizedBox(width: 12), Text(label)],
+    ),
   );
 }
 
@@ -88,9 +111,13 @@ class RobotFaceScreen extends StatelessWidget {
         return Theme(
           data: state.config.isDarkTheme ? ThemeData.dark() : ThemeData.light(),
           child: Scaffold(
-            backgroundColor: state.config.isDarkTheme ? Colors.black : Colors.grey[100],
+            backgroundColor: state.config.isDarkTheme
+                ? Colors.black
+                : Colors.grey[100],
             appBar: AppBar(
-              backgroundColor: state.config.isDarkTheme ? Colors.black : Colors.grey[100],
+              backgroundColor: state.config.isDarkTheme
+                  ? Colors.black
+                  : Colors.grey[100],
               elevation: 0,
               toolbarHeight: kToolbarHeight,
               actions: [
@@ -110,16 +137,26 @@ class RobotFaceScreen extends StatelessWidget {
                             MimicStatus.listening => Icons.mic,
                             MimicStatus.replaying => Icons.graphic_eq,
                           }),
-                          color: state.mimicStatus == MimicStatus.listening ? Colors.redAccent : null,
+                          color: state.mimicStatus == MimicStatus.listening
+                              ? Colors.redAccent
+                              : null,
                           tooltip: 'Mimic',
-                          onPressed: () => context.read<RobotFaceCubit>().toggleMimic(),
+                          onPressed: () =>
+                              context.read<RobotFaceCubit>().toggleMimic(),
                         ),
                         // Feelings game — Haze acts, the player names the emotion
-                        IconButton(icon: Icon(Icons.emoji_emotions_outlined), tooltip: t.game.play, onPressed: () => _showGame(context)),
+                        IconButton(
+                          icon: Icon(Icons.emoji_emotions_outlined),
+                          tooltip: t.game.play,
+                          onPressed: () => _showGame(context),
+                        ),
                         // Timer button with indicator
                         Stack(
                           children: [
-                            IconButton(icon: Icon(Icons.timer), onPressed: () => _showTimer(context)),
+                            IconButton(
+                              icon: Icon(Icons.timer),
+                              onPressed: () => _showTimer(context),
+                            ),
                             if (state.isTimerRunning)
                               Positioned(
                                 right: 8,
@@ -127,7 +164,10 @@ class RobotFaceScreen extends StatelessWidget {
                                 child: Container(
                                   width: 8,
                                   height: 8,
-                                  decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
                               ),
                           ],
@@ -137,18 +177,36 @@ class RobotFaceScreen extends StatelessWidget {
                           children: [
                             IconButton(
                               icon: Icon(Icons.smart_toy),
-                              onPressed: () => _withAiConsent(context, () => context.read<RobotFaceCubit>().getAIResponse()),
+                              onPressed: () => _withAiConsent(
+                                context,
+                                () => context
+                                    .read<RobotFaceCubit>()
+                                    .getAIResponse(),
+                              ),
                             ),
                             if (state.isLoadingAI)
                               Positioned.fill(
-                                child: Center(child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
                               ),
                           ],
                         ),
                         // Talk-to-Haze button — type a message, Haze replies + emotes
                         IconButton(
                           icon: Icon(Icons.chat_bubble_outline),
-                          onPressed: () => _withAiConsent(context, () => context.read<RobotFaceCubit>().toggleChatComposer()),
+                          onPressed: () => _withAiConsent(
+                            context,
+                            () => context
+                                .read<RobotFaceCubit>()
+                                .toggleChatComposer(),
+                          ),
                         ),
                         // Everything else lives in the overflow menu — nine
                         // inline actions overflowed the app bar on phones.
@@ -169,17 +227,37 @@ class RobotFaceScreen extends StatelessWidget {
                             }
                           },
                           itemBuilder: (_) => [
-                            _menuItem(_MenuAction.colors, Icons.palette, 'Colors'),
-                            _menuItem(_MenuAction.faceStyle, Icons.face, 'Face style'),
+                            _menuItem(
+                              _MenuAction.colors,
+                              Icons.palette,
+                              'Colors',
+                            ),
+                            _menuItem(
+                              _MenuAction.faceStyle,
+                              Icons.face,
+                              'Face style',
+                            ),
                             _menuItem(
                               _MenuAction.theme,
-                              state.config.isDarkTheme ? Icons.light_mode : Icons.dark_mode,
-                              state.config.isDarkTheme ? 'Light theme' : 'Dark theme',
+                              state.config.isDarkTheme
+                                  ? Icons.light_mode
+                                  : Icons.dark_mode,
+                              state.config.isDarkTheme
+                                  ? 'Light theme'
+                                  : 'Dark theme',
                             ),
-                            _menuItem(_MenuAction.settings, Icons.settings, 'Settings'),
+                            _menuItem(
+                              _MenuAction.settings,
+                              Icons.settings,
+                              'Settings',
+                            ),
                           ],
                         ),
-                        IconButton(icon: Icon(Icons.visibility_off), onPressed: () => context.read<RobotFaceCubit>().toggleControls()),
+                        IconButton(
+                          icon: Icon(Icons.visibility_off),
+                          onPressed: () =>
+                              context.read<RobotFaceCubit>().toggleControls(),
+                        ),
                       ],
                     ),
                   ),
@@ -202,14 +280,18 @@ class RobotFaceScreen extends StatelessWidget {
                   ),
                 // Robot face always centered
                 Padding(
-                  padding: EdgeInsets.only(bottom: AppBar().preferredSize.height),
+                  padding: EdgeInsets.only(
+                    bottom: AppBar().preferredSize.height,
+                  ),
                   child: Center(child: const RobotFaceWidget()),
                 ),
                 if (state.showChatComposer)
                   Positioned(
                     left: 16,
                     right: 16,
-                    bottom: (state.timerSeconds > 0 || state.isTimerRunning) ? 92 : 20,
+                    bottom: (state.timerSeconds > 0 || state.isTimerRunning)
+                        ? 92
+                        : 20,
                     child: const TalkComposer(),
                   ),
                 // Whatever Haze last said, as a fading speech bubble — so its
@@ -223,19 +305,31 @@ class RobotFaceScreen extends StatelessWidget {
                         : (state.timerSeconds > 0 || state.isTimerRunning)
                         ? 104
                         : 36,
-                    child: _HazeSpeechBubble(message: state.aiMessage, speaking: state.isSpeaking, accent: state.config.eyeColor),
+                    child: _HazeSpeechBubble(
+                      message: state.aiMessage,
+                      speaking: state.isSpeaking,
+                      accent: state.config.eyeColor,
+                    ),
                   ),
                 if (state.timerSeconds > 0 || state.isTimerRunning)
-                  Positioned(left: 20, right: 20, bottom: 28, child: _TimerOverlay(state: state)),
+                  Positioned(
+                    left: 20,
+                    right: 20,
+                    bottom: 28,
+                    child: _TimerOverlay(state: state),
+                  ),
                 // Live waveform of Haze's ears (listening) or voice (talking).
-                if (state.mimicStatus != MimicStatus.idle || (state.isSpeaking && state.config.robotVoiceEnabled))
+                if (state.mimicStatus != MimicStatus.idle ||
+                    (state.isSpeaking && state.config.robotVoiceEnabled))
                   Positioned(
                     left: 60,
                     right: 60,
                     top: 12,
                     child: VoiceWaveform(
                       voice: context.read<RobotFaceCubit>().voice,
-                      color: state.mimicStatus == MimicStatus.listening ? Colors.redAccent : state.config.eyeColor,
+                      color: state.mimicStatus == MimicStatus.listening
+                          ? Colors.redAccent
+                          : state.config.eyeColor,
                     ),
                   ),
               ],
@@ -264,28 +358,40 @@ class RobotFaceScreen extends StatelessWidget {
   void _showColorPicker(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => BlocProvider.value(value: context.read<RobotFaceCubit>(), child: const ColorPickerDialog()),
+      builder: (dialogContext) => BlocProvider.value(
+        value: context.read<RobotFaceCubit>(),
+        child: const ColorPickerDialog(),
+      ),
     );
   }
 
   void _showFaceTypePicker(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => BlocProvider.value(value: context.read<RobotFaceCubit>(), child: const FaceTypePickerDialog()),
+      builder: (dialogContext) => BlocProvider.value(
+        value: context.read<RobotFaceCubit>(),
+        child: const FaceTypePickerDialog(),
+      ),
     );
   }
 
   void _showSettings(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => BlocProvider.value(value: context.read<RobotFaceCubit>(), child: const SettingsDialog()),
+      builder: (dialogContext) => BlocProvider.value(
+        value: context.read<RobotFaceCubit>(),
+        child: const SettingsDialog(),
+      ),
     );
   }
 
   void _showTimer(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => BlocProvider.value(value: context.read<RobotFaceCubit>(), child: const TimerDialog()),
+      builder: (dialogContext) => BlocProvider.value(
+        value: context.read<RobotFaceCubit>(),
+        child: const TimerDialog(),
+      ),
     );
   }
 
@@ -316,7 +422,11 @@ class _HazeSpeechBubble extends StatefulWidget {
   final bool speaking;
   final Color accent;
 
-  const _HazeSpeechBubble({required this.message, required this.speaking, required this.accent});
+  const _HazeSpeechBubble({
+    required this.message,
+    required this.speaking,
+    required this.accent,
+  });
 
   @override
   State<_HazeSpeechBubble> createState() => _HazeSpeechBubbleState();
@@ -335,7 +445,8 @@ class _HazeSpeechBubbleState extends State<_HazeSpeechBubble> {
   @override
   void didUpdateWidget(covariant _HazeSpeechBubble oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.message != oldWidget.message || (widget.speaking && !oldWidget.speaking)) {
+    if (widget.message != oldWidget.message ||
+        (widget.speaking && !oldWidget.speaking)) {
       _show();
     }
   }
@@ -381,17 +492,30 @@ class _HazeSpeechBubbleState extends State<_HazeSpeechBubble> {
               onTap: () => setState(() => _visible = false),
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 420),
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: colors.surface.withValues(alpha: 0.94),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: widget.accent.withValues(alpha: 0.35)),
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 16, offset: const Offset(0, 6))],
+                  border: Border.all(
+                    color: widget.accent.withValues(alpha: 0.35),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.25),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
                 child: Text(
                   widget.message,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.35),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(height: 1.35),
                 ),
               ),
             ),
@@ -430,7 +554,8 @@ class _TimerOverlay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                state.personality == HazePersonality.meditative || state.personality == HazePersonality.sleepy
+                state.personality == HazePersonality.meditative ||
+                        state.personality == HazePersonality.sleepy
                     ? Icons.self_improvement
                     : Icons.timer,
                 color: colors.primary,
@@ -455,7 +580,11 @@ class _TimerOverlay extends StatelessWidget {
                 icon: Icon(paused ? Icons.play_arrow : Icons.pause),
               ),
               const SizedBox(width: 6),
-              IconButton(tooltip: 'Stop', onPressed: cubit.stopTimer, icon: const Icon(Icons.stop)),
+              IconButton(
+                tooltip: 'Stop',
+                onPressed: cubit.stopTimer,
+                icon: const Icon(Icons.stop),
+              ),
             ],
           ),
         ),

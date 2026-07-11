@@ -1,7 +1,11 @@
 import 'dart:math' as math;
+import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 import '../cubits/robot_face_cubit.dart';
 import '../models/robot_config.dart';
@@ -13,8 +17,48 @@ import 'looi_face.dart';
 import 'minimal_face.dart';
 import 'bean_face.dart';
 
-class RobotFaceWidget extends StatelessWidget {
+class RobotFaceWidget extends StatefulWidget {
   const RobotFaceWidget({super.key});
+
+  @override
+  State<RobotFaceWidget> createState() => _RobotFaceWidgetState();
+}
+
+class _RobotFaceWidgetState extends State<RobotFaceWidget> {
+  StreamSubscription<AccelerometerEvent>? _motion;
+
+  @override
+  void initState() {
+    super.initState();
+    final isFlutterTest = WidgetsBinding.instance.runtimeType
+        .toString()
+        .contains('TestWidgetsFlutterBinding');
+    if (isFlutterTest ||
+        kIsWeb ||
+        (defaultTargetPlatform != TargetPlatform.android &&
+            defaultTargetPlatform != TargetPlatform.iOS)) {
+      return;
+    }
+    _motion =
+        accelerometerEventStream(
+          samplingPeriod: const Duration(milliseconds: 100),
+        ).listen((event) {
+          // Gravity contributes ~9.8 m/s². A magnitude well above that is a
+          // deliberate shake, with the cubit handling debounce and animation.
+          final magnitude = math.sqrt(
+            event.x * event.x + event.y * event.y + event.z * event.z,
+          );
+          if (magnitude > 20 && mounted) {
+            context.read<RobotFaceCubit>().onShake();
+          }
+        });
+  }
+
+  @override
+  void dispose() {
+    _motion?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +103,10 @@ class RobotFaceWidget extends StatelessWidget {
               // hit-testable — without this, taps on V2/V3 never land.
               behavior: HitTestBehavior.opaque,
               onTap: cubit.onTap,
-              onLongPress: cubit.sing,
+              onLongPress: () {
+                HapticFeedback.mediumImpact();
+                cubit.cuddle();
+              },
               onPanStart: (details) => lookAt(details.localPosition),
               onPanUpdate: (details) => lookAt(details.localPosition),
               onPanEnd: (_) => cubit.setLookTarget(null),

@@ -64,6 +64,7 @@ dependencies:
   shared_preferences: ^2.3.2
   flutter_soloud: ^4.0.12
   record: ^7.1.1
+  sensors_plus: ^6.1.1
 
 dev_dependencies:
   flutter_test:
