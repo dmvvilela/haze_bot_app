@@ -123,28 +123,38 @@ class SettingsDialog extends StatelessWidget {
                         context.read<RobotFaceCubit>().toggleSpeech(),
                   ),
                   if (state.config.speechEnabled) ...[
-                    DropdownButtonFormField<HazeVoice>(
-                      initialValue: state.config.hazeVoice,
-                      decoration: const InputDecoration(
-                        labelText: 'Haze character voice',
-                        helperText: 'Used for authored reactions',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: HazeVoice.values
-                          .map(
-                            (voice) => DropdownMenuItem(
-                              value: voice,
-                              child: Text(voice.displayName),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (voice) {
-                        if (voice != null) {
-                          context.read<RobotFaceCubit>().updateHazeVoice(voice);
-                        }
-                      },
+                    Text(
+                      'Haze character voice',
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Used for authored reactions',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 10),
+                    _VoiceGroup(
+                      label: 'Female voices',
+                      voices: HazeVoice.values
+                          .where((voice) => !voice.isMale)
+                          .toList(),
+                      selected: state.config.hazeVoice,
+                      onSelected: context
+                          .read<RobotFaceCubit>()
+                          .updateHazeVoice,
+                    ),
+                    const SizedBox(height: 10),
+                    _VoiceGroup(
+                      label: 'Male voices',
+                      voices: HazeVoice.values
+                          .where((voice) => voice.isMale)
+                          .toList(),
+                      selected: state.config.hazeVoice,
+                      onSelected: context
+                          .read<RobotFaceCubit>()
+                          .updateHazeVoice,
+                    ),
+                    const SizedBox(height: 6),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: const Text('Robot voice'),
@@ -316,6 +326,43 @@ class _SectionHeader extends StatelessWidget {
               Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
             ],
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _VoiceGroup extends StatelessWidget {
+  final String label;
+  final List<HazeVoice> voices;
+  final HazeVoice selected;
+  final ValueChanged<HazeVoice> onSelected;
+
+  const _VoiceGroup({
+    required this.label,
+    required this.voices,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: Theme.of(context).textTheme.labelLarge),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 8,
+          runSpacing: 6,
+          children: [
+            for (final voice in voices)
+              ChoiceChip(
+                label: Text(voice.displayName),
+                selected: voice == selected,
+                onSelected: (_) => onSelected(voice),
+              ),
+          ],
         ),
       ],
     );

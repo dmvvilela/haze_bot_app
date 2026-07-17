@@ -34,11 +34,13 @@ void main() {
   ) async {
     const clips = ['hello', 'happy', 'annoyed', 'sleepy', 'confused', 'love'];
     for (final voice in HazeVoice.values) {
-      for (final clip in clips) {
-        final data = await rootBundle.load(
-          'assets/voices/haze/${voice.assetId}/$clip.wav',
-        );
-        expect(data.lengthInBytes, greaterThan(1000));
+      for (final localePath in ['', '/pt']) {
+        for (final clip in clips) {
+          final data = await rootBundle.load(
+            'assets/voices/haze/${voice.assetId}$localePath/$clip.wav',
+          );
+          expect(data.lengthInBytes, greaterThan(1000));
+        }
       }
     }
   });

@@ -48,6 +48,12 @@ audition is approved, use it as a reference for Qwen's Base clone model:
 .voice-studio/bin/python tool/freeze_haze_voice_packs.py
 ```
 
+Generate the same frozen identities speaking Brazilian Portuguese:
+
+```sh
+.voice-studio/bin/python tool/freeze_haze_voice_packs.py --locale pt-BR
+```
+
 While iterating, generate only selected content:
 
 ```sh

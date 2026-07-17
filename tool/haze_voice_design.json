@@ -16,5 +16,13 @@
     "sleepy": "Five more minutes. My pixels are still asleep.",
     "confused": "Hmm. That was not in my calculations.",
     "love": "Maximum hug pressure reached!"
+  },
+  "portuguese_lines": {
+    "hello": "Oh! Olá, humano. Eu definitivamente não estava reorganizando os seus segredos.",
+    "happy": "Sim! Dancinha da vitória do robô! Bip bip!",
+    "annoyed": "Estou registrando cada cutucada, sabia?",
+    "sleepy": "Só mais cinco minutos. Meus pixels ainda estão dormindo.",
+    "confused": "Hmm. Isso não estava nos meus cálculos.",
+    "love": "Pressão máxima de abraço atingida!"
   }
 }

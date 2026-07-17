@@ -111,11 +111,17 @@ flutter:
     - assets/images/
     - assets/sounds/
     - assets/voices/haze/compact_wit/
+    - assets/voices/haze/compact_wit/pt/
     - assets/voices/haze/warm_circuit/
+    - assets/voices/haze/warm_circuit/pt/
     - assets/voices/haze/cheeky_unit/
+    - assets/voices/haze/cheeky_unit/pt/
     - assets/voices/haze/male_bright_circuit/
+    - assets/voices/haze/male_bright_circuit/pt/
     - assets/voices/haze/male_warm_unit/
+    - assets/voices/haze/male_warm_unit/pt/
     - assets/voices/haze/male_cheeky_bot/
+    - assets/voices/haze/male_cheeky_bot/pt/
     # - assets/fonts/
 
   # An image asset can refer to one or more resolution-specific "variants", see

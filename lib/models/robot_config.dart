@@ -50,6 +50,15 @@ enum HazeVoice {
 }
 
 extension HazeVoiceExtension on HazeVoice {
+  bool get isMale => switch (this) {
+    HazeVoice.compactWit ||
+    HazeVoice.warmCircuit ||
+    HazeVoice.cheekyUnit => false,
+    HazeVoice.maleBrightCircuit ||
+    HazeVoice.maleWarmUnit ||
+    HazeVoice.maleCheekyBot => true,
+  };
+
   String get assetId => switch (this) {
     HazeVoice.compactWit => 'compact_wit',
     HazeVoice.warmCircuit => 'warm_circuit',

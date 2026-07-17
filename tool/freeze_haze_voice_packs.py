@@ -17,12 +17,14 @@ ROOT = Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "tool" / "haze_voice_design.json"
 REFERENCES = ROOT / "tool" / "voice_output"
 DEFAULT_OUTPUT = ROOT / "tool" / "voice_pack_output"
+PORTUGUESE_OUTPUT = ROOT / "tool" / "voice_pack_output_pt"
 MODEL_ID = "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--locale", choices=["en", "pt-BR"], default="en")
     parser.add_argument("--voice", action="append", help="Voice ID; repeatable")
     parser.add_argument("--line", action="append", help="Line ID; repeatable")
     return parser.parse_args()
@@ -31,8 +33,15 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     config = json.loads(CONFIG.read_text())
+    output_root = args.output or (
+        PORTUGUESE_OUTPUT if args.locale == "pt-BR" else DEFAULT_OUTPUT
+    )
+    target_lines = (
+        config["portuguese_lines"] if args.locale == "pt-BR" else config["lines"]
+    )
+    target_language = "Portuguese" if args.locale == "pt-BR" else "English"
     voices = args.voice or list(config["variants"])
-    lines = args.line or list(config["lines"])
+    lines = args.line or list(target_lines)
     ref_text = config["lines"]["hello"]
 
     if not torch.backends.mps.is_available():
@@ -55,18 +64,18 @@ def main() -> None:
             ref_audio=str(reference),
             ref_text=ref_text,
         )
-        voice_dir = args.output / voice_id
+        voice_dir = output_root / voice_id
         voice_dir.mkdir(parents=True, exist_ok=True)
         for line_id in lines:
-            text = config["lines"][line_id]
+            text = target_lines[line_id]
             output = voice_dir / f"{line_id}.wav"
-            if line_id == "hello":
+            if line_id == "hello" and args.locale == "en":
                 output.write_bytes(reference.read_bytes())
                 continue
             print(f"Generating {voice_id}/{line_id}: {text}")
             waves, sample_rate = model.generate_voice_clone(
                 text=text,
-                language=config["language"],
+                language=target_language,
                 voice_clone_prompt=prompt,
             )
             sf.write(output, waves[0], sample_rate)

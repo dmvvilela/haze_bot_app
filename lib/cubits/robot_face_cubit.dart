@@ -750,10 +750,17 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       };
 
   Future<bool> _playCharacterClip(String clipId) async {
-    if (!state.config.language.toLowerCase().startsWith('en')) return false;
     try {
+      final language = state.config.language.toLowerCase();
+      final localePath = language.startsWith('pt')
+          ? '/pt'
+          : language.startsWith('en')
+          ? ''
+          : null;
+      if (localePath == null) return false;
       final asset =
-          'assets/voices/haze/${state.config.hazeVoice.assetId}/$clipId.wav';
+          'assets/voices/haze/${state.config.hazeVoice.assetId}'
+          '$localePath/$clipId.wav';
       final data = await rootBundle.load(asset);
       final bytes = data.buffer.asUint8List(
         data.offsetInBytes,
