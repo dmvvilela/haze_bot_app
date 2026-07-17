@@ -23,6 +23,9 @@ _$RobotConfigImpl _$$RobotConfigImplFromJson(Map<String, dynamic> json) =>
           $enumDecodeNullable(_$FaceTypeEnumMap, json['faceType']) ??
           FaceType.hazeV3,
       speechEnabled: json['speechEnabled'] as bool? ?? false,
+      hazeVoice:
+          $enumDecodeNullable(_$HazeVoiceEnumMap, json['hazeVoice']) ??
+          HazeVoice.compactWit,
       robotVoiceEnabled: json['robotVoiceEnabled'] as bool? ?? true,
       soundEnabled: json['soundEnabled'] as bool? ?? true,
       speechRate: (json['speechRate'] as num?)?.toDouble() ?? 0.55,
@@ -38,6 +41,7 @@ Map<String, dynamic> _$$RobotConfigImplToJson(_$RobotConfigImpl instance) =>
       'mouthColor': const ColorConverter().toJson(instance.mouthColor),
       'faceType': _$FaceTypeEnumMap[instance.faceType]!,
       'speechEnabled': instance.speechEnabled,
+      'hazeVoice': _$HazeVoiceEnumMap[instance.hazeVoice]!,
       'robotVoiceEnabled': instance.robotVoiceEnabled,
       'soundEnabled': instance.soundEnabled,
       'speechRate': instance.speechRate,
@@ -66,4 +70,13 @@ const _$FaceTypeEnumMap = {
   FaceType.bean: 'bean',
   FaceType.hazeV2: 'hazeV2',
   FaceType.hazeV3: 'hazeV3',
+};
+
+const _$HazeVoiceEnumMap = {
+  HazeVoice.compactWit: 'compactWit',
+  HazeVoice.warmCircuit: 'warmCircuit',
+  HazeVoice.cheekyUnit: 'cheekyUnit',
+  HazeVoice.maleBrightCircuit: 'maleBrightCircuit',
+  HazeVoice.maleWarmUnit: 'maleWarmUnit',
+  HazeVoice.maleCheekyBot: 'maleCheekyBot',
 };

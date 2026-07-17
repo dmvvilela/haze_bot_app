@@ -319,8 +319,7 @@ class RobotFaceScreen extends StatelessWidget {
                     child: _TimerOverlay(state: state),
                   ),
                 // Live waveform of Haze's ears (listening) or voice (talking).
-                if (state.mimicStatus != MimicStatus.idle ||
-                    (state.isSpeaking && state.config.robotVoiceEnabled))
+                if (state.mimicStatus != MimicStatus.idle || state.isSpeaking)
                   Positioned(
                     left: 60,
                     right: 60,

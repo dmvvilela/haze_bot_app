@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,6 +27,20 @@ void main() {
     expect(state.isLoadingAI, isFalse);
     expect(state.ttsVoiceOptions, isEmpty);
     expect(state.selectedTtsVoiceId, isNull);
+  });
+
+  testWidgets('Every Haze character voice ships a complete reaction pack', (
+    WidgetTester tester,
+  ) async {
+    const clips = ['hello', 'happy', 'annoyed', 'sleepy', 'confused', 'love'];
+    for (final voice in HazeVoice.values) {
+      for (final clip in clips) {
+        final data = await rootBundle.load(
+          'assets/voices/haze/${voice.assetId}/$clip.wav',
+        );
+        expect(data.lengthInBytes, greaterThan(1000));
+      }
+    }
   });
 
   testWidgets('Haze app renders main controls', (WidgetTester tester) async {

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubits/robot_face_cubit.dart';
 import '../i18n/strings.g.dart';
+import '../models/robot_config.dart';
 import '../services/haze_brain.dart';
 
 class SettingsDialog extends StatelessWidget {
@@ -122,6 +123,28 @@ class SettingsDialog extends StatelessWidget {
                         context.read<RobotFaceCubit>().toggleSpeech(),
                   ),
                   if (state.config.speechEnabled) ...[
+                    DropdownButtonFormField<HazeVoice>(
+                      initialValue: state.config.hazeVoice,
+                      decoration: const InputDecoration(
+                        labelText: 'Haze character voice',
+                        helperText: 'Used for authored reactions',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: HazeVoice.values
+                          .map(
+                            (voice) => DropdownMenuItem(
+                              value: voice,
+                              child: Text(voice.displayName),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (voice) {
+                        if (voice != null) {
+                          context.read<RobotFaceCubit>().updateHazeVoice(voice);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 8),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: const Text('Robot voice'),
@@ -140,7 +163,7 @@ class SettingsDialog extends StatelessWidget {
                             state.selectedTtsVoiceId ??
                             RobotFaceCubit.automaticVoiceId,
                         decoration: const InputDecoration(
-                          labelText: 'Voice',
+                          labelText: 'Device fallback voice',
                           border: OutlineInputBorder(),
                         ),
                         items: [

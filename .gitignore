@@ -36,6 +36,11 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Mac-only voice asset production environment and generated auditions.
+.voice-studio/
+tool/voice_output/
+tool/voice_pack_output/
+
 # Symbolication related
 app.*.symbols
 

@@ -12,6 +12,7 @@ class RobotConfig with _$RobotConfig {
     @Default(Colors.pink) @ColorConverter() Color mouthColor,
     @Default(FaceType.hazeV3) FaceType faceType,
     @Default(false) bool speechEnabled,
+    @Default(HazeVoice.compactWit) HazeVoice hazeVoice,
     @Default(true) bool robotVoiceEnabled,
     @Default(true) bool soundEnabled,
     @Default(0.55) double speechRate,
@@ -38,6 +39,35 @@ enum RobotExpression {
 }
 
 enum FaceType { classic, looi, minimal, bean, hazeV2, hazeV3 }
+
+enum HazeVoice {
+  compactWit,
+  warmCircuit,
+  cheekyUnit,
+  maleBrightCircuit,
+  maleWarmUnit,
+  maleCheekyBot,
+}
+
+extension HazeVoiceExtension on HazeVoice {
+  String get assetId => switch (this) {
+    HazeVoice.compactWit => 'compact_wit',
+    HazeVoice.warmCircuit => 'warm_circuit',
+    HazeVoice.cheekyUnit => 'cheeky_unit',
+    HazeVoice.maleBrightCircuit => 'male_bright_circuit',
+    HazeVoice.maleWarmUnit => 'male_warm_unit',
+    HazeVoice.maleCheekyBot => 'male_cheeky_bot',
+  };
+
+  String get displayName => switch (this) {
+    HazeVoice.compactWit => 'Compact Wit',
+    HazeVoice.warmCircuit => 'Warm Circuit',
+    HazeVoice.cheekyUnit => 'Cheeky Unit',
+    HazeVoice.maleBrightCircuit => 'Bright Circuit',
+    HazeVoice.maleWarmUnit => 'Warm Unit',
+    HazeVoice.maleCheekyBot => 'Cheeky Bot',
+  };
+}
 
 // Custom color converter for Freezed
 class ColorConverter implements JsonConverter<Color, int> {

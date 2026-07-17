@@ -1,0 +1,20 @@
+{
+  "model": "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "language": "English",
+  "variants": {
+    "compact_wit": "A gender-neutral adult robot companion with a compact, bright synthetic timbre. Clever, mischievous, emotionally expressive, and warmly confident. Medium pitch, crisp articulation, controlled energetic rhythm, subtle electronic resonance, and dry comic timing. Cute through wit and personality, never through baby talk. Mature young-adult presence; not childish, squeaky, sing-song, breathy, seductive, or narrator-like.",
+    "warm_circuit": "A friendly gender-neutral adult digital creature with a warm synthetic voice and a small metallic resonance. Calm confidence, medium-low pitch, natural conversational pacing, precise diction, restrained playfulness, and occasional curious upward inflection. Charming and unusual without sounding young, cutesy, sultry, theatrical, or like a commercial narrator.",
+    "cheeky_unit": "A cheeky gender-neutral adult pocket computer. Clear synthetic timbre, medium pitch, quick intelligent delivery, understated sarcasm, compact mechanical resonance, and expressive but controlled intonation. Playful without sounding like a child or cartoon mascot. Avoid high pitch, baby affect, exaggerated excitement, breathiness, seduction, and announcer delivery.",
+    "male_bright_circuit": "A male young-adult robot companion with a bright tenor voice and compact synthetic resonance. Clever, friendly, mischievous, and emotionally responsive. Clear articulation, lively conversational rhythm, subtle electronic texture, and dry comic timing. Masculine but light and approachable; not a child, cartoon boy, macho hero, breathy actor, salesman, or narrator.",
+    "male_warm_unit": "A male adult digital creature with a warm medium-low voice, small metallic resonance, and relaxed confidence. Natural conversational pacing, precise diction, understated humor, gentle curiosity, and restrained emotional expression. Compact and charming rather than large or imposing. Avoid booming bass, seduction, gravel, theatrical acting, radio-host polish, and commercial narration.",
+    "male_cheeky_bot": "A quick-witted male adult pocket robot with a clear midrange synthetic voice. Energetic but controlled delivery, playful skepticism, concise phrasing, subtle glitchy color, and expressive comic timing. Cute because of intelligence and attitude, not youth. Never childish, squeaky, macho, sultry, breathy, exaggerated, or announcer-like."
+  },
+  "lines": {
+    "hello": "Oh! Hello, human. I was definitely not reorganizing your secrets.",
+    "happy": "Yes! Tiny robot victory dance! Beep beep!",
+    "annoyed": "I am logging every poke, you know.",
+    "sleepy": "Five more minutes. My pixels are still asleep.",
+    "confused": "Hmm. That was not in my calculations.",
+    "love": "Maximum hug pressure reached!"
+  }
+}

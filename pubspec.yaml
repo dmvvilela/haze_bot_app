@@ -59,13 +59,11 @@ dependencies:
 
   # Utilities
   wakelock_plus: ^1.2.8
-  http: ^1.2.2
   flutter_dotenv: ^5.1.0
   shared_preferences: ^2.3.2
   flutter_soloud: ^4.0.12
   record: ^7.1.1
   sensors_plus: ^6.1.1
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -112,6 +110,12 @@ flutter:
     - .env
     - assets/images/
     - assets/sounds/
+    - assets/voices/haze/compact_wit/
+    - assets/voices/haze/warm_circuit/
+    - assets/voices/haze/cheeky_unit/
+    - assets/voices/haze/male_bright_circuit/
+    - assets/voices/haze/male_warm_unit/
+    - assets/voices/haze/male_cheeky_bot/
     # - assets/fonts/
 
   # An image asset can refer to one or more resolution-specific "variants", see
