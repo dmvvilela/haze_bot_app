@@ -18,12 +18,14 @@ from qwen_tts import Qwen3TTSModel
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CONFIG = ROOT / "tool" / "haze_voice_design.json"
 DEFAULT_OUTPUT = ROOT / "tool" / "voice_output"
+PORTUGUESE_OUTPUT = ROOT / "tool" / "voice_output_pt"
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--locale", choices=["en", "pt-BR"], default="en")
     parser.add_argument(
         "--variant",
         action="append",
@@ -61,7 +63,11 @@ def main() -> None:
     args = parse_args()
     config = json.loads(args.config.read_text())
     variants = config["variants"]
-    lines = config["lines"]
+    is_brazilian_portuguese = args.locale == "pt-BR"
+    lines = config["portuguese_lines"] if is_brazilian_portuguese else config["lines"]
+    language = "Portuguese" if is_brazilian_portuguese else config["language"]
+    if is_brazilian_portuguese and args.output == DEFAULT_OUTPUT:
+        args.output = PORTUGUESE_OUTPUT
     if args.variant:
         variants = {variant: variants[variant] for variant in args.variant}
     if args.line:
@@ -74,13 +80,20 @@ def main() -> None:
     for variant_id, instruction in variants.items():
         variant_dir = args.output / variant_id
         variant_dir.mkdir(parents=True, exist_ok=True)
+        localized_instruction = instruction
+        if is_brazilian_portuguese:
+            localized_instruction += (
+                " Speak as a native Brazilian Portuguese speaker with a neutral "
+                "contemporary Brazilian accent. Use Brazilian pronunciation, rhythm, "
+                "and open vowels; never European Portuguese pronunciation or cadence."
+            )
         for line_id, text in lines.items():
             output = variant_dir / f"{line_id}.wav"
             print(f"Generating {variant_id}/{line_id}: {text}")
             waves, sample_rate = model.generate_voice_design(
                 text=text,
-                language=config["language"],
-                instruct=instruction,
+                language=language,
+                instruct=localized_instruction,
             )
             sf.write(output, waves[0], sample_rate)
             print(f"Wrote {output}")

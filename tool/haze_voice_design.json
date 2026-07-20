@@ -15,7 +15,9 @@
     "annoyed": "I am logging every poke, you know.",
     "sleepy": "Five more minutes. My pixels are still asleep.",
     "confused": "Hmm. That was not in my calculations.",
-    "love": "Maximum hug pressure reached!"
+    "love": "Maximum hug pressure reached!",
+    "sad": "Aw. My little circuits feel sad.",
+    "scared": "Eek! That startled all my sensors!"
   },
   "portuguese_lines": {
     "hello": "Oh! Olá, humano. Eu definitivamente não estava reorganizando os seus segredos.",
@@ -23,6 +25,8 @@
     "annoyed": "Estou registrando cada cutucada, sabia?",
     "sleepy": "Só mais cinco minutos. Meus pixels ainda estão dormindo.",
     "confused": "Hmm. Isso não estava nos meus cálculos.",
-    "love": "Pressão máxima de abraço atingida!"
+    "love": "Pressão máxima de abraço atingida!",
+    "sad": "Ah. Meus circuitinhos estão tristes.",
+    "scared": "Ai! Isso assustou todos os meus sensores!"
   }
 }

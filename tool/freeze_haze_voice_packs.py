@@ -16,6 +16,7 @@ from qwen_tts import Qwen3TTSModel
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "tool" / "haze_voice_design.json"
 REFERENCES = ROOT / "tool" / "voice_output"
+PORTUGUESE_REFERENCES = ROOT / "tool" / "voice_output_pt"
 DEFAULT_OUTPUT = ROOT / "tool" / "voice_pack_output"
 PORTUGUESE_OUTPUT = ROOT / "tool" / "voice_pack_output_pt"
 MODEL_ID = "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
@@ -42,7 +43,8 @@ def main() -> None:
     target_language = "Portuguese" if args.locale == "pt-BR" else "English"
     voices = args.voice or list(config["variants"])
     lines = args.line or list(target_lines)
-    ref_text = config["lines"]["hello"]
+    reference_root = PORTUGUESE_REFERENCES if args.locale == "pt-BR" else REFERENCES
+    ref_text = target_lines["hello"]
 
     if not torch.backends.mps.is_available():
         raise RuntimeError("This studio expects Apple Silicon MPS")
@@ -56,7 +58,7 @@ def main() -> None:
     )
 
     for voice_id in voices:
-        reference = REFERENCES / voice_id / "hello.wav"
+        reference = reference_root / voice_id / "hello.wav"
         if not reference.exists():
             raise FileNotFoundError(f"Generate reference first: {reference}")
         print(f"Freezing voice identity from {reference}")

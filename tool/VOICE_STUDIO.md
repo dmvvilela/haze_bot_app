@@ -35,6 +35,15 @@ Generate a single combination while iterating:
 Pass `--variant` more than once to audition several selected personas without
 reloading the model between them.
 
+For Brazilian Portuguese, generate native `pt-BR` references first. This is
+important because Qwen exposes only a generic `Portuguese` language token; an
+English reference may drift toward European Portuguese:
+
+```sh
+.voice-studio/bin/python tool/generate_haze_voices.py \
+  --locale pt-BR --line hello
+```
+
 Edit `tool/haze_voice_design.json` to change personas and audition lines.
 Generated files appear under `tool/voice_output/` and remain ignored by Git
 until a final voice pack is deliberately copied into app assets.
@@ -53,6 +62,9 @@ Generate the same frozen identities speaking Brazilian Portuguese:
 ```sh
 .voice-studio/bin/python tool/freeze_haze_voice_packs.py --locale pt-BR
 ```
+
+The Portuguese freeze uses the Brazilian reference generated in the previous
+step, preserving both the character identity and Brazilian pronunciation.
 
 While iterating, generate only selected content:
 

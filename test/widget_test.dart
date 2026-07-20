@@ -32,7 +32,16 @@ void main() {
   testWidgets('Every Haze character voice ships a complete reaction pack', (
     WidgetTester tester,
   ) async {
-    const clips = ['hello', 'happy', 'annoyed', 'sleepy', 'confused', 'love'];
+    const clips = [
+      'hello',
+      'happy',
+      'annoyed',
+      'sleepy',
+      'confused',
+      'love',
+      'sad',
+      'scared',
+    ];
     for (final voice in HazeVoice.values) {
       for (final localePath in ['', '/pt']) {
         for (final clip in clips) {

@@ -662,7 +662,11 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         emit(state.copyWith(aiMessage: ''));
       }
     });
-    _speak(line, emotion: emotion);
+    _speak(
+      line,
+      emotion: emotion,
+      characterClipId: _characterClipForExpression(emotion),
+    );
   }
 
   void _scheduleNextBlink() {
@@ -746,7 +750,8 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         RobotExpression.love => 'love',
         RobotExpression.angry => 'annoyed',
         RobotExpression.winking => 'hello',
-        RobotExpression.sad || RobotExpression.scared => null,
+        RobotExpression.sad => 'sad',
+        RobotExpression.scared => 'scared',
       };
 
   Future<bool> _playCharacterClip(String clipId) async {
