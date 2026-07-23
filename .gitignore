@@ -62,3 +62,6 @@ release/fastlane/report.xml
 release/fastlane/README.md
 release/asc/**
 !release/asc/.gitkeep
+
+# asc release checkpoints (machine-local run state)
+.asc/
