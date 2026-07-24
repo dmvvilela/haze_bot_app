@@ -7,8 +7,10 @@ import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'cubits/feelings_game_cubit.dart';
+import 'cubits/mix_game_cubit.dart';
 import 'cubits/robot_face_cubit.dart';
 import 'widgets/feelings_game_screen.dart';
+import 'widgets/haze_lab_screen.dart';
 import 'widgets/robot_face_widget.dart';
 import 'widgets/color_picker_dialog.dart';
 import 'widgets/face_type_picker_dialog.dart';
@@ -86,7 +88,7 @@ class HazeBotApp extends StatelessWidget {
   }
 }
 
-enum _MenuAction { colors, faceStyle, theme, settings }
+enum _MenuAction { lab, colors, faceStyle, theme, settings }
 
 PopupMenuItem<_MenuAction> _menuItem(
   _MenuAction action,
@@ -216,6 +218,8 @@ class RobotFaceScreen extends StatelessWidget {
                           onSelected: (action) {
                             final cubit = context.read<RobotFaceCubit>();
                             switch (action) {
+                              case _MenuAction.lab:
+                                _showLab(context);
                               case _MenuAction.colors:
                                 _showColorPicker(context);
                               case _MenuAction.faceStyle:
@@ -227,6 +231,12 @@ class RobotFaceScreen extends StatelessWidget {
                             }
                           },
                           itemBuilder: (_) => [
+                            // The window into Haze's simulated neurochemistry
+                            _menuItem(
+                              _MenuAction.lab,
+                              Icons.science_outlined,
+                              t.lab.title,
+                            ),
                             _menuItem(
                               _MenuAction.colors,
                               Icons.palette,
@@ -349,6 +359,21 @@ class RobotFaceScreen extends StatelessWidget {
             BlocProvider(create: (_) => FeelingsGameCubit(cubit)),
           ],
           child: const FeelingsGameScreen(),
+        ),
+      ),
+    );
+  }
+
+  void _showLab(BuildContext context) {
+    final cubit = context.read<RobotFaceCubit>();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: cubit),
+            BlocProvider(create: (_) => MixGameCubit(cubit)),
+          ],
+          child: const HazeLabScreen(),
         ),
       ),
     );

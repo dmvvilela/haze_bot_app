@@ -52,6 +52,56 @@ game:
   streak: Streak
   play: Feelings game
 
+lab:
+  title: Haze Lab
+  feeling_now: "Right now Haze feels $name"
+  boop_reaction: "Boop! Dopamine and adrenaline stirred."
+  cuddle_reaction: "Cuddle! Oxytocin and endorphins stirred."
+  chemistry: Body chemistry
+  emotion_mix: Emotion mix
+  hint: Tap a chemical to give Haze a tiny dose — then watch the face and the bars react. Feelings fade on their own, each at its own speed.
+  reset: Back to baseline
+  challenge:
+    start: Start a challenge
+    stop: Back to free play
+    target: "Make Haze feel $name!"
+    shifted: "Haze's mood just shifted! Mix the chemicals until it feels $name."
+    solved: "You did it — Haze feels $name!"
+  emotions:
+    happiness: happy
+    excitement: excited
+    anger: grumpy
+    calm: calm
+    bonding: loved
+    anxiety: worried
+    sadness: sad
+    euphoria: over the moon
+  chemicals:
+    dopamine:
+      name: Dopamine
+      tag: the reward spark
+    serotonin:
+      name: Serotonin
+      tag: the sunshine
+    oxytocin:
+      name: Oxytocin
+      tag: the cuddle chemical
+    testosterone:
+      name: Testosterone
+      tag: the drive
+    cortisol:
+      name: Cortisol
+      tag: the stress alarm
+    adrenaline:
+      name: Adrenaline
+      tag: the turbo boost
+    endorphins:
+      name: Endorphins
+      tag: the giggle glow
+    gaba:
+      name: GABA
+      tag: the calm blanket
+
 ui:
   choose_colors: Choose Colors
   choose_face_type: Choose Face Type
@@ -66,4 +116,4 @@ ui:
   language: Language
   theme: Theme
   dark_theme: Dark Theme
-  light_theme: Light Theme 
+  light_theme: Light Theme

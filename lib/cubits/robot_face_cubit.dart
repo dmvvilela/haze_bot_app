@@ -14,6 +14,7 @@ import 'dart:async';
 import '../models/robot_config.dart';
 import '../i18n/strings.g.dart';
 import '../services/haze_brain.dart';
+import '../services/haze_mood.dart';
 import '../services/robot_voice_service.dart';
 import '../services/sound_service.dart';
 import '../services/timer_service.dart';
@@ -45,6 +46,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   static const _personalityKey = 'haze_personality';
   static const _voiceIdKey = 'haze_tts_voice_id';
   static const _configKey = 'haze_robot_config';
+  static const _chemistryKey = 'haze_chemistry';
   static const automaticVoiceId = '__automatic_voice__';
 
   final FlutterTts _flutterTts = FlutterTts();
@@ -52,6 +54,9 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   final TimerService _timerService = TimerService();
   final SoundService sounds = SoundService();
   final RobotVoiceService voice = RobotVoiceService();
+
+  /// Haze's simulated neurochemistry — what the idle face and the lab read.
+  final HazeMood mood = HazeMood();
   StreamSubscription? _timerSubscription;
   StreamSubscription? _timerStatusSubscription;
   StreamSubscription? _timerCompleteSubscription;
@@ -72,6 +77,19 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       emit(state.copyWith(aiConsent: AiConsent.granted));
     }
     _restorePreferences();
+    // Persist the chemistry on every change — impulses are user-paced and
+    // the snapshot is tiny, and mobile apps are killed, not closed, so any
+    // throttling here is a window where a cuddle can be lost.
+    mood.onChanged = _saveMood;
+  }
+
+  Future<void> _saveMood() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_chemistryKey, jsonEncode(mood.toJson()));
+    } catch (e) {
+      debugPrint('RobotFaceCubit: failed to save chemistry: $e');
+    }
   }
 
   /// Every config change (face, colors, theme, speech, language...) is saved,
@@ -147,6 +165,24 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         if (restoredPersonality != null) {
           await _brain.setPersonality(restoredPersonality);
         }
+        // Seed the chemistry from the personality actually in effect: on
+        // first launch nothing is saved yet, but Haze still defaults to
+        // playful and the resting mood must match the voice.
+        mood.setPersonality((restoredPersonality ?? state.personality).name);
+        var chemistryRestored = false;
+        final savedChemistry = prefs.getString(_chemistryKey);
+        if (savedChemistry != null) {
+          try {
+            mood.restore(jsonDecode(savedChemistry) as Map<String, dynamic>);
+            chemistryRestored = true;
+          } catch (e) {
+            debugPrint('RobotFaceCubit: failed to restore chemistry: $e');
+          }
+        }
+        // No snapshot (first run, or upgrade from a pre-chemistry build):
+        // start at this personality's resting state rather than hours of
+        // decay away from it.
+        if (!chemistryRestored) mood.resetToBaseline();
         if (restoredVoiceId != null || restoredConfig != null) {
           _activeVoiceLocale = null;
           _activeVoiceId = null;
@@ -177,6 +213,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   /// Switch Haze's voice (playful / sarcastic / sleepy / zen).
   Future<void> setPersonality(HazePersonality personality) async {
     emit(state.copyWith(personality: personality));
+    mood.setPersonality(personality.name);
     await _savePersonality(personality);
     await _brain.setPersonality(personality);
   }
@@ -293,6 +330,9 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   void updateExpression(RobotExpression expression) {
     final newConfig = state.config.copyWith(expression: expression);
     emit(state.copyWith(config: newConfig));
+    // Method acting: making a face nudges the chemistry behind it a little.
+    mood.holdExpression();
+    mood.reactedTo(expression);
 
     if (state.config.speechEnabled) {
       _speak(
@@ -403,6 +443,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   /// Change Haze's face without speaking about it — used by the feelings
   /// game, where announcing the emotion would give the answer away.
   void showExpression(RobotExpression expression) {
+    mood.holdExpression();
     emit(state.copyWith(config: state.config.copyWith(expression: expression)));
   }
 
@@ -421,6 +462,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     final wasSleeping = _idleSleeping;
     _recordActivity();
     sounds.play(HazeSound.poke);
+    mood.poked();
     emit(state.copyWith(isPressed: true));
 
     if (wasSleeping) {
@@ -446,6 +488,24 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       if (!isClosed) {
         emit(state.copyWith(isPressed: false));
       }
+    });
+  }
+
+  /// Lab's controlled boop: it creates the same small chemical impulse as a
+  /// poke, but deliberately does not cycle to a preset expression. The live
+  /// chemistry remains in charge of the face, which makes cause and effect
+  /// visible instead of masking it behind the normal tap interaction.
+  void labBoop() {
+    final wasSleeping = _idleSleeping;
+    _recordActivity();
+    sounds.play(HazeSound.poke);
+    mood.poked();
+    emit(state.copyWith(isPressed: true));
+
+    if (wasSleeping) _performWakeUp();
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (!isClosed) emit(state.copyWith(isPressed: false));
     });
   }
 
@@ -488,6 +548,9 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       _idleSleeping = true;
       sounds.play(HazeSound.sleep);
       showExpression(RobotExpression.sleepy);
+      // Sleep owns the face until something wakes Haze up — don't let the
+      // mood pull the eyes back open after the usual short hold.
+      mood.holdExpression(const Duration(days: 1));
     });
   }
 
@@ -507,6 +570,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   Future<void> _performDizzy() async {
     final performance = ++_performanceId;
     sounds.play(HazeSound.curious);
+    mood.shaken();
     showExpression(RobotExpression.scared);
     _dizzyTimer?.cancel();
     var tick = 0;
@@ -540,6 +604,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     _recordActivity();
     final performance = ++_performanceId;
     sounds.play(HazeSound.proud);
+    mood.cuddled();
     showExpression(RobotExpression.love);
     emit(state.copyWith(isPressed: true, lookTarget: const Offset(0, .25)));
     await Future.delayed(const Duration(milliseconds: 350));
@@ -564,6 +629,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   Future<void> _performWakeUp() async {
     final performance = ++_performanceId;
     sounds.play(HazeSound.curious);
+    mood.wokeUp();
     showExpression(RobotExpression.scared);
     emit(state.copyWith(isPressed: true, lookTarget: const Offset(0, -1)));
     await Future.delayed(const Duration(milliseconds: 300));
@@ -596,6 +662,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
 
   Future<void> _performAnnoyed() async {
     final performance = ++_performanceId;
+    mood.annoyed();
     showExpression(RobotExpression.angry);
     for (var i = 0; i < 3; i++) {
       if (!_stillPerforming(performance)) return;
@@ -617,6 +684,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   Future<void> _performTickleAttack() async {
     final performance = ++_performanceId;
     sounds.play(HazeSound.laugh);
+    mood.tickled();
     for (var i = 0; i < 6; i++) {
       if (!_stillPerforming(performance)) return;
       showExpression(
@@ -651,6 +719,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   void _secretLine(String line, RobotExpression emotion) {
     if (isClosed) return;
     _secretMessageTimer?.cancel();
+    mood.holdExpression();
     emit(
       state.copyWith(
         aiMessage: line,
@@ -1071,6 +1140,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   // Timer functionality
   void startTimer(int minutes) {
     _timerService.startTimer(minutes);
+    mood.timerStarted();
     _respond(_timerStartPrompt(minutes), bias: _timerPromptBias);
   }
 
@@ -1089,12 +1159,14 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   void _onTimerComplete() {
     // Audible even with speech off — a silent timer isn't a timer.
     sounds.play(HazeSound.chime);
+    mood.timerFinished();
     _respond(_timerCompletePrompt, bias: _timerPromptBias);
   }
 
   /// Easter egg: long-press the face and Haze sings a little tune.
   void sing() {
     sounds.play(HazeSound.sing);
+    mood.sang();
     showExpression(RobotExpression.love);
   }
 
@@ -1168,6 +1240,9 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         fallbackEmotion: bias,
       );
 
+      // The brain committed to a feeling — the chemistry follows it.
+      mood.holdExpression();
+      mood.reactedTo(reply.emotion, sourceId: 'chat');
       final newConfig = state.config.copyWith(expression: reply.emotion);
       emit(
         state.copyWith(
@@ -1216,6 +1291,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     _idleTimer?.cancel();
     _dizzyTimer?.cancel();
     _secretMessageTimer?.cancel();
+    await _saveMood();
     try {
       await _flutterTts.stop();
     } catch (_) {}

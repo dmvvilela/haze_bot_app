@@ -18,7 +18,12 @@ import 'minimal_face.dart';
 import 'bean_face.dart';
 
 class RobotFaceWidget extends StatefulWidget {
-  const RobotFaceWidget({super.key});
+  /// Optional interaction overrides for screens where touching Haze has a
+  /// more specific meaning (for example, a controlled experiment in Lab).
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+
+  const RobotFaceWidget({super.key, this.onTap, this.onLongPress});
 
   @override
   State<RobotFaceWidget> createState() => _RobotFaceWidgetState();
@@ -121,10 +126,10 @@ class _RobotFaceWidgetState extends State<RobotFaceWidget> {
                 // The face itself paints on a bare CustomPaint, which isn't
                 // hit-testable — without this, taps on V2/V3 never land.
                 behavior: HitTestBehavior.opaque,
-                onTap: cubit.onTap,
+                onTap: widget.onTap ?? cubit.onTap,
                 onLongPress: () {
                   HapticFeedback.mediumImpact();
-                  cubit.cuddle();
+                  (widget.onLongPress ?? cubit.cuddle).call();
                 },
                 onPanStart: (details) => lookAt(details.localPosition),
                 onPanUpdate: (details) => lookAt(details.localPosition),
@@ -201,6 +206,7 @@ class _RobotFaceWidgetState extends State<RobotFaceWidget> {
           voiceLevel: state.isSpeaking || state.mimicStatus != MimicStatus.idle
               ? cubit.voice.level
               : null,
+          mood: cubit.mood,
         );
     }
   }

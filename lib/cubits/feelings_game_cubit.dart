@@ -74,6 +74,9 @@ class FeelingsGameCubit extends Cubit<FeelingsGameState> {
     : _random = random ?? math.Random(),
       super(const FeelingsGameState()) {
     _robot.sounds.play(HazeSound.hello);
+    // During the game the acted face IS the puzzle — Haze's real mood must
+    // not leak through and change the answer mid-round.
+    _robot.mood.pinned = true;
     _startRound();
   }
 
@@ -107,6 +110,9 @@ class FeelingsGameCubit extends Cubit<FeelingsGameState> {
       final streak = state.streak + 1;
       // Escalating rewards: normal ding, a proud little hum at 3 in a row,
       // the full arpeggio at every 5 — and the face climbs the same ladder.
+      // Wins are real dopamine for Haze too; big streaks feel euphoric.
+      _robot.mood.gameCorrect();
+      if (streak % 5 == 0) _robot.mood.gameStreak();
       _robot.sounds.play(switch (streak) {
         _ when streak % 5 == 0 => HazeSound.win,
         3 => HazeSound.proud,
@@ -134,6 +140,7 @@ class FeelingsGameCubit extends Cubit<FeelingsGameState> {
       });
     } else {
       _robot.sounds.play(HazeSound.wrong);
+      _robot.mood.gameWrong();
       emit(state.copyWith(misses: {...state.misses, choice}, streak: 0));
     }
   }
@@ -141,6 +148,7 @@ class FeelingsGameCubit extends Cubit<FeelingsGameState> {
   @override
   Future<void> close() {
     _nextRoundTimer?.cancel();
+    _robot.mood.pinned = false;
     return super.close();
   }
 }

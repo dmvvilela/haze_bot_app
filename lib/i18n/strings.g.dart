@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 106 (53 per locale)
+/// Strings: 180 (90 per locale)
 ///
-/// Built on 2026-07-02 at 21:32 UTC
+/// Built on 2026-07-24 at 17:17 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -153,6 +153,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsFaceTypesEn face_types = _StringsFaceTypesEn._(_root);
 	late final _StringsEmotionNamesEn emotion_names = _StringsEmotionNamesEn._(_root);
 	late final _StringsGameEn game = _StringsGameEn._(_root);
+	late final _StringsLabEn lab = _StringsLabEn._(_root);
 	late final _StringsUiEn ui = _StringsUiEn._(_root);
 }
 
@@ -238,6 +239,26 @@ class _StringsGameEn {
 	String get play => 'Feelings game';
 }
 
+// Path: lab
+class _StringsLabEn {
+	_StringsLabEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get title => 'Haze Lab';
+	String feeling_now({required Object name}) => 'Right now Haze feels ${name}';
+	String get boop_reaction => 'Boop! Dopamine and adrenaline stirred.';
+	String get cuddle_reaction => 'Cuddle! Oxytocin and endorphins stirred.';
+	String get chemistry => 'Body chemistry';
+	String get emotion_mix => 'Emotion mix';
+	String get hint => 'Tap a chemical to give Haze a tiny dose — then watch the face and the bars react. Feelings fade on their own, each at its own speed.';
+	String get reset => 'Back to baseline';
+	late final _StringsLabChallengeEn challenge = _StringsLabChallengeEn._(_root);
+	late final _StringsLabEmotionsEn emotions = _StringsLabEmotionsEn._(_root);
+	late final _StringsLabChemicalsEn chemicals = _StringsLabChemicalsEn._(_root);
+}
+
 // Path: ui
 class _StringsUiEn {
 	_StringsUiEn._(this._root);
@@ -305,6 +326,142 @@ class _StringsFaceTypesBeanEn {
 	String get description => 'Fall Guys inspired vertical bean eyes';
 }
 
+// Path: lab.challenge
+class _StringsLabChallengeEn {
+	_StringsLabChallengeEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get start => 'Start a challenge';
+	String get stop => 'Back to free play';
+	String target({required Object name}) => 'Make Haze feel ${name}!';
+	String shifted({required Object name}) => 'Haze\'s mood just shifted! Mix the chemicals until it feels ${name}.';
+	String solved({required Object name}) => 'You did it — Haze feels ${name}!';
+}
+
+// Path: lab.emotions
+class _StringsLabEmotionsEn {
+	_StringsLabEmotionsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get happiness => 'happy';
+	String get excitement => 'excited';
+	String get anger => 'grumpy';
+	String get calm => 'calm';
+	String get bonding => 'loved';
+	String get anxiety => 'worried';
+	String get sadness => 'sad';
+	String get euphoria => 'over the moon';
+}
+
+// Path: lab.chemicals
+class _StringsLabChemicalsEn {
+	_StringsLabChemicalsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	late final _StringsLabChemicalsDopamineEn dopamine = _StringsLabChemicalsDopamineEn._(_root);
+	late final _StringsLabChemicalsSerotoninEn serotonin = _StringsLabChemicalsSerotoninEn._(_root);
+	late final _StringsLabChemicalsOxytocinEn oxytocin = _StringsLabChemicalsOxytocinEn._(_root);
+	late final _StringsLabChemicalsTestosteroneEn testosterone = _StringsLabChemicalsTestosteroneEn._(_root);
+	late final _StringsLabChemicalsCortisolEn cortisol = _StringsLabChemicalsCortisolEn._(_root);
+	late final _StringsLabChemicalsAdrenalineEn adrenaline = _StringsLabChemicalsAdrenalineEn._(_root);
+	late final _StringsLabChemicalsEndorphinsEn endorphins = _StringsLabChemicalsEndorphinsEn._(_root);
+	late final _StringsLabChemicalsGabaEn gaba = _StringsLabChemicalsGabaEn._(_root);
+}
+
+// Path: lab.chemicals.dopamine
+class _StringsLabChemicalsDopamineEn {
+	_StringsLabChemicalsDopamineEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get name => 'Dopamine';
+	String get tag => 'the reward spark';
+}
+
+// Path: lab.chemicals.serotonin
+class _StringsLabChemicalsSerotoninEn {
+	_StringsLabChemicalsSerotoninEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get name => 'Serotonin';
+	String get tag => 'the sunshine';
+}
+
+// Path: lab.chemicals.oxytocin
+class _StringsLabChemicalsOxytocinEn {
+	_StringsLabChemicalsOxytocinEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get name => 'Oxytocin';
+	String get tag => 'the cuddle chemical';
+}
+
+// Path: lab.chemicals.testosterone
+class _StringsLabChemicalsTestosteroneEn {
+	_StringsLabChemicalsTestosteroneEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get name => 'Testosterone';
+	String get tag => 'the drive';
+}
+
+// Path: lab.chemicals.cortisol
+class _StringsLabChemicalsCortisolEn {
+	_StringsLabChemicalsCortisolEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get name => 'Cortisol';
+	String get tag => 'the stress alarm';
+}
+
+// Path: lab.chemicals.adrenaline
+class _StringsLabChemicalsAdrenalineEn {
+	_StringsLabChemicalsAdrenalineEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get name => 'Adrenaline';
+	String get tag => 'the turbo boost';
+}
+
+// Path: lab.chemicals.endorphins
+class _StringsLabChemicalsEndorphinsEn {
+	_StringsLabChemicalsEndorphinsEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get name => 'Endorphins';
+	String get tag => 'the giggle glow';
+}
+
+// Path: lab.chemicals.gaba
+class _StringsLabChemicalsGabaEn {
+	_StringsLabChemicalsGabaEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get name => 'GABA';
+	String get tag => 'the calm blanket';
+}
+
 // Path: <root>
 class _StringsPt extends Translations {
 	/// You can call this constructor and build your own translation instance of this locale.
@@ -336,6 +493,7 @@ class _StringsPt extends Translations {
 	@override late final _StringsFaceTypesPt face_types = _StringsFaceTypesPt._(_root);
 	@override late final _StringsEmotionNamesPt emotion_names = _StringsEmotionNamesPt._(_root);
 	@override late final _StringsGamePt game = _StringsGamePt._(_root);
+	@override late final _StringsLabPt lab = _StringsLabPt._(_root);
 	@override late final _StringsUiPt ui = _StringsUiPt._(_root);
 }
 
@@ -421,6 +579,26 @@ class _StringsGamePt extends _StringsGameEn {
 	@override String get play => 'Jogo dos sentimentos';
 }
 
+// Path: lab
+class _StringsLabPt extends _StringsLabEn {
+	_StringsLabPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Laboratório do Haze';
+	@override String feeling_now({required Object name}) => 'Agora o Haze está se sentindo ${name}';
+	@override String get boop_reaction => 'Boop! A dopamina e a adrenalina se agitaram.';
+	@override String get cuddle_reaction => 'Abraço! A ocitocina e as endorfinas se agitaram.';
+	@override String get chemistry => 'Química do corpo';
+	@override String get emotion_mix => 'Mistura de emoções';
+	@override String get hint => 'Toque em uma substância para dar uma dosezinha ao Haze — e veja o rosto e as barras reagirem. Os sentimentos passam sozinhos, cada um na sua velocidade.';
+	@override String get reset => 'Voltar ao normal';
+	@override late final _StringsLabChallengePt challenge = _StringsLabChallengePt._(_root);
+	@override late final _StringsLabEmotionsPt emotions = _StringsLabEmotionsPt._(_root);
+	@override late final _StringsLabChemicalsPt chemicals = _StringsLabChemicalsPt._(_root);
+}
+
 // Path: ui
 class _StringsUiPt extends _StringsUiEn {
 	_StringsUiPt._(_StringsPt root) : this._root = root, super._(root);
@@ -488,6 +666,142 @@ class _StringsFaceTypesBeanPt extends _StringsFaceTypesBeanEn {
 	@override String get description => 'Olhos verticais inspirados no Fall Guys';
 }
 
+// Path: lab.challenge
+class _StringsLabChallengePt extends _StringsLabChallengeEn {
+	_StringsLabChallengePt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get start => 'Começar um desafio';
+	@override String get stop => 'Voltar ao modo livre';
+	@override String target({required Object name}) => 'Faça o Haze se sentir ${name}!';
+	@override String shifted({required Object name}) => 'O humor do Haze mudou! Misture as substâncias até ele se sentir ${name}.';
+	@override String solved({required Object name}) => 'Você conseguiu — o Haze está se sentindo ${name}!';
+}
+
+// Path: lab.emotions
+class _StringsLabEmotionsPt extends _StringsLabEmotionsEn {
+	_StringsLabEmotionsPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get happiness => 'feliz';
+	@override String get excitement => 'animado';
+	@override String get anger => 'bravinho';
+	@override String get calm => 'calmo';
+	@override String get bonding => 'amado';
+	@override String get anxiety => 'preocupado';
+	@override String get sadness => 'triste';
+	@override String get euphoria => 'nas nuvens';
+}
+
+// Path: lab.chemicals
+class _StringsLabChemicalsPt extends _StringsLabChemicalsEn {
+	_StringsLabChemicalsPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override late final _StringsLabChemicalsDopaminePt dopamine = _StringsLabChemicalsDopaminePt._(_root);
+	@override late final _StringsLabChemicalsSerotoninPt serotonin = _StringsLabChemicalsSerotoninPt._(_root);
+	@override late final _StringsLabChemicalsOxytocinPt oxytocin = _StringsLabChemicalsOxytocinPt._(_root);
+	@override late final _StringsLabChemicalsTestosteronePt testosterone = _StringsLabChemicalsTestosteronePt._(_root);
+	@override late final _StringsLabChemicalsCortisolPt cortisol = _StringsLabChemicalsCortisolPt._(_root);
+	@override late final _StringsLabChemicalsAdrenalinePt adrenaline = _StringsLabChemicalsAdrenalinePt._(_root);
+	@override late final _StringsLabChemicalsEndorphinsPt endorphins = _StringsLabChemicalsEndorphinsPt._(_root);
+	@override late final _StringsLabChemicalsGabaPt gaba = _StringsLabChemicalsGabaPt._(_root);
+}
+
+// Path: lab.chemicals.dopamine
+class _StringsLabChemicalsDopaminePt extends _StringsLabChemicalsDopamineEn {
+	_StringsLabChemicalsDopaminePt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get name => 'Dopamina';
+	@override String get tag => 'a faísca da recompensa';
+}
+
+// Path: lab.chemicals.serotonin
+class _StringsLabChemicalsSerotoninPt extends _StringsLabChemicalsSerotoninEn {
+	_StringsLabChemicalsSerotoninPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get name => 'Serotonina';
+	@override String get tag => 'o solzinho';
+}
+
+// Path: lab.chemicals.oxytocin
+class _StringsLabChemicalsOxytocinPt extends _StringsLabChemicalsOxytocinEn {
+	_StringsLabChemicalsOxytocinPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get name => 'Ocitocina';
+	@override String get tag => 'a química do abraço';
+}
+
+// Path: lab.chemicals.testosterone
+class _StringsLabChemicalsTestosteronePt extends _StringsLabChemicalsTestosteroneEn {
+	_StringsLabChemicalsTestosteronePt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get name => 'Testosterona';
+	@override String get tag => 'a garra';
+}
+
+// Path: lab.chemicals.cortisol
+class _StringsLabChemicalsCortisolPt extends _StringsLabChemicalsCortisolEn {
+	_StringsLabChemicalsCortisolPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get name => 'Cortisol';
+	@override String get tag => 'o alarme do estresse';
+}
+
+// Path: lab.chemicals.adrenaline
+class _StringsLabChemicalsAdrenalinePt extends _StringsLabChemicalsAdrenalineEn {
+	_StringsLabChemicalsAdrenalinePt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get name => 'Adrenalina';
+	@override String get tag => 'o turbo';
+}
+
+// Path: lab.chemicals.endorphins
+class _StringsLabChemicalsEndorphinsPt extends _StringsLabChemicalsEndorphinsEn {
+	_StringsLabChemicalsEndorphinsPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get name => 'Endorfinas';
+	@override String get tag => 'o brilho da risada';
+}
+
+// Path: lab.chemicals.gaba
+class _StringsLabChemicalsGabaPt extends _StringsLabChemicalsGabaEn {
+	_StringsLabChemicalsGabaPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get name => 'GABA';
+	@override String get tag => 'o cobertor da calma';
+}
+
 /// Flat map(s) containing all translations.
 /// Only for edge cases! For simple maps, use the map function of this library.
 
@@ -533,6 +847,43 @@ extension on Translations {
 			case 'game.score': return 'Score';
 			case 'game.streak': return 'Streak';
 			case 'game.play': return 'Feelings game';
+			case 'lab.title': return 'Haze Lab';
+			case 'lab.feeling_now': return ({required Object name}) => 'Right now Haze feels ${name}';
+			case 'lab.boop_reaction': return 'Boop! Dopamine and adrenaline stirred.';
+			case 'lab.cuddle_reaction': return 'Cuddle! Oxytocin and endorphins stirred.';
+			case 'lab.chemistry': return 'Body chemistry';
+			case 'lab.emotion_mix': return 'Emotion mix';
+			case 'lab.hint': return 'Tap a chemical to give Haze a tiny dose — then watch the face and the bars react. Feelings fade on their own, each at its own speed.';
+			case 'lab.reset': return 'Back to baseline';
+			case 'lab.challenge.start': return 'Start a challenge';
+			case 'lab.challenge.stop': return 'Back to free play';
+			case 'lab.challenge.target': return ({required Object name}) => 'Make Haze feel ${name}!';
+			case 'lab.challenge.shifted': return ({required Object name}) => 'Haze\'s mood just shifted! Mix the chemicals until it feels ${name}.';
+			case 'lab.challenge.solved': return ({required Object name}) => 'You did it — Haze feels ${name}!';
+			case 'lab.emotions.happiness': return 'happy';
+			case 'lab.emotions.excitement': return 'excited';
+			case 'lab.emotions.anger': return 'grumpy';
+			case 'lab.emotions.calm': return 'calm';
+			case 'lab.emotions.bonding': return 'loved';
+			case 'lab.emotions.anxiety': return 'worried';
+			case 'lab.emotions.sadness': return 'sad';
+			case 'lab.emotions.euphoria': return 'over the moon';
+			case 'lab.chemicals.dopamine.name': return 'Dopamine';
+			case 'lab.chemicals.dopamine.tag': return 'the reward spark';
+			case 'lab.chemicals.serotonin.name': return 'Serotonin';
+			case 'lab.chemicals.serotonin.tag': return 'the sunshine';
+			case 'lab.chemicals.oxytocin.name': return 'Oxytocin';
+			case 'lab.chemicals.oxytocin.tag': return 'the cuddle chemical';
+			case 'lab.chemicals.testosterone.name': return 'Testosterone';
+			case 'lab.chemicals.testosterone.tag': return 'the drive';
+			case 'lab.chemicals.cortisol.name': return 'Cortisol';
+			case 'lab.chemicals.cortisol.tag': return 'the stress alarm';
+			case 'lab.chemicals.adrenaline.name': return 'Adrenaline';
+			case 'lab.chemicals.adrenaline.tag': return 'the turbo boost';
+			case 'lab.chemicals.endorphins.name': return 'Endorphins';
+			case 'lab.chemicals.endorphins.tag': return 'the giggle glow';
+			case 'lab.chemicals.gaba.name': return 'GABA';
+			case 'lab.chemicals.gaba.tag': return 'the calm blanket';
 			case 'ui.choose_colors': return 'Choose Colors';
 			case 'ui.choose_face_type': return 'Choose Face Type';
 			case 'ui.settings': return 'Settings';
@@ -594,6 +945,43 @@ extension on _StringsPt {
 			case 'game.score': return 'Pontos';
 			case 'game.streak': return 'Sequência';
 			case 'game.play': return 'Jogo dos sentimentos';
+			case 'lab.title': return 'Laboratório do Haze';
+			case 'lab.feeling_now': return ({required Object name}) => 'Agora o Haze está se sentindo ${name}';
+			case 'lab.boop_reaction': return 'Boop! A dopamina e a adrenalina se agitaram.';
+			case 'lab.cuddle_reaction': return 'Abraço! A ocitocina e as endorfinas se agitaram.';
+			case 'lab.chemistry': return 'Química do corpo';
+			case 'lab.emotion_mix': return 'Mistura de emoções';
+			case 'lab.hint': return 'Toque em uma substância para dar uma dosezinha ao Haze — e veja o rosto e as barras reagirem. Os sentimentos passam sozinhos, cada um na sua velocidade.';
+			case 'lab.reset': return 'Voltar ao normal';
+			case 'lab.challenge.start': return 'Começar um desafio';
+			case 'lab.challenge.stop': return 'Voltar ao modo livre';
+			case 'lab.challenge.target': return ({required Object name}) => 'Faça o Haze se sentir ${name}!';
+			case 'lab.challenge.shifted': return ({required Object name}) => 'O humor do Haze mudou! Misture as substâncias até ele se sentir ${name}.';
+			case 'lab.challenge.solved': return ({required Object name}) => 'Você conseguiu — o Haze está se sentindo ${name}!';
+			case 'lab.emotions.happiness': return 'feliz';
+			case 'lab.emotions.excitement': return 'animado';
+			case 'lab.emotions.anger': return 'bravinho';
+			case 'lab.emotions.calm': return 'calmo';
+			case 'lab.emotions.bonding': return 'amado';
+			case 'lab.emotions.anxiety': return 'preocupado';
+			case 'lab.emotions.sadness': return 'triste';
+			case 'lab.emotions.euphoria': return 'nas nuvens';
+			case 'lab.chemicals.dopamine.name': return 'Dopamina';
+			case 'lab.chemicals.dopamine.tag': return 'a faísca da recompensa';
+			case 'lab.chemicals.serotonin.name': return 'Serotonina';
+			case 'lab.chemicals.serotonin.tag': return 'o solzinho';
+			case 'lab.chemicals.oxytocin.name': return 'Ocitocina';
+			case 'lab.chemicals.oxytocin.tag': return 'a química do abraço';
+			case 'lab.chemicals.testosterone.name': return 'Testosterona';
+			case 'lab.chemicals.testosterone.tag': return 'a garra';
+			case 'lab.chemicals.cortisol.name': return 'Cortisol';
+			case 'lab.chemicals.cortisol.tag': return 'o alarme do estresse';
+			case 'lab.chemicals.adrenaline.name': return 'Adrenalina';
+			case 'lab.chemicals.adrenaline.tag': return 'o turbo';
+			case 'lab.chemicals.endorphins.name': return 'Endorfinas';
+			case 'lab.chemicals.endorphins.tag': return 'o brilho da risada';
+			case 'lab.chemicals.gaba.name': return 'GABA';
+			case 'lab.chemicals.gaba.tag': return 'o cobertor da calma';
 			case 'ui.choose_colors': return 'Escolher Cores';
 			case 'ui.choose_face_type': return 'Escolher Tipo de Rosto';
 			case 'ui.settings': return 'Configurações';

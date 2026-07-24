@@ -5,8 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../chemistry/chemistry.dart';
 import '../cubits/robot_face_cubit.dart';
 import '../models/robot_config.dart';
+import '../services/haze_mood.dart';
 
 /// Haze V3 — the signature face.
 ///
@@ -17,6 +19,12 @@ import '../models/robot_config.dart';
 /// into a heart. Every parameter is smoothed toward its per-expression target
 /// each frame, so the face never snaps between states; blinks, breathing and
 /// gaze saccades run on top to keep it alive while idle.
+///
+/// With a [mood] attached, the idle face stops being one of ten fixed poses:
+/// whenever no explicit expression holds the screen, the target pose is a
+/// live blend of the poses weighted by Haze's simulated neurochemistry — so
+/// it can look mostly-content-but-a-little-anxious, states no single preset
+/// can make.
 class HazeFace extends StatefulWidget {
   final RobotFaceState state;
 
@@ -24,7 +32,11 @@ class HazeFace extends StatefulWidget {
   /// Null (e.g. in golden tests) falls back to the pseudo-syllable mouth.
   final ValueListenable<double>? voiceLevel;
 
-  const HazeFace({super.key, required this.state, this.voiceLevel});
+  /// Haze's neurochemistry. Null (golden tests, previews) keeps the classic
+  /// expression-driven behavior exactly as it was.
+  final HazeMood? mood;
+
+  const HazeFace({super.key, required this.state, this.voiceLevel, this.mood});
 
   @override
   State<HazeFace> createState() => _HazeFaceState();
@@ -81,7 +93,8 @@ class _HazeFaceState extends State<HazeFace>
     if (dt <= 0) return;
     dt = math.min(dt, 0.05);
 
-    final target = _FacePose.of(widget.state.config.expression);
+    final target =
+        _moodTarget() ?? _FacePose.of(widget.state.config.expression);
     _pose = _FacePose.lerp(_pose, target, 1 - math.exp(-dt * 7.5));
 
     if (_blinkT < 1) _blinkT = math.min(1, _blinkT + dt / 0.30);
@@ -122,6 +135,88 @@ class _HazeFaceState extends State<HazeFace>
     if (_blinkT >= 1) return 0;
     if (_blinkT < 0.38) return Curves.easeInQuad.transform(_blinkT / 0.38);
     return 1 - Curves.easeOutCubic.transform((_blinkT - 0.38) / 0.62);
+  }
+
+  /// The pose Haze's chemistry is asking for, or null while an explicit
+  /// expression (game round, easter egg, fresh brain reply) owns the face.
+  _FacePose? _moodTarget() {
+    final mood = widget.mood;
+    if (mood == null || !mood.moodDriven) return null;
+    final emotions = mood.emotions();
+
+    // Only emotions clearly above the ambient hum get a say, and squaring
+    // makes the strong ones dominate instead of everything averaging into
+    // one mushy middle face.
+    double sharp(Emotion emotion) {
+      final x = (emotions[emotion] - 0.15).clamp(0.0, 1.0);
+      return x * x;
+    }
+
+    // Euphoria has no pose of its own: it reads as thrilled + smitten.
+    final euphoria = sharp(Emotion.euphoria);
+    final base = _FacePose.blend([
+      (_FacePose.of(RobotExpression.happy), sharp(Emotion.happiness)),
+      (
+        _FacePose.of(RobotExpression.excited),
+        sharp(Emotion.excitement) + euphoria * 0.5,
+      ),
+      (
+        _FacePose.of(RobotExpression.love),
+        sharp(Emotion.bonding) + euphoria * 0.5,
+      ),
+      (_FacePose.of(RobotExpression.angry), sharp(Emotion.anger)),
+      (_FacePose.of(RobotExpression.scared), sharp(Emotion.anxiety)),
+      (_FacePose.of(RobotExpression.sad), sharp(Emotion.sadness)),
+      // The calm anchor keeps a weak mix resting on a soft content face.
+      (_FacePose.neutral, math.max(0.02, sharp(Emotion.calm))),
+    ]);
+
+    // All-or-nothing accents (heart eyes, "o" mouth, tears...) look ghostly
+    // at partial blend weights — suppress them until their source pose
+    // genuinely dominates the mix.
+    double gate(double v) => v < 0.35 ? 0.0 : (v - 0.35) / 0.65;
+
+    // Second projection, kindalive-style: chemicals also modulate the face
+    // directly. Arousal sets the idle tempo, stress makes the gaze restless,
+    // warmth blushes, and an extreme spike adds a trembling edge.
+    final adrenaline = mood.level(Chemical.adrenaline);
+    final dopamine = mood.level(Chemical.dopamine);
+    final cortisol = mood.level(Chemical.cortisol);
+    final oxytocin = mood.level(Chemical.oxytocin);
+
+    _EyePose gateEye(_EyePose eye) => _EyePose(
+          open: eye.open,
+          width: eye.width,
+          smile: eye.smile,
+          droop: eye.droop,
+          slant: eye.slant,
+          round: eye.round,
+          heart: gate(eye.heart),
+          arc: gate(eye.arc),
+        );
+
+    return _FacePose(
+      left: gateEye(base.left),
+      right: gateEye(base.right),
+      mouthCurve: base.mouthCurve,
+      mouthOpen: base.mouthOpen,
+      mouthWide: base.mouthWide,
+      mouthO: gate(base.mouthO),
+      mouthWave: gate(base.mouthWave),
+      smirk: base.smirk,
+      blush: (base.blush + (oxytocin - 0.2) * 0.5).clamp(0.0, 1.0),
+      tilt: base.tilt,
+      energy: (base.energy * (0.6 + adrenaline * 0.9 + (dopamine - 0.3) * 0.5))
+          .clamp(0.15, 1.2),
+      wander: (base.wander + (cortisol - 0.2) * 0.8).clamp(0.0, 1.0),
+      sparkle: base.sparkle,
+      zzz: gate(base.zzz),
+      hearts: base.hearts,
+      tear: gate(base.tear),
+      shiver: (base.shiver + (adrenaline + cortisol - 1.2).clamp(0.0, 1.0))
+          .clamp(0.0, 1.0),
+      gazeBias: base.gazeBias,
+    );
   }
 
   @override
@@ -176,6 +271,30 @@ class _EyePose {
     this.heart = 0,
     this.arc = 0,
   });
+
+  static _EyePose blend(List<(_EyePose, double)> parts, double total) =>
+      _EyePose(
+        open: _sum(parts, total, (e) => e.open),
+        width: _sum(parts, total, (e) => e.width),
+        smile: _sum(parts, total, (e) => e.smile),
+        droop: _sum(parts, total, (e) => e.droop),
+        slant: _sum(parts, total, (e) => e.slant),
+        round: _sum(parts, total, (e) => e.round),
+        heart: _sum(parts, total, (e) => e.heart),
+        arc: _sum(parts, total, (e) => e.arc),
+      );
+
+  static double _sum(
+    List<(_EyePose, double)> parts,
+    double total,
+    double Function(_EyePose) field,
+  ) {
+    var value = 0.0;
+    for (final (eye, weight) in parts) {
+      value += field(eye) * weight;
+    }
+    return value / total;
+  }
 
   static _EyePose lerp(_EyePose a, _EyePose b, double t) => _EyePose(
         open: ui.lerpDouble(a.open, b.open, t)!,
@@ -233,6 +352,67 @@ class _FacePose {
   });
 
   static _FacePose of(RobotExpression expression) => _poses[expression]!;
+
+  /// The resting anchor for mood blending: softly content, low energy —
+  /// where a weak emotion mix settles instead of averaging all ten poses.
+  static const _FacePose neutral = _FacePose(
+    left: _EyePose(open: 0.92, smile: 0.14, round: 0.6),
+    right: _EyePose(open: 0.92, smile: 0.14, round: 0.6),
+    mouthCurve: 0.22,
+    mouthWide: 0.82,
+    blush: 0.15,
+    energy: 0.45,
+  );
+
+  /// Weighted average of poses (weights need not be normalized). Every field
+  /// is linear, so this is the multi-way generalization of [lerp].
+  static _FacePose blend(List<(_FacePose, double)> parts) {
+    var total = 0.0;
+    for (final (_, weight) in parts) {
+      total += weight;
+    }
+    if (total <= 1e-9) return neutral;
+
+    double f(double Function(_FacePose) field) {
+      var value = 0.0;
+      for (final (pose, weight) in parts) {
+        value += field(pose) * weight;
+      }
+      return value / total;
+    }
+
+    var gazeBias = Offset.zero;
+    for (final (pose, weight) in parts) {
+      gazeBias += pose.gazeBias * weight;
+    }
+
+    return _FacePose(
+      left: _EyePose.blend(
+        [for (final (pose, weight) in parts) (pose.left, weight)],
+        total,
+      ),
+      right: _EyePose.blend(
+        [for (final (pose, weight) in parts) (pose.right, weight)],
+        total,
+      ),
+      mouthCurve: f((p) => p.mouthCurve),
+      mouthOpen: f((p) => p.mouthOpen),
+      mouthWide: f((p) => p.mouthWide),
+      mouthO: f((p) => p.mouthO),
+      mouthWave: f((p) => p.mouthWave),
+      smirk: f((p) => p.smirk),
+      blush: f((p) => p.blush),
+      tilt: f((p) => p.tilt),
+      energy: f((p) => p.energy),
+      wander: f((p) => p.wander),
+      sparkle: f((p) => p.sparkle),
+      zzz: f((p) => p.zzz),
+      hearts: f((p) => p.hearts),
+      tear: f((p) => p.tear),
+      shiver: f((p) => p.shiver),
+      gazeBias: gazeBias / total,
+    );
+  }
 
   static const Map<RobotExpression, _FacePose> _poses = {
     RobotExpression.happy: _FacePose(
