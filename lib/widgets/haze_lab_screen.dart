@@ -9,6 +9,8 @@ import '../cubits/mix_game_cubit.dart';
 import '../cubits/robot_face_cubit.dart';
 import '../i18n/strings.g.dart';
 import '../services/sound_service.dart';
+import '../services/haze_brain.dart';
+import 'ai_consent_dialog.dart';
 import 'robot_face_widget.dart';
 
 /// The Haze Lab: a live window into the neurochemistry behind the face.
@@ -26,6 +28,7 @@ class HazeLabScreen extends StatefulWidget {
 }
 
 class _HazeLabScreenState extends State<HazeLabScreen> {
+  late final RobotFaceCubit _robot;
   Timer? _refresh;
   Timer? _reactionTimer;
   _LabReaction? _reaction;
@@ -33,6 +36,7 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
   @override
   void initState() {
     super.initState();
+    _robot = context.read<RobotFaceCubit>()..enterLab();
     // Chemistry drifts continuously; poll it at a UI-friendly rate.
     _refresh = Timer.periodic(
       const Duration(milliseconds: 150),
@@ -44,6 +48,7 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
   void dispose() {
     _refresh?.cancel();
     _reactionTimer?.cancel();
+    _robot.leaveLab();
     super.dispose();
   }
 
@@ -64,6 +69,7 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
         final accent = faceState.config.eyeColor;
         final levels = cubit.mood.levels();
         final emotions = cubit.mood.emotions();
+        final game = context.watch<MixGameCubit>().state;
         return Theme(
           data: isDark ? ThemeData.dark() : ThemeData.light(),
           child: Scaffold(
@@ -72,7 +78,29 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
               backgroundColor: isDark ? Colors.black : Colors.grey[100],
               elevation: 0,
               title: Text(t.lab.title),
+              bottom: game.phase == MixPhase.idle
+                  ? null
+                  : PreferredSize(
+                      preferredSize: const Size.fromHeight(54),
+                      child: _ChallengeBanner(
+                        game: game,
+                        emotions: emotions,
+                        accent: accent,
+                      ),
+                    ),
               actions: [
+                IconButton(
+                  icon: Icon(
+                    game.phase == MixPhase.idle
+                        ? Icons.emoji_events_outlined
+                        : Icons.emoji_events,
+                  ),
+                  color: game.phase == MixPhase.idle ? null : accent,
+                  tooltip: game.phase == MixPhase.idle
+                      ? t.lab.challenge.start
+                      : t.lab.challenge.active,
+                  onPressed: () => _showChallengeSheet(context),
+                ),
                 IconButton(
                   icon: const Icon(Icons.restart_alt),
                   tooltip: t.lab.reset,
@@ -101,7 +129,7 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  _ChallengeArea(
+                  _MoodSummary(
                     emotions: emotions,
                     accent: accent,
                     reaction: _reaction,
@@ -143,6 +171,10 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
                       ],
                     ),
                   ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20, 6, 20, 12),
+                    child: _LabEventComposer(),
+                  ),
                 ],
               ),
             ),
@@ -151,9 +183,259 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
       },
     );
   }
+
+  void _showChallengeSheet(BuildContext context) {
+    final gameCubit = context.read<MixGameCubit>();
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (_) =>
+          BlocProvider.value(value: gameCubit, child: const _ChallengeSheet()),
+    );
+  }
 }
 
 enum _LabReaction { boop, cuddle }
+
+class _ChallengeBanner extends StatelessWidget {
+  final MixGameState game;
+  final EmotionVector emotions;
+  final Color accent;
+
+  const _ChallengeBanner({
+    required this.game,
+    required this.emotions,
+    required this.accent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final solved = game.phase == MixPhase.celebrating;
+    final name = _emotionLabel(game.target);
+    final progress = (emotions[game.target] / mixThreshold(game.target)).clamp(
+      0.0,
+      1.0,
+    );
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 2, 12, 8),
+        child: Row(
+          children: [
+            Icon(
+              solved ? Icons.check_circle : Icons.science_outlined,
+              size: 20,
+              color: accent,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    solved
+                        ? t.lab.challenge.solved(name: name)
+                        : t.lab.challenge.target(name: name),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 6,
+                      color: accent,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              visualDensity: VisualDensity.compact,
+              tooltip: t.lab.challenge.stop,
+              onPressed: context.read<MixGameCubit>().stopChallenge,
+              icon: const Icon(Icons.close, size: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ChallengeSheet extends StatelessWidget {
+  const _ChallengeSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<MixGameCubit, MixGameState>(
+      builder: (context, game) {
+        final cubit = context.read<MixGameCubit>();
+        final active = game.phase != MixPhase.idle;
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 4, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.emoji_events_outlined,
+                  size: 42,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  t.lab.challenge.title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  active
+                      ? t.lab.challenge.current(
+                          name: _emotionLabel(game.target),
+                        )
+                      : t.lab.challenge.explanation,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: active
+                      ? OutlinedButton.icon(
+                          onPressed: () {
+                            cubit.stopChallenge();
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(Icons.close),
+                          label: Text(t.lab.challenge.stop),
+                        )
+                      : FilledButton.icon(
+                          onPressed: () {
+                            cubit.startChallenge();
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(Icons.play_arrow),
+                          label: Text(t.lab.challenge.start),
+                        ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _LabEventComposer extends StatefulWidget {
+  const _LabEventComposer();
+
+  @override
+  State<_LabEventComposer> createState() => _LabEventComposerState();
+}
+
+class _LabEventComposerState extends State<_LabEventComposer> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _send() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    final cubit = context.read<RobotFaceCubit>();
+
+    void respond() {
+      cubit.talkToHaze(text);
+      _controller.clear();
+    }
+
+    if (cubit.state.aiConsent == AiConsent.unknown) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => BlocProvider.value(
+          value: cubit,
+          child: AiConsentDialog(onResolved: respond),
+        ),
+      );
+    } else {
+      respond();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RobotFaceCubit, RobotFaceState>(
+      buildWhen: (previous, current) =>
+          previous.isLoadingAI != current.isLoadingAI ||
+          previous.chemistryReaction != current.chemistryReaction,
+      builder: (context, state) {
+        return Column(
+          children: [
+            TextField(
+              controller: _controller,
+              enabled: !state.isLoadingAI,
+              textInputAction: TextInputAction.send,
+              onSubmitted: (_) => _send(),
+              decoration: InputDecoration(
+                hintText: t.lab.tell_haze,
+                prefixIcon: const Icon(Icons.auto_awesome, size: 20),
+                suffixIcon: state.isLoadingAI
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : IconButton(
+                        tooltip: t.lab.send,
+                        onPressed: _send,
+                        icon: const Icon(Icons.send_rounded),
+                      ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                isDense: true,
+              ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 180),
+              child: state.chemistryReaction.isEmpty
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Text(
+                        state.chemistryReaction,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
 
 Color _chemicalColor(Chemical chem) => switch (chem) {
   Chemical.dopamine => const Color(0xFFFFD54F),
@@ -188,14 +470,12 @@ String _chemicalTag(Chemical chem) => switch (chem) {
   Chemical.gaba => t.lab.chemicals.gaba.tag,
 };
 
-/// Free play shows what Haze feels; challenge mode shows what to make it
-/// feel, how close the mix is, and the running score.
-class _ChallengeArea extends StatelessWidget {
+class _MoodSummary extends StatelessWidget {
   final EmotionVector emotions;
   final Color accent;
   final _LabReaction? reaction;
 
-  const _ChallengeArea({
+  const _MoodSummary({
     required this.emotions,
     required this.accent,
     required this.reaction,
@@ -204,140 +484,23 @@ class _ChallengeArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return BlocBuilder<MixGameCubit, MixGameState>(
-      builder: (context, game) {
-        final gameCubit = context.read<MixGameCubit>();
-        switch (game.phase) {
-          case MixPhase.idle:
-            return Column(
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 180),
-                  child: Text(
-                    switch (reaction) {
-                      _LabReaction.boop => t.lab.boop_reaction,
-                      _LabReaction.cuddle => t.lab.cuddle_reaction,
-                      null => t.lab.feeling_now(
-                        name: mixEmotionLabel(emotions.dominant),
-                      ),
-                    },
-                    key: ValueKey(reaction),
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: accent,
-                    ),
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: gameCubit.startChallenge,
-                  icon: const Icon(Icons.emoji_events_outlined, size: 20),
-                  label: Text(t.lab.challenge.start),
-                ),
-              ],
-            );
-          case MixPhase.playing:
-          case MixPhase.celebrating:
-            final name = mixEmotionLabel(game.target);
-            final solved = game.phase == MixPhase.celebrating;
-            final progress = (emotions[game.target] / mixThreshold(game.target))
-                .clamp(0.0, 1.0);
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 250),
-                          child: Text(
-                            solved
-                                ? t.lab.challenge.solved(name: name)
-                                : game.shifted
-                                ? t.lab.challenge.shifted(name: name)
-                                : t.lab.challenge.target(name: name),
-                            key: ValueKey('${game.round}-$solved'),
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: solved ? accent : null,
-                            ),
-                          ),
-                        ),
-                      ),
-                      _ScorePill(
-                        icon: Icons.star_rounded,
-                        label: '${game.score}',
-                        color: Colors.amber,
-                      ),
-                      const SizedBox(width: 6),
-                      _ScorePill(
-                        icon: Icons.bolt_rounded,
-                        label: '${game.streak}',
-                        color: accent,
-                      ),
-                      IconButton(
-                        visualDensity: VisualDensity.compact,
-                        icon: const Icon(Icons.close, size: 18),
-                        tooltip: t.lab.challenge.stop,
-                        onPressed: gameCubit.stopChallenge,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 9,
-                      backgroundColor: theme.colorScheme.surfaceContainerHighest
-                          .withValues(alpha: 0.6),
-                      color: solved ? accent : accent.withValues(alpha: 0.85),
-                    ),
-                  ),
-                ],
-              ),
-            );
-        }
-      },
-    );
-  }
-}
-
-class _ScorePill extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  const _ScorePill({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerHighest.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 15, color: color),
-          const SizedBox(width: 3),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              fontFeatures: [FontFeature.tabularFigures()],
-            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 180),
+        child: Text(
+          switch (reaction) {
+            _LabReaction.boop => t.lab.boop_reaction,
+            _LabReaction.cuddle => t.lab.cuddle_reaction,
+            null => t.lab.feeling_now(name: _emotionLabel(emotions.dominant)),
+          },
+          key: ValueKey(reaction),
+          textAlign: TextAlign.center,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: accent,
           ),
-        ],
+        ),
       ),
     );
   }
@@ -370,7 +533,7 @@ class _EmotionMixRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              '${mixEmotionLabel(entry.key)} ${(entry.value * 100).round()}%',
+              '${_emotionLabel(entry.key)} ${(entry.value * 100).round()}%',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -382,6 +545,17 @@ class _EmotionMixRow extends StatelessWidget {
     );
   }
 }
+
+String _emotionLabel(Emotion emotion) => switch (emotion) {
+  Emotion.happiness => t.lab.emotions.happiness,
+  Emotion.excitement => t.lab.emotions.excitement,
+  Emotion.anger => t.lab.emotions.anger,
+  Emotion.calm => t.lab.emotions.calm,
+  Emotion.bonding => t.lab.emotions.bonding,
+  Emotion.anxiety => t.lab.emotions.anxiety,
+  Emotion.sadness => t.lab.emotions.sadness,
+  Emotion.euphoria => t.lab.emotions.euphoria,
+};
 
 class _ChemicalBar extends StatelessWidget {
   final Chemical chemical;

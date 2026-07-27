@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 180 (90 per locale)
+/// Strings: 196 (98 per locale)
 ///
-/// Built on 2026-07-24 at 17:17 UTC
+/// Built on 2026-07-26 at 21:40 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -247,9 +247,11 @@ class _StringsLabEn {
 
 	// Translations
 	String get title => 'Haze Lab';
-	String feeling_now({required Object name}) => 'Right now Haze feels ${name}';
+	String feeling_now({required Object name}) => 'Current mood: ${name}';
 	String get boop_reaction => 'Boop! Dopamine and adrenaline stirred.';
 	String get cuddle_reaction => 'Cuddle! Oxytocin and endorphins stirred.';
+	String get tell_haze => 'Tell Haze what happened...';
+	String get send => 'Send';
 	String get chemistry => 'Body chemistry';
 	String get emotion_mix => 'Emotion mix';
 	String get hint => 'Tap a chemical to give Haze a tiny dose — then watch the face and the bars react. Feelings fade on their own, each at its own speed.';
@@ -280,6 +282,8 @@ class _StringsUiEn {
 	String get theme => 'Theme';
 	String get dark_theme => 'Dark Theme';
 	String get light_theme => 'Light Theme';
+	String get never_sleep => 'Never sleep';
+	String get never_sleep_description => 'Keep Haze awake while the app is open';
 }
 
 // Path: face_types.classic
@@ -333,6 +337,10 @@ class _StringsLabChallengeEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+	String get title => 'Chemistry challenge';
+	String get explanation => 'Haze will name a feeling. Change the chemicals—or interact with Haze—until the body and face reach it.';
+	String get active => 'Challenge in progress';
+	String current({required Object name}) => 'Current goal: ${name}';
 	String get start => 'Start a challenge';
 	String get stop => 'Back to free play';
 	String target({required Object name}) => 'Make Haze feel ${name}!';
@@ -354,7 +362,7 @@ class _StringsLabEmotionsEn {
 	String get bonding => 'loved';
 	String get anxiety => 'worried';
 	String get sadness => 'sad';
-	String get euphoria => 'over the moon';
+	String get euphoria => 'euphoria';
 }
 
 // Path: lab.chemicals
@@ -587,9 +595,11 @@ class _StringsLabPt extends _StringsLabEn {
 
 	// Translations
 	@override String get title => 'Laboratório do Haze';
-	@override String feeling_now({required Object name}) => 'Agora o Haze está se sentindo ${name}';
+	@override String feeling_now({required Object name}) => 'Humor atual: ${name}';
 	@override String get boop_reaction => 'Boop! A dopamina e a adrenalina se agitaram.';
 	@override String get cuddle_reaction => 'Abraço! A ocitocina e as endorfinas se agitaram.';
+	@override String get tell_haze => 'Conte ao Haze o que aconteceu...';
+	@override String get send => 'Enviar';
 	@override String get chemistry => 'Química do corpo';
 	@override String get emotion_mix => 'Mistura de emoções';
 	@override String get hint => 'Toque em uma substância para dar uma dosezinha ao Haze — e veja o rosto e as barras reagirem. Os sentimentos passam sozinhos, cada um na sua velocidade.';
@@ -620,6 +630,8 @@ class _StringsUiPt extends _StringsUiEn {
 	@override String get theme => 'Tema';
 	@override String get dark_theme => 'Tema Escuro';
 	@override String get light_theme => 'Tema Claro';
+	@override String get never_sleep => 'Nunca dormir';
+	@override String get never_sleep_description => 'Manter o Haze acordado enquanto o app estiver aberto';
 }
 
 // Path: face_types.classic
@@ -673,6 +685,10 @@ class _StringsLabChallengePt extends _StringsLabChallengeEn {
 	@override final _StringsPt _root; // ignore: unused_field
 
 	// Translations
+	@override String get title => 'Desafio de química';
+	@override String get explanation => 'O Haze vai escolher um sentimento. Mude as substâncias — ou interaja com ele — até o corpo e o rosto chegarem lá.';
+	@override String get active => 'Desafio em andamento';
+	@override String current({required Object name}) => 'Objetivo atual: ${name}';
 	@override String get start => 'Começar um desafio';
 	@override String get stop => 'Voltar ao modo livre';
 	@override String target({required Object name}) => 'Faça o Haze se sentir ${name}!';
@@ -694,7 +710,7 @@ class _StringsLabEmotionsPt extends _StringsLabEmotionsEn {
 	@override String get bonding => 'amado';
 	@override String get anxiety => 'preocupado';
 	@override String get sadness => 'triste';
-	@override String get euphoria => 'nas nuvens';
+	@override String get euphoria => 'euforia';
 }
 
 // Path: lab.chemicals
@@ -848,13 +864,19 @@ extension on Translations {
 			case 'game.streak': return 'Streak';
 			case 'game.play': return 'Feelings game';
 			case 'lab.title': return 'Haze Lab';
-			case 'lab.feeling_now': return ({required Object name}) => 'Right now Haze feels ${name}';
+			case 'lab.feeling_now': return ({required Object name}) => 'Current mood: ${name}';
 			case 'lab.boop_reaction': return 'Boop! Dopamine and adrenaline stirred.';
 			case 'lab.cuddle_reaction': return 'Cuddle! Oxytocin and endorphins stirred.';
+			case 'lab.tell_haze': return 'Tell Haze what happened...';
+			case 'lab.send': return 'Send';
 			case 'lab.chemistry': return 'Body chemistry';
 			case 'lab.emotion_mix': return 'Emotion mix';
 			case 'lab.hint': return 'Tap a chemical to give Haze a tiny dose — then watch the face and the bars react. Feelings fade on their own, each at its own speed.';
 			case 'lab.reset': return 'Back to baseline';
+			case 'lab.challenge.title': return 'Chemistry challenge';
+			case 'lab.challenge.explanation': return 'Haze will name a feeling. Change the chemicals—or interact with Haze—until the body and face reach it.';
+			case 'lab.challenge.active': return 'Challenge in progress';
+			case 'lab.challenge.current': return ({required Object name}) => 'Current goal: ${name}';
 			case 'lab.challenge.start': return 'Start a challenge';
 			case 'lab.challenge.stop': return 'Back to free play';
 			case 'lab.challenge.target': return ({required Object name}) => 'Make Haze feel ${name}!';
@@ -867,7 +889,7 @@ extension on Translations {
 			case 'lab.emotions.bonding': return 'loved';
 			case 'lab.emotions.anxiety': return 'worried';
 			case 'lab.emotions.sadness': return 'sad';
-			case 'lab.emotions.euphoria': return 'over the moon';
+			case 'lab.emotions.euphoria': return 'euphoria';
 			case 'lab.chemicals.dopamine.name': return 'Dopamine';
 			case 'lab.chemicals.dopamine.tag': return 'the reward spark';
 			case 'lab.chemicals.serotonin.name': return 'Serotonin';
@@ -898,6 +920,8 @@ extension on Translations {
 			case 'ui.theme': return 'Theme';
 			case 'ui.dark_theme': return 'Dark Theme';
 			case 'ui.light_theme': return 'Light Theme';
+			case 'ui.never_sleep': return 'Never sleep';
+			case 'ui.never_sleep_description': return 'Keep Haze awake while the app is open';
 			default: return null;
 		}
 	}
@@ -946,13 +970,19 @@ extension on _StringsPt {
 			case 'game.streak': return 'Sequência';
 			case 'game.play': return 'Jogo dos sentimentos';
 			case 'lab.title': return 'Laboratório do Haze';
-			case 'lab.feeling_now': return ({required Object name}) => 'Agora o Haze está se sentindo ${name}';
+			case 'lab.feeling_now': return ({required Object name}) => 'Humor atual: ${name}';
 			case 'lab.boop_reaction': return 'Boop! A dopamina e a adrenalina se agitaram.';
 			case 'lab.cuddle_reaction': return 'Abraço! A ocitocina e as endorfinas se agitaram.';
+			case 'lab.tell_haze': return 'Conte ao Haze o que aconteceu...';
+			case 'lab.send': return 'Enviar';
 			case 'lab.chemistry': return 'Química do corpo';
 			case 'lab.emotion_mix': return 'Mistura de emoções';
 			case 'lab.hint': return 'Toque em uma substância para dar uma dosezinha ao Haze — e veja o rosto e as barras reagirem. Os sentimentos passam sozinhos, cada um na sua velocidade.';
 			case 'lab.reset': return 'Voltar ao normal';
+			case 'lab.challenge.title': return 'Desafio de química';
+			case 'lab.challenge.explanation': return 'O Haze vai escolher um sentimento. Mude as substâncias — ou interaja com ele — até o corpo e o rosto chegarem lá.';
+			case 'lab.challenge.active': return 'Desafio em andamento';
+			case 'lab.challenge.current': return ({required Object name}) => 'Objetivo atual: ${name}';
 			case 'lab.challenge.start': return 'Começar um desafio';
 			case 'lab.challenge.stop': return 'Voltar ao modo livre';
 			case 'lab.challenge.target': return ({required Object name}) => 'Faça o Haze se sentir ${name}!';
@@ -965,7 +995,7 @@ extension on _StringsPt {
 			case 'lab.emotions.bonding': return 'amado';
 			case 'lab.emotions.anxiety': return 'preocupado';
 			case 'lab.emotions.sadness': return 'triste';
-			case 'lab.emotions.euphoria': return 'nas nuvens';
+			case 'lab.emotions.euphoria': return 'euforia';
 			case 'lab.chemicals.dopamine.name': return 'Dopamina';
 			case 'lab.chemicals.dopamine.tag': return 'a faísca da recompensa';
 			case 'lab.chemicals.serotonin.name': return 'Serotonina';
@@ -996,6 +1026,8 @@ extension on _StringsPt {
 			case 'ui.theme': return 'Tema';
 			case 'ui.dark_theme': return 'Tema Escuro';
 			case 'ui.light_theme': return 'Tema Claro';
+			case 'ui.never_sleep': return 'Nunca dormir';
+			case 'ui.never_sleep_description': return 'Manter o Haze acordado enquanto o app estiver aberto';
 			default: return null;
 		}
 	}

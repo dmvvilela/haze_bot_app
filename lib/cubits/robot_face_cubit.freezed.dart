@@ -24,6 +24,7 @@ mixin _$RobotFaceState {
   bool get isTimerRunning => throw _privateConstructorUsedError;
   int get timerSeconds => throw _privateConstructorUsedError;
   String get aiMessage => throw _privateConstructorUsedError;
+  String get chemistryReaction => throw _privateConstructorUsedError;
   bool get isLoadingAI => throw _privateConstructorUsedError;
   bool get isSpeaking => throw _privateConstructorUsedError;
   bool get showChatComposer => throw _privateConstructorUsedError;
@@ -63,6 +64,7 @@ abstract class $RobotFaceStateCopyWith<$Res> {
     bool isTimerRunning,
     int timerSeconds,
     String aiMessage,
+    String chemistryReaction,
     bool isLoadingAI,
     bool isSpeaking,
     bool showChatComposer,
@@ -102,6 +104,7 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
     Object? isTimerRunning = null,
     Object? timerSeconds = null,
     Object? aiMessage = null,
+    Object? chemistryReaction = null,
     Object? isLoadingAI = null,
     Object? isSpeaking = null,
     Object? showChatComposer = null,
@@ -144,6 +147,10 @@ class _$RobotFaceStateCopyWithImpl<$Res, $Val extends RobotFaceState>
             aiMessage: null == aiMessage
                 ? _value.aiMessage
                 : aiMessage // ignore: cast_nullable_to_non_nullable
+                      as String,
+            chemistryReaction: null == chemistryReaction
+                ? _value.chemistryReaction
+                : chemistryReaction // ignore: cast_nullable_to_non_nullable
                       as String,
             isLoadingAI: null == isLoadingAI
                 ? _value.isLoadingAI
@@ -226,6 +233,7 @@ abstract class _$$RobotFaceStateImplCopyWith<$Res>
     bool isTimerRunning,
     int timerSeconds,
     String aiMessage,
+    String chemistryReaction,
     bool isLoadingAI,
     bool isSpeaking,
     bool showChatComposer,
@@ -265,6 +273,7 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
     Object? isTimerRunning = null,
     Object? timerSeconds = null,
     Object? aiMessage = null,
+    Object? chemistryReaction = null,
     Object? isLoadingAI = null,
     Object? isSpeaking = null,
     Object? showChatComposer = null,
@@ -307,6 +316,10 @@ class __$$RobotFaceStateImplCopyWithImpl<$Res>
         aiMessage: null == aiMessage
             ? _value.aiMessage
             : aiMessage // ignore: cast_nullable_to_non_nullable
+                  as String,
+        chemistryReaction: null == chemistryReaction
+            ? _value.chemistryReaction
+            : chemistryReaction // ignore: cast_nullable_to_non_nullable
                   as String,
         isLoadingAI: null == isLoadingAI
             ? _value.isLoadingAI
@@ -372,6 +385,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     this.isTimerRunning = false,
     this.timerSeconds = 0,
     this.aiMessage = '',
+    this.chemistryReaction = '',
     this.isLoadingAI = false,
     this.isSpeaking = false,
     this.showChatComposer = false,
@@ -407,6 +421,9 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
   @override
   @JsonKey()
   final String aiMessage;
+  @override
+  @JsonKey()
+  final String chemistryReaction;
   @override
   @JsonKey()
   final bool isLoadingAI;
@@ -453,7 +470,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
 
   @override
   String toString() {
-    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, showChatComposer: $showChatComposer, mimicStatus: $mimicStatus, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoiceOptions: $ttsVoiceOptions, selectedTtsVoiceId: $selectedTtsVoiceId, lookTarget: $lookTarget)';
+    return 'RobotFaceState(config: $config, isPressed: $isPressed, isBlinking: $isBlinking, showControls: $showControls, isTimerRunning: $isTimerRunning, timerSeconds: $timerSeconds, aiMessage: $aiMessage, chemistryReaction: $chemistryReaction, isLoadingAI: $isLoadingAI, isSpeaking: $isSpeaking, showChatComposer: $showChatComposer, mimicStatus: $mimicStatus, keepScreenAwake: $keepScreenAwake, brainStatus: $brainStatus, downloadProgress: $downloadProgress, aiConsent: $aiConsent, personality: $personality, ttsVoiceOptions: $ttsVoiceOptions, selectedTtsVoiceId: $selectedTtsVoiceId, lookTarget: $lookTarget)';
   }
 
   @override
@@ -474,6 +491,8 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
                 other.timerSeconds == timerSeconds) &&
             (identical(other.aiMessage, aiMessage) ||
                 other.aiMessage == aiMessage) &&
+            (identical(other.chemistryReaction, chemistryReaction) ||
+                other.chemistryReaction == chemistryReaction) &&
             (identical(other.isLoadingAI, isLoadingAI) ||
                 other.isLoadingAI == isLoadingAI) &&
             (identical(other.isSpeaking, isSpeaking) ||
@@ -512,6 +531,7 @@ class _$RobotFaceStateImpl implements _RobotFaceState {
     isTimerRunning,
     timerSeconds,
     aiMessage,
+    chemistryReaction,
     isLoadingAI,
     isSpeaking,
     showChatComposer,
@@ -547,6 +567,7 @@ abstract class _RobotFaceState implements RobotFaceState {
     final bool isTimerRunning,
     final int timerSeconds,
     final String aiMessage,
+    final String chemistryReaction,
     final bool isLoadingAI,
     final bool isSpeaking,
     final bool showChatComposer,
@@ -575,6 +596,8 @@ abstract class _RobotFaceState implements RobotFaceState {
   int get timerSeconds;
   @override
   String get aiMessage;
+  @override
+  String get chemistryReaction;
   @override
   bool get isLoadingAI;
   @override

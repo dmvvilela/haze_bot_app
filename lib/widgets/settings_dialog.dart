@@ -116,6 +116,14 @@ class SettingsDialog extends StatelessWidget {
                   ),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
+                    secondary: const Icon(Icons.bedtime_off_outlined),
+                    title: Text(t.ui.never_sleep),
+                    subtitle: Text(t.ui.never_sleep_description),
+                    value: state.config.neverSleep,
+                    onChanged: context.read<RobotFaceCubit>().setNeverSleep,
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
                     title: Text(t.ui.speech_enabled),
                     subtitle: Text(t.ui.speech_description),
                     value: state.config.speechEnabled,

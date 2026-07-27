@@ -10,6 +10,7 @@ class RobotFaceState with _$RobotFaceState {
     @Default(false) bool isTimerRunning,
     @Default(0) int timerSeconds,
     @Default('') String aiMessage,
+    @Default('') String chemistryReaction,
     @Default(false) bool isLoadingAI,
     @Default(false) bool isSpeaking,
     @Default(false) bool showChatComposer,

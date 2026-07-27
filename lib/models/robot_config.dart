@@ -19,6 +19,7 @@ class RobotConfig with _$RobotConfig {
     @Default(0.95) double speechPitch,
     @Default('en-US') String language,
     @Default(true) bool isDarkTheme,
+    @Default(false) bool neverSleep,
   }) = _RobotConfig;
 
   factory RobotConfig.fromJson(Map<String, dynamic> json) =>

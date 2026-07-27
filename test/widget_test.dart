@@ -18,6 +18,7 @@ void main() {
     expect(config.speechRate, 0.55);
     expect(config.speechPitch, 0.95);
     expect(config.robotVoiceEnabled, isTrue);
+    expect(config.neverSleep, isFalse);
   });
 
   test('Robot interaction defaults are idle', () {
@@ -100,6 +101,7 @@ void main() {
     expect(find.text('AI Brain'), findsOneWidget);
     expect(find.text('Haze mood'), findsOneWidget);
     expect(find.text('Voice and language'), findsOneWidget);
+    expect(find.text('Never sleep'), findsOneWidget);
     expect(find.text('Playful'), findsWidgets);
     expect(find.text('Voice style'), findsNothing);
     expect(find.text('Voice'), findsNothing);
@@ -185,5 +187,40 @@ void main() {
     await tester.pump();
 
     expect(secondCubit.state.personality, HazePersonality.zen);
+  });
+
+  testWidgets('never-sleep preference is persisted and restored', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+
+    final firstCubit = RobotFaceCubit();
+    addTearDown(firstCubit.close);
+    firstCubit.setNeverSleep(true);
+    await tester.pump();
+
+    final secondCubit = RobotFaceCubit();
+    addTearDown(secondCubit.close);
+    await tester.pump();
+
+    expect(secondCubit.state.config.neverSleep, isTrue);
+  });
+
+  testWidgets('lab suspends idle sleep until it closes', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+
+    final cubit = RobotFaceCubit();
+    addTearDown(cubit.close);
+    cubit.startSecretInteractions();
+    cubit.enterLab();
+
+    await tester.pump(const Duration(seconds: 46));
+    expect(cubit.state.config.expression, isNot(RobotExpression.sleepy));
+
+    cubit.leaveLab();
+    await tester.pump(const Duration(seconds: 46));
+    expect(cubit.state.config.expression, RobotExpression.sleepy);
   });
 }

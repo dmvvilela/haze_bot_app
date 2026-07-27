@@ -25,8 +25,8 @@ class HazeMood {
   void Function()? onChanged;
 
   HazeMood({DateTime Function()? clock})
-      : _now = clock ?? DateTime.now,
-        _lastSync = (clock ?? DateTime.now)();
+    : _now = clock ?? DateTime.now,
+      _lastSync = (clock ?? DateTime.now)();
 
   /// Beyond this, catch-up switches to one exact analytic decay step: the
   /// engine sub-steps at 0.5 s, so simulating a day of suspension would be
@@ -73,14 +73,14 @@ class HazeMood {
   /// The face Haze would make about its current chemistry — used where a
   /// discrete [RobotExpression] is needed (non-V3 faces, speech tone).
   RobotExpression dominantExpression() => switch (emotions().dominant) {
-        Emotion.happiness => RobotExpression.happy,
-        Emotion.excitement || Emotion.euphoria => RobotExpression.excited,
-        Emotion.anger => RobotExpression.angry,
-        Emotion.calm => RobotExpression.happy,
-        Emotion.bonding => RobotExpression.love,
-        Emotion.anxiety => RobotExpression.scared,
-        Emotion.sadness => RobotExpression.sad,
-      };
+    Emotion.happiness => RobotExpression.happy,
+    Emotion.excitement || Emotion.euphoria => RobotExpression.excited,
+    Emotion.anger => RobotExpression.angry,
+    Emotion.calm => RobotExpression.happy,
+    Emotion.bonding => RobotExpression.love,
+    Emotion.anxiety => RobotExpression.scared,
+    Emotion.sadness => RobotExpression.sad,
+  };
 
   // --- Expression holds --------------------------------------------------
 
@@ -88,6 +88,11 @@ class HazeMood {
   /// for a while before the mood shows through again.
   void holdExpression([Duration duration = const Duration(seconds: 7)]) {
     _holdUntil = _now().add(duration);
+  }
+
+  /// Give the live chemistry control of the face immediately.
+  void releaseExpression() {
+    _holdUntil = null;
   }
 
   bool get moodDriven =>
@@ -119,64 +124,64 @@ class HazeMood {
   void applyImpulses(List<ChemicalImpulse> impulses) => _apply(impulses);
 
   void poked() => _apply(const [
-        ChemicalImpulse(Chemical.dopamine, 0.05, sourceId: 'poke'),
-        ChemicalImpulse(Chemical.adrenaline, 0.04, sourceId: 'poke'),
-      ]);
+    ChemicalImpulse(Chemical.dopamine, 0.05, sourceId: 'poke'),
+    ChemicalImpulse(Chemical.adrenaline, 0.04, sourceId: 'poke'),
+  ]);
 
   void annoyed() => _apply(const [
-        ChemicalImpulse(Chemical.cortisol, 0.10, sourceId: 'annoy'),
-        ChemicalImpulse(Chemical.testosterone, 0.06, sourceId: 'annoy'),
-        ChemicalImpulse(Chemical.adrenaline, 0.06, sourceId: 'annoy'),
-      ]);
+    ChemicalImpulse(Chemical.cortisol, 0.10, sourceId: 'annoy'),
+    ChemicalImpulse(Chemical.testosterone, 0.06, sourceId: 'annoy'),
+    ChemicalImpulse(Chemical.adrenaline, 0.06, sourceId: 'annoy'),
+  ]);
 
   void tickled() => _apply(const [
-        ChemicalImpulse(Chemical.endorphins, 0.25, sourceId: 'tickle'),
-        ChemicalImpulse(Chemical.dopamine, 0.15, sourceId: 'tickle'),
-        ChemicalImpulse(Chemical.adrenaline, 0.10, sourceId: 'tickle'),
-      ]);
+    ChemicalImpulse(Chemical.endorphins, 0.25, sourceId: 'tickle'),
+    ChemicalImpulse(Chemical.dopamine, 0.15, sourceId: 'tickle'),
+    ChemicalImpulse(Chemical.adrenaline, 0.10, sourceId: 'tickle'),
+  ]);
 
   void cuddled() => _apply(const [
-        ChemicalImpulse(Chemical.oxytocin, 0.30, sourceId: 'cuddle'),
-        ChemicalImpulse(Chemical.endorphins, 0.12, sourceId: 'cuddle'),
-      ]);
+    ChemicalImpulse(Chemical.oxytocin, 0.30, sourceId: 'cuddle'),
+    ChemicalImpulse(Chemical.endorphins, 0.12, sourceId: 'cuddle'),
+  ]);
 
   void shaken() => _apply(const [
-        ChemicalImpulse(Chemical.adrenaline, 0.30, sourceId: 'shake'),
-        ChemicalImpulse(Chemical.cortisol, 0.12, sourceId: 'shake'),
-      ]);
+    ChemicalImpulse(Chemical.adrenaline, 0.30, sourceId: 'shake'),
+    ChemicalImpulse(Chemical.cortisol, 0.12, sourceId: 'shake'),
+  ]);
 
   void wokeUp() => _apply(const [
-        ChemicalImpulse(Chemical.adrenaline, 0.15, sourceId: 'wake'),
-      ]);
+    ChemicalImpulse(Chemical.adrenaline, 0.15, sourceId: 'wake'),
+  ]);
 
   void sang() => _apply(const [
-        ChemicalImpulse(Chemical.oxytocin, 0.15, sourceId: 'sing'),
-        ChemicalImpulse(Chemical.endorphins, 0.15, sourceId: 'sing'),
-      ]);
+    ChemicalImpulse(Chemical.oxytocin, 0.15, sourceId: 'sing'),
+    ChemicalImpulse(Chemical.endorphins, 0.15, sourceId: 'sing'),
+  ]);
 
   void timerStarted() => _apply(const [
-        ChemicalImpulse(Chemical.dopamine, 0.08, sourceId: 'timer'),
-      ]);
+    ChemicalImpulse(Chemical.dopamine, 0.08, sourceId: 'timer'),
+  ]);
 
   void timerFinished() => _apply(const [
-        ChemicalImpulse(Chemical.dopamine, 0.20, sourceId: 'timer'),
-        ChemicalImpulse(Chemical.endorphins, 0.10, sourceId: 'timer'),
-        ChemicalImpulse(Chemical.adrenaline, 0.08, sourceId: 'timer'),
-      ]);
+    ChemicalImpulse(Chemical.dopamine, 0.20, sourceId: 'timer'),
+    ChemicalImpulse(Chemical.endorphins, 0.10, sourceId: 'timer'),
+    ChemicalImpulse(Chemical.adrenaline, 0.08, sourceId: 'timer'),
+  ]);
 
   void gameCorrect() => _apply(const [
-        ChemicalImpulse(Chemical.dopamine, 0.12, sourceId: 'game-correct'),
-      ]);
+    ChemicalImpulse(Chemical.dopamine, 0.12, sourceId: 'game-correct'),
+  ]);
 
   void gameStreak() => _apply(const [
-        ChemicalImpulse(Chemical.endorphins, 0.15, sourceId: 'game-streak'),
-        ChemicalImpulse(Chemical.dopamine, 0.10, sourceId: 'game-streak'),
-        ChemicalImpulse(Chemical.oxytocin, 0.05, sourceId: 'game-streak'),
-      ]);
+    ChemicalImpulse(Chemical.endorphins, 0.15, sourceId: 'game-streak'),
+    ChemicalImpulse(Chemical.dopamine, 0.10, sourceId: 'game-streak'),
+    ChemicalImpulse(Chemical.oxytocin, 0.05, sourceId: 'game-streak'),
+  ]);
 
   void gameWrong() => _apply(const [
-        ChemicalImpulse(Chemical.cortisol, 0.05, sourceId: 'game-wrong'),
-      ]);
+    ChemicalImpulse(Chemical.cortisol, 0.05, sourceId: 'game-wrong'),
+  ]);
 
   /// Haze committed to a feeling (brain reply tag, or acting a face the user
   /// cycled to) — method acting: making the face nudges the chemistry.
@@ -187,48 +192,195 @@ class HazeMood {
     ]);
   }
 
+  /// A tiny local model occasionally chooses the right feeling but emits
+  /// impulses too weak to overcome Haze's resting mood. If the projected
+  /// chemistry still contradicts that intent, add one calibrated correction.
+  ///
+  /// The face remains chemistry-driven: this changes the body, rather than
+  /// pinning a preset expression over an inconsistent mood readout.
+  List<ChemicalImpulse> reinforceBrainIntent(RobotExpression intent) {
+    if (_chemistryFits(intent)) return const [];
+    final recipe = _brainCorrection(intent);
+    if (recipe.isEmpty) return const [];
+    _apply(recipe);
+    return recipe;
+  }
+
+  bool _chemistryFits(RobotExpression intent) {
+    final dominant = emotions().dominant;
+    return switch (intent) {
+      RobotExpression.happy =>
+        dominant == Emotion.happiness || dominant == Emotion.calm,
+      RobotExpression.excited =>
+        dominant == Emotion.excitement || dominant == Emotion.euphoria,
+      RobotExpression.love => dominant == Emotion.bonding,
+      RobotExpression.angry => dominant == Emotion.anger,
+      RobotExpression.scared => dominant == Emotion.anxiety,
+      RobotExpression.sad => dominant == Emotion.sadness,
+      RobotExpression.sleepy => dominant == Emotion.calm,
+      RobotExpression.surprised =>
+        dominant == Emotion.excitement || dominant == Emotion.anxiety,
+      RobotExpression.winking =>
+        dominant == Emotion.happiness || dominant == Emotion.bonding,
+      // The eight-axis chemistry has no dedicated confusion projection.
+      RobotExpression.confused => true,
+    };
+  }
+
+  List<ChemicalImpulse> _brainCorrection(
+    RobotExpression intent,
+  ) => switch (intent) {
+    RobotExpression.happy || RobotExpression.winking => const [
+      ChemicalImpulse(
+        Chemical.dopamine,
+        0.25,
+        sourceId: 'brain-correction-positive',
+      ),
+      ChemicalImpulse(
+        Chemical.serotonin,
+        0.12,
+        sourceId: 'brain-correction-positive',
+      ),
+      ChemicalImpulse(
+        Chemical.cortisol,
+        -0.10,
+        sourceId: 'brain-correction-positive',
+      ),
+    ],
+    RobotExpression.excited || RobotExpression.surprised => const [
+      ChemicalImpulse(
+        Chemical.adrenaline,
+        0.35,
+        sourceId: 'brain-correction-excited',
+      ),
+      ChemicalImpulse(
+        Chemical.dopamine,
+        0.25,
+        sourceId: 'brain-correction-excited',
+      ),
+    ],
+    RobotExpression.love => const [
+      ChemicalImpulse(
+        Chemical.oxytocin,
+        0.35,
+        sourceId: 'brain-correction-love',
+      ),
+      ChemicalImpulse(
+        Chemical.serotonin,
+        0.12,
+        sourceId: 'brain-correction-love',
+      ),
+    ],
+    RobotExpression.angry => const [
+      ChemicalImpulse(
+        Chemical.testosterone,
+        0.35,
+        sourceId: 'brain-correction-angry',
+      ),
+      ChemicalImpulse(
+        Chemical.cortisol,
+        0.30,
+        sourceId: 'brain-correction-angry',
+      ),
+      ChemicalImpulse(
+        Chemical.adrenaline,
+        0.20,
+        sourceId: 'brain-correction-angry',
+      ),
+      ChemicalImpulse(Chemical.gaba, -0.20, sourceId: 'brain-correction-angry'),
+    ],
+    RobotExpression.scared => const [
+      ChemicalImpulse(
+        Chemical.cortisol,
+        0.35,
+        sourceId: 'brain-correction-scared',
+      ),
+      ChemicalImpulse(
+        Chemical.adrenaline,
+        0.35,
+        sourceId: 'brain-correction-scared',
+      ),
+      ChemicalImpulse(
+        Chemical.gaba,
+        -0.15,
+        sourceId: 'brain-correction-scared',
+      ),
+    ],
+    RobotExpression.sad => const [
+      ChemicalImpulse(
+        Chemical.cortisol,
+        0.35,
+        sourceId: 'brain-correction-sad',
+      ),
+      ChemicalImpulse(
+        Chemical.dopamine,
+        -0.35,
+        sourceId: 'brain-correction-sad',
+      ),
+      ChemicalImpulse(
+        Chemical.serotonin,
+        -0.30,
+        sourceId: 'brain-correction-sad',
+      ),
+      ChemicalImpulse(
+        Chemical.oxytocin,
+        -0.10,
+        sourceId: 'brain-correction-sad',
+      ),
+    ],
+    RobotExpression.sleepy => const [
+      ChemicalImpulse(Chemical.gaba, 0.30, sourceId: 'brain-correction-sleepy'),
+      ChemicalImpulse(
+        Chemical.adrenaline,
+        -0.20,
+        sourceId: 'brain-correction-sleepy',
+      ),
+    ],
+    RobotExpression.confused => const [],
+  };
+
   List<(Chemical, double)> _actingImpulses(RobotExpression emotion) =>
       switch (emotion) {
         RobotExpression.happy => const [
-            (Chemical.dopamine, 0.10),
-            (Chemical.serotonin, 0.05),
-          ],
+          (Chemical.dopamine, 0.10),
+          (Chemical.serotonin, 0.05),
+        ],
         RobotExpression.excited => const [
-            (Chemical.dopamine, 0.12),
-            (Chemical.adrenaline, 0.12),
-          ],
+          (Chemical.dopamine, 0.12),
+          (Chemical.adrenaline, 0.12),
+        ],
         RobotExpression.love => const [
-            (Chemical.oxytocin, 0.20),
-            (Chemical.endorphins, 0.08),
-          ],
+          (Chemical.oxytocin, 0.20),
+          (Chemical.endorphins, 0.08),
+        ],
         RobotExpression.sad => const [
-            (Chemical.dopamine, -0.10),
-            (Chemical.serotonin, -0.08),
-            (Chemical.cortisol, 0.08),
-          ],
+          (Chemical.dopamine, -0.10),
+          (Chemical.serotonin, -0.08),
+          (Chemical.cortisol, 0.08),
+        ],
         RobotExpression.angry => const [
-            (Chemical.testosterone, 0.12),
-            (Chemical.cortisol, 0.10),
-            (Chemical.adrenaline, 0.08),
-            (Chemical.gaba, -0.05),
-          ],
+          (Chemical.testosterone, 0.12),
+          (Chemical.cortisol, 0.10),
+          (Chemical.adrenaline, 0.08),
+          (Chemical.gaba, -0.05),
+        ],
         RobotExpression.scared => const [
-            (Chemical.adrenaline, 0.20),
-            (Chemical.cortisol, 0.12),
-          ],
+          (Chemical.adrenaline, 0.20),
+          (Chemical.cortisol, 0.12),
+        ],
         RobotExpression.surprised => const [(Chemical.adrenaline, 0.15)],
         RobotExpression.sleepy => const [
-            (Chemical.gaba, 0.10),
-            (Chemical.adrenaline, -0.05),
-          ],
+          (Chemical.gaba, 0.10),
+          (Chemical.adrenaline, -0.05),
+        ],
         RobotExpression.confused => const [
-            (Chemical.cortisol, 0.04),
-            (Chemical.adrenaline, 0.04),
-          ],
+          (Chemical.cortisol, 0.04),
+          (Chemical.adrenaline, 0.04),
+        ],
         RobotExpression.winking => const [
-            (Chemical.dopamine, 0.08),
-            (Chemical.oxytocin, 0.05),
-          ],
+          (Chemical.dopamine, 0.08),
+          (Chemical.oxytocin, 0.05),
+        ],
       };
 
   /// Lab: hand-feed one chemical and watch what happens. Saturation is per
@@ -250,11 +402,11 @@ class HazeMood {
   /// Levels + timestamp. Baselines are not saved — they re-derive from the
   /// persisted personality on restore.
   Map<String, dynamic> toJson() => {
-        'levels': {
-          for (final entry in levels().entries) entry.key.name: entry.value,
-        },
-        'savedAt': _now().toIso8601String(),
-      };
+    'levels': {
+      for (final entry in levels().entries) entry.key.name: entry.value,
+    },
+    'savedAt': _now().toIso8601String(),
+  };
 
   /// Restore a previous session's chemistry, then let it decay by however
   /// long the app was closed — Haze kept feeling things while it was away.

@@ -368,12 +368,12 @@ class RobotFaceScreen extends StatelessWidget {
     final cubit = context.read<RobotFaceCubit>();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => MultiBlocProvider(
-          providers: [
-            BlocProvider.value(value: cubit),
-            BlocProvider(create: (_) => MixGameCubit(cubit)),
-          ],
-          child: const HazeLabScreen(),
+        builder: (_) => BlocProvider.value(
+          value: cubit,
+          child: BlocProvider(
+            create: (_) => MixGameCubit(cubit),
+            child: const HazeLabScreen(),
+          ),
         ),
       ),
     );

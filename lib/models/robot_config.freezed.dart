@@ -35,6 +35,7 @@ mixin _$RobotConfig {
   double get speechPitch => throw _privateConstructorUsedError;
   String get language => throw _privateConstructorUsedError;
   bool get isDarkTheme => throw _privateConstructorUsedError;
+  bool get neverSleep => throw _privateConstructorUsedError;
 
   /// Serializes this RobotConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -66,6 +67,7 @@ abstract class $RobotConfigCopyWith<$Res> {
     double speechPitch,
     String language,
     bool isDarkTheme,
+    bool neverSleep,
   });
 }
 
@@ -96,6 +98,7 @@ class _$RobotConfigCopyWithImpl<$Res, $Val extends RobotConfig>
     Object? speechPitch = null,
     Object? language = null,
     Object? isDarkTheme = null,
+    Object? neverSleep = null,
   }) {
     return _then(
       _value.copyWith(
@@ -147,6 +150,10 @@ class _$RobotConfigCopyWithImpl<$Res, $Val extends RobotConfig>
                 ? _value.isDarkTheme
                 : isDarkTheme // ignore: cast_nullable_to_non_nullable
                       as bool,
+            neverSleep: null == neverSleep
+                ? _value.neverSleep
+                : neverSleep // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -175,6 +182,7 @@ abstract class _$$RobotConfigImplCopyWith<$Res>
     double speechPitch,
     String language,
     bool isDarkTheme,
+    bool neverSleep,
   });
 }
 
@@ -204,6 +212,7 @@ class __$$RobotConfigImplCopyWithImpl<$Res>
     Object? speechPitch = null,
     Object? language = null,
     Object? isDarkTheme = null,
+    Object? neverSleep = null,
   }) {
     return _then(
       _$RobotConfigImpl(
@@ -255,6 +264,10 @@ class __$$RobotConfigImplCopyWithImpl<$Res>
             ? _value.isDarkTheme
             : isDarkTheme // ignore: cast_nullable_to_non_nullable
                   as bool,
+        neverSleep: null == neverSleep
+            ? _value.neverSleep
+            : neverSleep // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -276,6 +289,7 @@ class _$RobotConfigImpl implements _RobotConfig {
     this.speechPitch = 0.95,
     this.language = 'en-US',
     this.isDarkTheme = true,
+    this.neverSleep = false,
   });
 
   factory _$RobotConfigImpl.fromJson(Map<String, dynamic> json) =>
@@ -319,10 +333,13 @@ class _$RobotConfigImpl implements _RobotConfig {
   @override
   @JsonKey()
   final bool isDarkTheme;
+  @override
+  @JsonKey()
+  final bool neverSleep;
 
   @override
   String toString() {
-    return 'RobotConfig(expression: $expression, eyeColor: $eyeColor, mouthColor: $mouthColor, faceType: $faceType, speechEnabled: $speechEnabled, hazeVoice: $hazeVoice, robotVoiceEnabled: $robotVoiceEnabled, soundEnabled: $soundEnabled, speechRate: $speechRate, speechPitch: $speechPitch, language: $language, isDarkTheme: $isDarkTheme)';
+    return 'RobotConfig(expression: $expression, eyeColor: $eyeColor, mouthColor: $mouthColor, faceType: $faceType, speechEnabled: $speechEnabled, hazeVoice: $hazeVoice, robotVoiceEnabled: $robotVoiceEnabled, soundEnabled: $soundEnabled, speechRate: $speechRate, speechPitch: $speechPitch, language: $language, isDarkTheme: $isDarkTheme, neverSleep: $neverSleep)';
   }
 
   @override
@@ -353,7 +370,9 @@ class _$RobotConfigImpl implements _RobotConfig {
             (identical(other.language, language) ||
                 other.language == language) &&
             (identical(other.isDarkTheme, isDarkTheme) ||
-                other.isDarkTheme == isDarkTheme));
+                other.isDarkTheme == isDarkTheme) &&
+            (identical(other.neverSleep, neverSleep) ||
+                other.neverSleep == neverSleep));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -372,6 +391,7 @@ class _$RobotConfigImpl implements _RobotConfig {
     speechPitch,
     language,
     isDarkTheme,
+    neverSleep,
   );
 
   /// Create a copy of RobotConfig
@@ -402,6 +422,7 @@ abstract class _RobotConfig implements RobotConfig {
     final double speechPitch,
     final String language,
     final bool isDarkTheme,
+    final bool neverSleep,
   }) = _$RobotConfigImpl;
 
   factory _RobotConfig.fromJson(Map<String, dynamic> json) =
@@ -433,6 +454,8 @@ abstract class _RobotConfig implements RobotConfig {
   String get language;
   @override
   bool get isDarkTheme;
+  @override
+  bool get neverSleep;
 
   /// Create a copy of RobotConfig
   /// with the given fields replaced by the non-null parameter values.

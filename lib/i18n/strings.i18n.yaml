@@ -54,14 +54,20 @@ game:
 
 lab:
   title: Haze Lab
-  feeling_now: "Right now Haze feels $name"
+  feeling_now: "Current mood: $name"
   boop_reaction: "Boop! Dopamine and adrenaline stirred."
   cuddle_reaction: "Cuddle! Oxytocin and endorphins stirred."
+  tell_haze: Tell Haze what happened...
+  send: Send
   chemistry: Body chemistry
   emotion_mix: Emotion mix
   hint: Tap a chemical to give Haze a tiny dose — then watch the face and the bars react. Feelings fade on their own, each at its own speed.
   reset: Back to baseline
   challenge:
+    title: Chemistry challenge
+    explanation: Haze will name a feeling. Change the chemicals—or interact with Haze—until the body and face reach it.
+    active: Challenge in progress
+    current: "Current goal: $name"
     start: Start a challenge
     stop: Back to free play
     target: "Make Haze feel $name!"
@@ -75,7 +81,7 @@ lab:
     bonding: loved
     anxiety: worried
     sadness: sad
-    euphoria: over the moon
+    euphoria: euphoria
   chemicals:
     dopamine:
       name: Dopamine
@@ -117,3 +123,5 @@ ui:
   theme: Theme
   dark_theme: Dark Theme
   light_theme: Light Theme
+  never_sleep: Never sleep
+  never_sleep_description: Keep Haze awake while the app is open

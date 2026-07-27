@@ -54,14 +54,20 @@ game:
 
 lab:
   title: Laboratório do Haze
-  feeling_now: "Agora o Haze está se sentindo $name"
+  feeling_now: "Humor atual: $name"
   boop_reaction: "Boop! A dopamina e a adrenalina se agitaram."
   cuddle_reaction: "Abraço! A ocitocina e as endorfinas se agitaram."
+  tell_haze: Conte ao Haze o que aconteceu...
+  send: Enviar
   chemistry: Química do corpo
   emotion_mix: Mistura de emoções
   hint: Toque em uma substância para dar uma dosezinha ao Haze — e veja o rosto e as barras reagirem. Os sentimentos passam sozinhos, cada um na sua velocidade.
   reset: Voltar ao normal
   challenge:
+    title: Desafio de química
+    explanation: O Haze vai escolher um sentimento. Mude as substâncias — ou interaja com ele — até o corpo e o rosto chegarem lá.
+    active: Desafio em andamento
+    current: "Objetivo atual: $name"
     start: Começar um desafio
     stop: Voltar ao modo livre
     target: "Faça o Haze se sentir $name!"
@@ -75,7 +81,7 @@ lab:
     bonding: amado
     anxiety: preocupado
     sadness: triste
-    euphoria: nas nuvens
+    euphoria: euforia
   chemicals:
     dopamine:
       name: Dopamina
@@ -117,3 +123,5 @@ ui:
   theme: Tema
   dark_theme: Tema Escuro
   light_theme: Tema Claro
+  never_sleep: Nunca dormir
+  never_sleep_description: Manter o Haze acordado enquanto o app estiver aberto

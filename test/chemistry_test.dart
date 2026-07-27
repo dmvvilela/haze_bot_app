@@ -9,7 +9,10 @@ void main() {
       final state = ChemicalState();
       state.set(Chemical.adrenaline, 0.9);
       final baseline = state.baseline(Chemical.adrenaline); // 0.1
-      state.applyDecay(Chemical.adrenaline, state.halfLife(Chemical.adrenaline));
+      state.applyDecay(
+        Chemical.adrenaline,
+        state.halfLife(Chemical.adrenaline),
+      );
       expect(
         state.get(Chemical.adrenaline),
         closeTo(baseline + (0.9 - baseline) / 2, 1e-9),
@@ -64,10 +67,14 @@ void main() {
 
     test('same-source impulses saturate inside the window', () {
       final engine = NeurochemicalEngine();
-      engine.apply(const ChemicalImpulse(Chemical.dopamine, 0.1, sourceId: 'x'));
+      engine.apply(
+        const ChemicalImpulse(Chemical.dopamine, 0.1, sourceId: 'x'),
+      );
       final afterFirst = engine.state.get(Chemical.dopamine);
       expect(afterFirst, closeTo(0.4, 1e-9));
-      engine.apply(const ChemicalImpulse(Chemical.dopamine, 0.1, sourceId: 'x'));
+      engine.apply(
+        const ChemicalImpulse(Chemical.dopamine, 0.1, sourceId: 'x'),
+      );
       // Second dose is dampened: 0.1 / (1 + 0.3)
       expect(
         engine.state.get(Chemical.dopamine) - afterFirst,
@@ -103,21 +110,23 @@ void main() {
       );
     });
 
-    test('arousal cannot run away: adrenaline stays damped by the GABA floor',
-        () {
-      final engine = NeurochemicalEngine();
-      engine.applyAll(const [
-        ChemicalImpulse(Chemical.adrenaline, 0.9),
-        ChemicalImpulse(Chemical.testosterone, 0.7),
-      ]);
-      engine.advance(3600);
-      // The old constant-push formulation pinned adrenaline at 1.0 here.
-      expect(engine.state.get(Chemical.adrenaline), lessThan(0.5));
-      expect(
-        engine.state.get(Chemical.gaba),
-        greaterThanOrEqualTo(0.4 * 0.5 - 0.01), // never below the floor
-      );
-    });
+    test(
+      'arousal cannot run away: adrenaline stays damped by the GABA floor',
+      () {
+        final engine = NeurochemicalEngine();
+        engine.applyAll(const [
+          ChemicalImpulse(Chemical.adrenaline, 0.9),
+          ChemicalImpulse(Chemical.testosterone, 0.7),
+        ]);
+        engine.advance(3600);
+        // The old constant-push formulation pinned adrenaline at 1.0 here.
+        expect(engine.state.get(Chemical.adrenaline), lessThan(0.5));
+        expect(
+          engine.state.get(Chemical.gaba),
+          greaterThanOrEqualTo(0.4 * 0.5 - 0.01), // never below the floor
+        );
+      },
+    );
 
     test('reseed keeps current levels but changes the resting nature', () {
       final engine = NeurochemicalEngine();
@@ -131,8 +140,9 @@ void main() {
 
   group('EmotionVector', () {
     test('at playful rest Haze is content, not blank', () {
-      final engine =
-          NeurochemicalEngine(seed: SeedChemistry.forPersonality('playful'));
+      final engine = NeurochemicalEngine(
+        seed: SeedChemistry.forPersonality('playful'),
+      );
       final emotions = EmotionVector.compute(engine.state);
       expect(emotions[Emotion.happiness], greaterThan(0.3));
       expect(emotions[Emotion.sadness], lessThan(0.15));
@@ -162,10 +172,12 @@ void main() {
     });
 
     test('personalities feel different at rest', () {
-      final zen =
-          NeurochemicalEngine(seed: SeedChemistry.forPersonality('zen'));
-      final sarcastic =
-          NeurochemicalEngine(seed: SeedChemistry.forPersonality('sarcastic'));
+      final zen = NeurochemicalEngine(
+        seed: SeedChemistry.forPersonality('zen'),
+      );
+      final sarcastic = NeurochemicalEngine(
+        seed: SeedChemistry.forPersonality('sarcastic'),
+      );
       expect(
         EmotionVector.compute(zen.state)[Emotion.calm],
         greaterThan(EmotionVector.compute(sarcastic.state)[Emotion.calm]),
@@ -210,21 +222,34 @@ void main() {
       expect(mood.level(Chemical.testosterone), greaterThan(before));
     });
 
-    test('days of suspension settle to baseline via the analytic fast path',
-        () {
-      var now = DateTime(2026, 7, 23, 12);
-      final mood = HazeMood(clock: () => now);
-      mood.tickled();
-      mood.shaken();
-      now = now.add(const Duration(days: 2));
-      for (final chem in Chemical.values) {
-        expect(
-          mood.level(chem),
-          closeTo(mood.baselines()[chem]!, 0.01),
-          reason: '${chem.name} not settled after two days away',
-        );
-      }
+    test('brain intent correction makes a weak sad response read as sad', () {
+      final mood = HazeMood(clock: () => DateTime(2026, 7, 23, 12));
+      mood.reactedTo(RobotExpression.sad, sourceId: 'chat');
+
+      final correction = mood.reinforceBrainIntent(RobotExpression.sad);
+
+      expect(correction, isNotEmpty);
+      expect(mood.emotions().dominant, Emotion.sadness);
+      expect(mood.dominantExpression(), RobotExpression.sad);
     });
+
+    test(
+      'days of suspension settle to baseline via the analytic fast path',
+      () {
+        var now = DateTime(2026, 7, 23, 12);
+        final mood = HazeMood(clock: () => now);
+        mood.tickled();
+        mood.shaken();
+        now = now.add(const Duration(days: 2));
+        for (final chem in Chemical.values) {
+          expect(
+            mood.level(chem),
+            closeTo(mood.baselines()[chem]!, 0.01),
+            reason: '${chem.name} not settled after two days away',
+          );
+        }
+      },
+    );
 
     test('restoring a week-old snapshot lands at baseline', () {
       var now = DateTime(2026, 7, 23, 12);

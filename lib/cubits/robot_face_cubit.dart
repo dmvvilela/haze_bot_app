@@ -66,6 +66,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   final List<DateTime> _recentTaps = [];
   DateTime? _lastShake;
   bool _idleSleeping = false;
+  bool _labActive = false;
   int _performanceId = 0;
   String? _activeVoiceLocale;
   String? _activeVoiceId;
@@ -161,6 +162,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
                 ? AppLocale.pt
                 : AppLocale.en,
           );
+          if (restoredConfig.neverSleep) _idleTimer?.cancel();
         }
         if (restoredPersonality != null) {
           await _brain.setPersonality(restoredPersonality);
@@ -435,6 +437,20 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     emit(state.copyWith(config: newConfig));
   }
 
+  void setNeverSleep(bool neverSleep) {
+    if (state.config.neverSleep == neverSleep) return;
+    final wasSleeping = _idleSleeping;
+    emit(state.copyWith(config: state.config.copyWith(neverSleep: neverSleep)));
+
+    if (neverSleep) {
+      _idleTimer?.cancel();
+      _idleSleeping = false;
+      if (wasSleeping) unawaited(_performWakeUp());
+    } else {
+      _recordActivity();
+    }
+  }
+
   void toggleControls() {
     emit(state.copyWith(showControls: !state.showControls));
     updateScreenAwakeBasedOnControls();
@@ -534,11 +550,29 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   /// Starts the quiet, undocumented behaviors that make Haze feel alive.
   void startSecretInteractions() => _recordActivity();
 
+  /// Lab is an active experiment even while the user is reading the bars.
+  /// Entering wakes Haze and suspends idle sleep until the route is closed.
+  void enterLab() {
+    _labActive = true;
+    _idleTimer?.cancel();
+    final wasSleeping = _idleSleeping;
+    _idleSleeping = false;
+    if (wasSleeping) unawaited(_performWakeUp());
+  }
+
+  void leaveLab() {
+    _labActive = false;
+    _recordActivity();
+  }
+
   void _recordActivity() {
     _idleSleeping = false;
     _idleTimer?.cancel();
+    if (state.config.neverSleep || _labActive) return;
     _idleTimer = Timer(const Duration(seconds: 45), () {
       if (isClosed ||
+          state.config.neverSleep ||
+          _labActive ||
           state.isSpeaking ||
           state.isTimerRunning ||
           state.mimicStatus != MimicStatus.idle) {
@@ -1204,11 +1238,13 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   Future<void> talkToHaze(String text) {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return Future.value();
+    _recordActivity();
     return _respond(trimmed, speakEvenIfSpeechDisabled: true);
   }
 
   /// "Say something" button: Haze comments on the face it currently shows.
   Future<void> getAIResponse() {
+    _recordActivity();
     final emotion = state.config.expression;
     return _respond(
       '(The user tapped you while your face shows "${emotion.name}". '
@@ -1225,7 +1261,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     bool speakEvenIfSpeechDisabled = false,
   }) async {
     _secretMessageTimer?.cancel();
-    emit(state.copyWith(isLoadingAI: true));
+    emit(state.copyWith(isLoadingAI: true, chemistryReaction: ''));
     // Only ever download / load the model once the user has opted in. Without
     // consent the brain stays unloaded and respond() returns a canned line.
     if (state.aiConsent == AiConsent.granted &&
@@ -1238,16 +1274,37 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         userText: userText,
         languageCode: state.config.language,
         fallbackEmotion: bias,
+        currentChemistry: mood.levels(),
       );
 
-      // The brain committed to a feeling — the chemistry follows it.
-      mood.holdExpression();
-      mood.reactedTo(reply.emotion, sourceId: 'chat');
-      final newConfig = state.config.copyWith(expression: reply.emotion);
+      mood.releaseExpression();
+      final appliedImpulses = [...reply.impulses];
+      if (reply.impulses.isNotEmpty) {
+        mood.applyImpulses(reply.impulses);
+      } else {
+        // Offline/legacy model output still enters through chemistry.
+        mood.reactedTo(reply.emotion, sourceId: 'chat');
+      }
+
+      // Gemma 1B sometimes names the right feeling but under-doses it. Keep
+      // the readout, face, and spoken intent coherent by correcting the
+      // chemistry—not by painting a contradictory preset face over it.
+      appliedImpulses.addAll(mood.reinforceBrainIntent(reply.emotion));
+      final expression = mood.dominantExpression();
+      final chemistryReaction = appliedImpulses
+          .map(
+            (impulse) =>
+                '${impulse.chemical.name} '
+                '${impulse.delta >= 0 ? '+' : ''}'
+                '${impulse.delta.toStringAsFixed(2)}',
+          )
+          .join(' · ');
+      final newConfig = state.config.copyWith(expression: expression);
       emit(
         state.copyWith(
           config: newConfig,
           aiMessage: reply.say,
+          chemistryReaction: chemistryReaction,
           isLoadingAI: false,
         ),
       );
@@ -1255,7 +1312,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       if (state.config.speechEnabled || speakEvenIfSpeechDisabled) {
         await _speak(
           reply.say,
-          emotion: reply.emotion,
+          emotion: expression,
           ignoreSpeechEnabled: speakEvenIfSpeechDisabled,
         );
       }
