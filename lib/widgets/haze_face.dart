@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import '../chemistry/chemistry.dart';
+import '../aurea/aurea_model.dart';
 import '../cubits/robot_face_cubit.dart';
 import '../models/robot_config.dart';
 import '../services/haze_mood.dart';
@@ -36,7 +37,18 @@ class HazeFace extends StatefulWidget {
   /// expression-driven behavior exactly as it was.
   final HazeMood? mood;
 
-  const HazeFace({super.key, required this.state, this.voiceLevel, this.mood});
+  /// A continuous performance from the Aurea experiment, independent of mood.
+  final AureaExpression? affect;
+  final bool framed;
+
+  const HazeFace({
+    super.key,
+    required this.state,
+    this.voiceLevel,
+    this.mood,
+    this.affect,
+    this.framed = true,
+  });
 
   @override
   State<HazeFace> createState() => _HazeFaceState();
@@ -94,7 +106,9 @@ class _HazeFaceState extends State<HazeFace>
     dt = math.min(dt, 0.05);
 
     final target =
-        _moodTarget() ?? _FacePose.of(widget.state.config.expression);
+        _affectTarget() ??
+        _moodTarget() ??
+        _FacePose.of(widget.state.config.expression);
     _pose = _FacePose.lerp(_pose, target, 1 - math.exp(-dt * 7.5));
 
     if (_blinkT < 1) _blinkT = math.min(1, _blinkT + dt / 0.30);
@@ -135,6 +149,32 @@ class _HazeFaceState extends State<HazeFace>
     if (_blinkT >= 1) return 0;
     if (_blinkT < 0.38) return Curves.easeInQuad.transform(_blinkT / 0.38);
     return 1 - Curves.easeOutCubic.transform((_blinkT - 0.38) / 0.62);
+  }
+
+  _FacePose? _affectTarget() {
+    final a = widget.affect;
+    if (a == null) return null;
+    final eye = _EyePose(
+      open: .85 + a.openness * .24 + a.surprise * .2 - a.sorrow * .18,
+      width: 1 - a.tension * .12,
+      smile: a.warmth * .5,
+      slant: -a.sorrow * .35 + a.tension * .2,
+      round: .55 + a.openness * .3,
+    );
+    return _FacePose(
+      left: eye,
+      right: eye,
+      mouthCurve: a.warmth * .8 - a.sorrow * .65 - a.tension * .2,
+      mouthWide: .75 + a.warmth * .2,
+      mouthOpen: a.openness * .15,
+      mouthO: a.surprise * .4,
+      blush: a.warmth * .65,
+      tilt: a.sorrow * -.08 * (1 - a.steadiness),
+      energy: .25 + a.activation * .6,
+      wander: a.tension * (1 - a.steadiness) * .9,
+      shiver: a.tension * (1 - a.steadiness * .85) * .7,
+      gazeBias: Offset(a.approach * .12, a.sorrow * .15 - a.approach * .18),
+    );
   }
 
   /// The pose Haze's chemistry is asking for, or null while an explicit
@@ -230,6 +270,7 @@ class _HazeFaceState extends State<HazeFace>
       child: CustomPaint(
         painter: _HazeFacePainter(
           pose: _pose,
+          framed: widget.framed,
           t: _t,
           blinkMul: 1 - close * 0.97,
           blinkStretch: 1 + close * 0.07,
@@ -538,6 +579,7 @@ class _FacePose {
 /// Paints in a fixed 400x480 design space, uniformly scaled and centered
 /// inside whatever box the widget gets.
 class _HazeFacePainter extends CustomPainter {
+  final bool framed;
   final _FacePose pose;
   final double t;
   final double blinkMul;
@@ -556,6 +598,7 @@ class _HazeFacePainter extends CustomPainter {
     required this.t,
     required this.blinkMul,
     required this.blinkStretch,
+    this.framed = true,
     required this.pop,
     required this.gaze,
     required this.eyeColor,
@@ -568,11 +611,14 @@ class _HazeFacePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final s = math.min(size.width / 400, size.height / 480);
-    canvas.translate((size.width - 400 * s) / 2, (size.height - 480 * s) / 2);
+    final viewWidth = framed ? 400.0 : 320.0;
+    final viewHeight = framed ? 480.0 : 230.0;
+    final s = math.min(size.width / viewWidth, size.height / viewHeight);
+    canvas.translate(size.width / 2, size.height / 2);
     canvas.scale(s);
+    canvas.translate(-200, framed ? -240 : -250);
 
-    _drawPanel(canvas);
+    if (framed) _drawPanel(canvas);
 
     final bob = math.sin(t * (1.0 + pose.energy)) * (1.5 + pose.energy * 2.5);
     final breath = 1 + 0.008 * math.sin(t * 0.9) + pop * 0.05;

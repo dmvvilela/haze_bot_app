@@ -53,6 +53,22 @@ game:
   play: Jogo dos sentimentos
 
 lab:
+  references:
+    title: Comece com uma referência
+    names: [Contente, Animado, Carinhoso, Tenso, Triste]
+    descriptions: ["Confortável e positivo, com pouca agitação.", "Cheio de energia e expectativa.", "Acolhedor e conectado.", "Agitado, com raiva e ansiedade juntas.", "Desanimado e retraído."]
+    model: Exemplos das emoções simuladas do Haze, não receitas da química cerebral humana.
+    try_change: "Experimente aumentar $chemical. O que muda?"
+    paused: Tempo pausado — suas mudanças ficam estáveis.
+    running: O tempo está passando — a mistura evolui.
+    resume: Retomar tempo
+    pause: Pausar tempo
+    restore: Restaurar estado inicial
+    free: Experimentar livremente
+    no_change: Nenhuma mudança mensurável — este controle pode ter atingido o limite.
+    comparison: "Estado inicial → Agora"
+    changed: "Último ajuste de $chemical (pontos de intensidade):"
+    unchanged: Faça uma mudança para comparar o efeito.
   title: Laboratório do Haze
   feeling_now: "Humor atual: $name"
   boop_reaction: "Boop! A dopamina e a adrenalina se agitaram."
@@ -125,3 +141,46 @@ ui:
   light_theme: Tema Claro
   never_sleep: Nunca dormir
   never_sleep_description: Manter o Haze acordado enquanto o app estiver aberto
+
+aurea:
+  title: Aurea · Haze Lab
+  subtitle: O sentido por trás de um sentimento
+  prototype: PROTÓTIPO INTERATIVO
+  introduction: Um momento. Diferentes formas de vivê-lo.
+  choose: Escolha um momento
+  interpretation: Como Haze interpreta isso?
+  history: Experiências anteriores
+  firstTime: Primeira vez
+  practiced: Com prática
+  historyHint: Um passado imaginado para esta cena. A memória do seu companheiro fica separada.
+  play: Ver a reação
+  replay: Rever este momento
+  pause: Pausar
+  resume: Continuar
+  reset: Reiniciar experimento
+  phases:
+    - Perceber
+    - Entender o momento
+    - Escolher uma resposta
+  why: Por que essa reação?
+  whyHint: Explore os ingredientes da Aurea.
+  forming: Ganhando forma
+  emerging: Se formando
+  incomplete: Algo está faltando
+  ready: Dê o play para ver o sentimento se desenvolver.
+  sameEvent: O acontecimento é o mesmo. O sentido e a experiência mudam a reação.
+  practiceEffect: A prática traz mais firmeza à resposta; o sentimento inicial permanece.
+  firstEffect: Isso é novo para Haze. A resposta é hesitante e ainda pode ganhar forma.
+  modelNote: Inspirado no modelo da Aurea. Tempos, níveis e comportamentos são escolhas experimentais, não medidas sobre uma pessoa.
+  signalNote: As barras mostram a força simulada dos ingredientes, não probabilidades científicas.
+  source: "Fonte: aureasystem.com · versão de 21 set 2026"
+  chemistry: Laboratório de química original
+  loadingError: Não foi possível carregar o experimento.
+  retry: Tentar novamente
+  timeline: Linha do tempo da resposta
+  layers:
+    - Química
+    - Emoção básica
+    - Interpretação
+    - Valor
+    - Composto

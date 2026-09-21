@@ -55,7 +55,9 @@ class _RobotFaceWidgetState extends State<RobotFaceWidget> {
           final magnitude = math.sqrt(
             event.x * event.x + event.y * event.y + event.z * event.z,
           );
-          if (magnitude > 20 && mounted) {
+          if (magnitude > 20 &&
+              mounted &&
+              !context.read<RobotFaceCubit>().mood.labControlled) {
             context.read<RobotFaceCubit>().onShake();
           }
         });

@@ -1,0 +1,379 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "url": "https://aureasystem.com",
+    "snapshotDate": "2026-09-21",
+    "sha256": "209707f016ac9bbe8ce714d4e125eccd397a252e889c9f3ebd3c197c4fa67919",
+    "scope": "Three compound ingredient lists copied from Aurea. Scenarios, levels, dynamics, dialogue and expression mappings are Haze prototype choices, not Aurea research findings."
+  },
+  "ingredients": {
+    "sad": {
+      "layer": "emotion",
+      "label": {
+        "en": "Sadness",
+        "pt": "Tristeza"
+      }
+    },
+    "oxy": {
+      "layer": "chemistry",
+      "label": {
+        "en": "Bonding · oxytocin",
+        "pt": "Vínculo · ocitocina"
+      }
+    },
+    "ap1": {
+      "layer": "appraisal",
+      "label": {
+        "en": "This suffering is real and unearned",
+        "pt": "Este sofrimento é real e não merecido"
+      }
+    },
+    "v1": {
+      "layer": "value",
+      "label": {
+        "en": "Turn toward suffering",
+        "pt": "Acolher o sofrimento"
+      }
+    },
+    "fear": {
+      "layer": "emotion",
+      "label": {
+        "en": "Fear",
+        "pt": "Medo"
+      }
+    },
+    "cor": {
+      "layer": "chemistry",
+      "label": {
+        "en": "Threat · cortisol",
+        "pt": "Ameaça · cortisol"
+      }
+    },
+    "v6": {
+      "layer": "value",
+      "label": {
+        "en": "Act before the evidence arrives",
+        "pt": "Agir antes de ter garantias"
+      }
+    },
+    "joy": {
+      "layer": "emotion",
+      "label": {
+        "en": "Joy",
+        "pt": "Alegria"
+      }
+    },
+    "ap2": {
+      "layer": "appraisal",
+      "label": {
+        "en": "This is a gift I did not earn",
+        "pt": "Isto é um presente que não precisei conquistar"
+      }
+    },
+    "v2": {
+      "layer": "value",
+      "label": {
+        "en": "Receive openly",
+        "pt": "Receber de coração aberto"
+      }
+    }
+  },
+  "compounds": [
+    {
+      "id": "compassion",
+      "ingredients": [
+        "sad",
+        "oxy",
+        "ap1",
+        "v1"
+      ],
+      "name": {
+        "en": "Compassion",
+        "pt": "Compaixão"
+      }
+    },
+    {
+      "id": "gratitude",
+      "ingredients": [
+        "joy",
+        "ap2",
+        "v2"
+      ],
+      "name": {
+        "en": "Gratitude",
+        "pt": "Gratidão"
+      }
+    },
+    {
+      "id": "courage",
+      "ingredients": [
+        "fear",
+        "cor",
+        "v1",
+        "v6"
+      ],
+      "name": {
+        "en": "Courage",
+        "pt": "Coragem"
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "compassion",
+      "title": {
+        "en": "Sit beside a friend",
+        "pt": "Ficar ao lado de um amigo"
+      },
+      "event": {
+        "en": "A friend’s paper boat falls apart in the rain. They sit quietly beside the pieces.",
+        "pt": "O barquinho de papel de um amigo se desfaz na chuva. Ele fica quietinho ao lado dos pedaços."
+      },
+      "interpretations": [
+        {
+          "en": "Their sadness matters",
+          "pt": "A tristeza dele importa"
+        },
+        {
+          "en": "It was only paper",
+          "pt": "Era só um papel"
+        }
+      ],
+      "practice": {
+        "en": "Has practiced staying and listening",
+        "pt": "Já praticou ficar e escutar"
+      },
+      "notice": {
+        "en": "Oh… that mattered to you.",
+        "pt": "Ah… isso era importante para você."
+      },
+      "consider": [
+        {
+          "en": "I can care without fixing everything.",
+          "pt": "Posso me importar sem resolver tudo."
+        },
+        {
+          "en": "I am treating the boat as replaceable.",
+          "pt": "Estou tratando o barquinho como algo fácil de substituir."
+        }
+      ],
+      "action": [
+        {
+          "en": "I’ll sit with you. We can take our time.",
+          "pt": "Vou ficar aqui com você. Sem pressa."
+        },
+        {
+          "en": "Let’s make another one! …Did I move too fast?",
+          "pt": "Vamos fazer outro! …Será que fui rápido demais?"
+        }
+      ],
+      "base": {
+        "sad": 0.78,
+        "oxy": 0.72
+      },
+      "appraisals": [
+        {
+          "ap1": 0.92
+        },
+        {
+          "ap1": 0.12
+        }
+      ],
+      "values": {
+        "v1": 0.9
+      },
+      "channels": {
+        "sorrow": {
+          "sad": 1
+        },
+        "warmth": {
+          "oxy": 0.35,
+          "v1": 0.65
+        },
+        "steadiness": {
+          "v1": 1
+        },
+        "approach": {
+          "v1": 0.8
+        },
+        "activation": {
+          "sad": 0.2
+        }
+      },
+      "blocked": {
+        "en": "Sadness is present, but Haze is dismissing what the loss means.",
+        "pt": "A tristeza está presente, mas Haze está desconsiderando o significado da perda."
+      }
+    },
+    {
+      "id": "courage",
+      "title": {
+        "en": "Take a difficult step",
+        "pt": "Dar um passo difícil"
+      },
+      "event": {
+        "en": "A friend is alone across a noisy room. Haze wants to go over, but the noise makes him hesitate.",
+        "pt": "Um amigo está sozinho do outro lado de uma sala barulhenta. Haze quer ir até ele, mas o barulho o faz hesitar."
+      },
+      "interpretations": [
+        {
+          "en": "Being there matters to me",
+          "pt": "Estar presente importa para mim"
+        },
+        {
+          "en": "I must prove I’m fearless",
+          "pt": "Preciso provar que não tenho medo"
+        }
+      ],
+      "practice": {
+        "en": "Has kept small promises under pressure",
+        "pt": "Já cumpriu pequenas promessas sob pressão"
+      },
+      "notice": {
+        "en": "That room feels like a lot.",
+        "pt": "Essa sala parece demais para mim."
+      },
+      "consider": [
+        {
+          "en": "I’m afraid, and I still want to be there.",
+          "pt": "Estou com medo e ainda quero estar lá."
+        },
+        {
+          "en": "I am trying to hide the fear.",
+          "pt": "Estou tentando esconder o medo."
+        }
+      ],
+      "action": [
+        {
+          "en": "One breath. One step. I’m coming over.",
+          "pt": "Uma respiração. Um passo. Estou indo."
+        },
+        {
+          "en": "I need a moment. Proving myself isn’t helping.",
+          "pt": "Preciso de um momento. Tentar provar meu valor não está ajudando."
+        }
+      ],
+      "base": {
+        "fear": 0.8,
+        "cor": 0.72
+      },
+      "appraisals": [
+        {},
+        {}
+      ],
+      "values": {
+        "v1": 0.85,
+        "v6": 0.95
+      },
+      "channels": {
+        "tension": {
+          "fear": 0.6,
+          "cor": 0.4
+        },
+        "activation": {
+          "fear": 0.6
+        },
+        "steadiness": {
+          "v6": 1
+        },
+        "approach": {
+          "v1": 0.4,
+          "v6": 0.6
+        },
+        "warmth": {
+          "v1": 0.25
+        }
+      },
+      "blocked": {
+        "en": "Fear is present, but the chosen commitment is missing. Bravado is not required.",
+        "pt": "O medo está presente, mas falta um compromisso escolhido. Não é preciso bancar o valente."
+      }
+    },
+    {
+      "id": "gratitude",
+      "title": {
+        "en": "Receive an unexpected gift",
+        "pt": "Receber um presente inesperado"
+      },
+      "event": {
+        "en": "Someone notices Haze’s dim little lamp and brings a new bulb. They ask for nothing in return.",
+        "pt": "Alguém percebe a luzinha fraca de Haze e traz uma lâmpada nova. Sem pedir nada em troca."
+      },
+      "interpretations": [
+        {
+          "en": "They wanted to help",
+          "pt": "A pessoa quis ajudar"
+        },
+        {
+          "en": "Now I owe them",
+          "pt": "Agora estou em dívida"
+        }
+      ],
+      "practice": {
+        "en": "Has practiced accepting kindness",
+        "pt": "Já praticou aceitar gentilezas"
+      },
+      "notice": {
+        "en": "You noticed my little light?",
+        "pt": "Você reparou na minha luzinha?"
+      },
+      "consider": [
+        {
+          "en": "I can let this kindness reach me.",
+          "pt": "Posso deixar essa gentileza chegar até mim."
+        },
+        {
+          "en": "I am turning the gift into an account to settle.",
+          "pt": "Estou transformando o presente numa conta para pagar."
+        }
+      ],
+      "action": [
+        {
+          "en": "Thank you. This makes my corner feel warm.",
+          "pt": "Obrigado. Meu cantinho ficou mais aconchegante."
+        },
+        {
+          "en": "How do I pay you back? …I’m finding it hard to just receive.",
+          "pt": "Como posso retribuir? …Está difícil só receber."
+        }
+      ],
+      "base": {
+        "joy": 0.82
+      },
+      "appraisals": [
+        {
+          "ap2": 0.95
+        },
+        {
+          "ap2": 0.1
+        }
+      ],
+      "values": {
+        "v2": 0.95
+      },
+      "channels": {
+        "warmth": {
+          "joy": 0.25,
+          "v2": 0.75
+        },
+        "openness": {
+          "joy": 0.4,
+          "ap2": 0.6
+        },
+        "activation": {
+          "joy": 0.55
+        },
+        "steadiness": {
+          "v2": 0.75
+        },
+        "approach": {
+          "v2": 0.65
+        }
+      },
+      "blocked": {
+        "en": "Joy is present, but Haze is reading the gift as a debt.",
+        "pt": "A alegria está presente, mas Haze está interpretando o presente como uma dívida."
+      }
+    }
+  ]
+}

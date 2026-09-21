@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../chemistry/chemistry.dart';
+import '../chemistry/lab_reference.dart';
 import '../cubits/mix_game_cubit.dart';
 import '../cubits/robot_face_cubit.dart';
 import '../i18n/strings.g.dart';
@@ -13,13 +14,8 @@ import '../services/haze_brain.dart';
 import 'ai_consent_dialog.dart';
 import 'robot_face_widget.dart';
 
-/// The Haze Lab: a live window into the neurochemistry behind the face.
+/// The Haze Lab: repeatable references and controlled mood experiments.
 ///
-/// The top half is Haze itself (fully interactive — poke it, cuddle it, and
-/// watch the chemistry move). Below are the eight chemical bars and the
-/// emotion mix they project to. Tapping a chemical administers a tiny dose,
-/// which is the whole lesson: feelings aren't picked from a list, they're
-/// mixed.
 class HazeLabScreen extends StatefulWidget {
   const HazeLabScreen({super.key});
 
@@ -32,11 +28,29 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
   Timer? _refresh;
   Timer? _reactionTimer;
   _LabReaction? _reaction;
+  LabReference _reference = LabReference.content;
+  late EmotionVector _before;
+  bool _free = false;
+  bool _changed = false;
+  String? _effect;
+
+  void _loadReference(LabReference reference) {
+    context.read<MixGameCubit>().stopChallenge();
+    _reference = reference;
+    _robot.mood.labControlled = !_free;
+    _robot.mood.setPaused(true);
+    _robot.mood.loadLabLevels(reference.levels);
+    _before = _robot.mood.emotions();
+    _changed = false;
+    _effect = null;
+    _reaction = null;
+  }
 
   @override
   void initState() {
     super.initState();
     _robot = context.read<RobotFaceCubit>()..enterLab();
+    _loadReference(_reference);
     // Chemistry drifts continuously; poll it at a UI-friendly rate.
     _refresh = Timer.periodic(
       const Duration(milliseconds: 150),
@@ -48,6 +62,8 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
   void dispose() {
     _refresh?.cancel();
     _reactionTimer?.cancel();
+    _robot.mood.labControlled = false;
+    _robot.mood.setPaused(false);
     _robot.leaveLab();
     super.dispose();
   }
@@ -67,7 +83,6 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
         final cubit = context.read<RobotFaceCubit>();
         final isDark = faceState.config.isDarkTheme;
         final accent = faceState.config.eyeColor;
-        final levels = cubit.mood.levels();
         final emotions = cubit.mood.emotions();
         final game = context.watch<MixGameCubit>().state;
         return Theme(
@@ -89,26 +104,19 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
                       ),
                     ),
               actions: [
-                IconButton(
-                  icon: Icon(
-                    game.phase == MixPhase.idle
-                        ? Icons.emoji_events_outlined
-                        : Icons.emoji_events,
+                if (_free)
+                  IconButton(
+                    icon: Icon(
+                      game.phase == MixPhase.idle
+                          ? Icons.emoji_events_outlined
+                          : Icons.emoji_events,
+                    ),
+                    color: game.phase == MixPhase.idle ? null : accent,
+                    tooltip: game.phase == MixPhase.idle
+                        ? t.lab.challenge.start
+                        : t.lab.challenge.active,
+                    onPressed: () => _showChallengeSheet(context),
                   ),
-                  color: game.phase == MixPhase.idle ? null : accent,
-                  tooltip: game.phase == MixPhase.idle
-                      ? t.lab.challenge.start
-                      : t.lab.challenge.active,
-                  onPressed: () => _showChallengeSheet(context),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.restart_alt),
-                  tooltip: t.lab.reset,
-                  onPressed: () {
-                    cubit.mood.resetToBaseline();
-                    cubit.sounds.play(HazeSound.curious);
-                  },
-                ),
               ],
             ),
             body: SafeArea(
@@ -116,16 +124,21 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
                 children: [
                   Expanded(
                     flex: 2,
-                    child: RobotFaceWidget(
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        cubit.labBoop();
-                        _showReaction(_LabReaction.boop);
-                      },
-                      onLongPress: () {
-                        cubit.cuddle();
-                        _showReaction(_LabReaction.cuddle);
-                      },
+                    child: IgnorePointer(
+                      ignoring: !_free,
+                      child: RobotFaceWidget(
+                        onTap: () {
+                          if (!_free) return;
+                          HapticFeedback.lightImpact();
+                          cubit.labBoop();
+                          _showReaction(_LabReaction.boop);
+                        },
+                        onLongPress: () {
+                          if (!_free) return;
+                          cubit.cuddle();
+                          _showReaction(_LabReaction.cuddle);
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -142,45 +155,142 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
                     child: ListView(
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
                       children: [
-                        for (final chem in Chemical.values)
-                          _ChemicalBar(
-                            chemical: chem,
-                            level: levels[chem]!,
-                            baseline: cubit.mood.baselines()[chem]!,
-                            onDose: (delta) {
-                              HapticFeedback.lightImpact();
-                              cubit.mood.dose(chem, delta);
-                              cubit.sounds.play(HazeSound.poke);
-                              // Dosing counts as playing with Haze — keep the
-                              // idle-sleep timer from firing mid-experiment.
-                              cubit.startSecretInteractions();
-                            },
+                        _referenceControls(emotions),
+                        if (_free)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Text(
+                              t.lab.hint,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.55),
+                                  ),
+                            ),
                           ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Text(
-                            t.lab.hint,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.55),
-                                ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(20, 6, 20, 12),
-                    child: _LabEventComposer(),
-                  ),
+                  if (_free)
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(20, 6, 20, 12),
+                      child: _LabEventComposer(),
+                    ),
                 ],
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _referenceControls(EmotionVector emotions) {
+    final labels = t.lab.references;
+    final differences = [
+      for (final emotion in Emotion.values)
+        (emotion, emotions[emotion] - _before[emotion]),
+    ]..sort((a, b) => b.$2.abs().compareTo(a.$2.abs()));
+    final visible = differences
+        .where((entry) => entry.$2.abs() >= 0.005)
+        .take(3);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(labels.title, style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 6,
+          children: [
+            for (final reference in LabReference.values)
+              ChoiceChip(
+                label: Text(labels.names[reference.index]),
+                selected: reference == _reference,
+                onSelected: (_) => setState(() => _loadReference(reference)),
+              ),
+          ],
+        ),
+        Text(labels.descriptions[_reference.index]),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: [
+            FilterChip(
+              label: Text(labels.free),
+              selected: _free,
+              onSelected: (value) => setState(() {
+                _free = value;
+                _loadReference(_reference);
+              }),
+            ),
+            TextButton.icon(
+              icon: Icon(_robot.mood.paused ? Icons.play_arrow : Icons.pause),
+              label: Text(_robot.mood.paused ? labels.resume : labels.pause),
+              onPressed: () =>
+                  setState(() => _robot.mood.setPaused(!_robot.mood.paused)),
+            ),
+            TextButton(
+              onPressed: () => setState(() => _loadReference(_reference)),
+              child: Text(labels.restore),
+            ),
+          ],
+        ),
+        Text(_robot.mood.paused ? labels.paused : labels.running),
+        if (!_free)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              labels.try_change(chemical: _chemicalName(_reference.experiment)),
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        for (final chem in _free ? Chemical.values : [_reference.experiment])
+          _ChemicalBar(
+            chemical: chem,
+            level: _robot.mood.level(chem),
+            baseline: _robot.mood.baselines()[chem]!,
+            onDose: (delta) {
+              HapticFeedback.lightImpact();
+              final wasPaused = _robot.mood.paused;
+              _robot.mood.setPaused(true);
+              final previous = _robot.mood.emotions();
+              _robot.mood.adjustLabChemical(chem, delta);
+              final current = _robot.mood.emotions();
+              if (_free && !wasPaused) _robot.mood.setPaused(false);
+              final effects = [
+                for (final emotion in Emotion.values)
+                  (emotion, current[emotion] - previous[emotion]),
+              ]..sort((a, b) => b.$2.abs().compareTo(a.$2.abs()));
+              _effect =
+                  '${labels.changed(chemical: _chemicalName(chem))} '
+                  '${effects.where((e) => e.$2.abs() >= 0.005).take(3).map((e) => '${_emotionLabel(e.$1)} ${e.$2 > 0 ? '+' : ''}${(e.$2 * 100).round()}').join(', ')}';
+              if (effects.every((e) => e.$2.abs() < 0.005)) {
+                _effect = labels.no_change;
+              }
+              setState(() => _changed = true);
+              _robot.sounds.play(HazeSound.poke);
+              // Dosing counts as playing with Haze — keep the
+              // idle-sleep timer from firing mid-experiment.
+              _robot.startSecretInteractions();
+            },
+          ),
+        if (_effect != null) Text(_effect!),
+        Text(labels.comparison, style: Theme.of(context).textTheme.labelLarge),
+        for (final emotion in {
+          ..._before.ranked().take(2).map((entry) => entry.key),
+          ...visible.map((entry) => entry.$1),
+        })
+          Text(
+            '${_emotionLabel(emotion)}: ${(_before[emotion] * 100).round()} → ${(emotions[emotion] * 100).round()}%',
+          ),
+        if (!_changed && _robot.mood.paused) Text(labels.unchanged),
+        const SizedBox(height: 8),
+        Text(labels.model, style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: 10),
+      ],
     );
   }
 

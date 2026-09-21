@@ -11,11 +11,38 @@ import '../models/robot_config.dart';
 /// lazily — every read fast-forwards the simulation by however much real time
 /// has passed, so there is no background timer.
 class HazeMood {
-  final NeurochemicalEngine _engine = NeurochemicalEngine();
+  NeurochemicalEngine _engine = NeurochemicalEngine();
   final DateTime Function() _now;
   DateTime _lastSync;
 
   DateTime? _holdUntil;
+  bool _paused = false;
+  bool labControlled = false;
+  bool get paused => _paused;
+
+  void setPaused(bool value) {
+    _sync();
+    _paused = value;
+  }
+
+  /// A repeatable experiment clears pending impulses and dose saturation.
+  void loadLabLevels(Map<Chemical, double> levels) {
+    _engine = NeurochemicalEngine(seed: _engine.seed);
+    for (final chemical in Chemical.values) {
+      _engine.state.set(chemical, levels[chemical]!);
+    }
+    _lastSync = _now();
+    releaseExpression();
+    onChanged?.call();
+  }
+
+  /// Exact single-variable adjustment, without event saturation.
+  void adjustLabChemical(Chemical chemical, double delta) {
+    _sync();
+    _engine.state.set(chemical, _engine.state.get(chemical) + delta);
+    releaseExpression();
+    onChanged?.call();
+  }
 
   /// While true (feelings game rounds), the acted expression owns the face
   /// and the mood never shows through — a kid mid-round needs a stable face.
@@ -39,7 +66,7 @@ class HazeMood {
     final now = _now();
     final elapsed = now.difference(_lastSync).inMilliseconds / 1000.0;
     _lastSync = now;
-    _advanceWall(elapsed);
+    if (!_paused) _advanceWall(elapsed);
   }
 
   void _advanceWall(double elapsed) {
@@ -87,6 +114,7 @@ class HazeMood {
   /// An explicit face (game round, easter egg, brain reply) holds the screen
   /// for a while before the mood shows through again.
   void holdExpression([Duration duration = const Duration(seconds: 7)]) {
+    if (labControlled) return;
     _holdUntil = _now().add(duration);
   }
 
@@ -114,6 +142,7 @@ class HazeMood {
   // same trick wear off (engine-level saturation).
 
   void _apply(List<ChemicalImpulse> impulses) {
+    if (labControlled) return;
     _sync();
     _engine.applyAll(impulses);
     onChanged?.call();

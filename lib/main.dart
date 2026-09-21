@@ -11,6 +11,7 @@ import 'cubits/mix_game_cubit.dart';
 import 'cubits/robot_face_cubit.dart';
 import 'widgets/feelings_game_screen.dart';
 import 'widgets/haze_lab_screen.dart';
+import 'widgets/aurea_lab_screen.dart';
 import 'widgets/robot_face_widget.dart';
 import 'widgets/color_picker_dialog.dart';
 import 'widgets/face_type_picker_dialog.dart';
@@ -368,11 +369,18 @@ class RobotFaceScreen extends StatelessWidget {
     final cubit = context.read<RobotFaceCubit>();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: cubit,
-          child: BlocProvider(
-            create: (_) => MixGameCubit(cubit),
-            child: const HazeLabScreen(),
+        builder: (_) => AureaLabScreen(
+          faceState: cubit.state,
+          onOpenChemistry: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => MultiBlocProvider(
+                providers: [
+                  BlocProvider.value(value: cubit),
+                  BlocProvider(create: (_) => MixGameCubit(cubit)),
+                ],
+                child: const HazeLabScreen(),
+              ),
+            ),
           ),
         ),
       ),

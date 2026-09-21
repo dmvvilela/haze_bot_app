@@ -53,6 +53,22 @@ game:
   play: Feelings game
 
 lab:
+  references:
+    title: Start with a reference
+    names: [Content, Excited, Affectionate, Tense, Sad]
+    descriptions: ["Comfortable and positive, with little excitement.", "Full of energy and anticipation.", "Warm and connected.", "Agitated, with anger and anxiety together.", "Low and withdrawn."]
+    model: Examples of Haze’s simulated emotions, not recipes for human brain chemistry.
+    try_change: "Try increasing $chemical. What changes?"
+    paused: Time paused — your changes stay still.
+    running: Time is running — the mixture evolves.
+    resume: Resume time
+    pause: Pause time
+    restore: Restore starting state
+    free: Experiment freely
+    no_change: No measurable change — this control may have reached its limit.
+    comparison: "Starting state → Now"
+    changed: "Last $chemical adjustment (intensity points):"
+    unchanged: Make one change to compare its effect.
   title: Haze Lab
   feeling_now: "Current mood: $name"
   boop_reaction: "Boop! Dopamine and adrenaline stirred."
@@ -125,3 +141,46 @@ ui:
   light_theme: Light Theme
   never_sleep: Never sleep
   never_sleep_description: Keep Haze awake while the app is open
+
+aurea:
+  title: Aurea · Haze Lab
+  subtitle: The meaning behind a feeling
+  prototype: INTERACTIVE PROTOTYPE
+  introduction: One moment. Different ways to meet it.
+  choose: Choose a moment
+  interpretation: How does Haze read this?
+  history: Earlier experiences
+  firstTime: First time here
+  practiced: With practice
+  historyHint: An imagined history for this replay. Your companion's memory stays separate.
+  play: Watch the response
+  replay: Replay this moment
+  pause: Pause
+  resume: Continue
+  reset: Reset experiment
+  phases:
+    - Notice
+    - Make sense of it
+    - Choose a response
+  why: Why this response?
+  whyHint: Explore the ingredients from Aurea.
+  forming: Taking shape
+  emerging: Coming together
+  incomplete: Something is missing
+  ready: Press play to watch the feeling develop.
+  sameEvent: The event stays the same. Meaning and experience change the response.
+  practiceEffect: Practice gives the response more steadiness; the initial feeling remains.
+  firstEffect: This is unfamiliar. The response is tentative, and can still take shape.
+  modelNote: Inspired by Aurea's framework. Timing, signal levels and behavior are experimental design choices, not measurements of a person.
+  signalNote: Bars show simulated ingredient strength, not scientific probabilities.
+  source: "Source: aureasystem.com · snapshot 21 Sep 2026"
+  chemistry: Original chemistry lab
+  loadingError: The experiment could not load.
+  retry: Try again
+  timeline: Response timeline
+  layers:
+    - Chemistry
+    - Basic emotion
+    - Appraisal
+    - Value
+    - Compound

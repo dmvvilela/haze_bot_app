@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 2
-/// Strings: 196 (98 per locale)
+/// Strings: 320 (160 per locale)
 ///
-/// Built on 2026-07-26 at 21:40 UTC
+/// Built on 2026-09-21 at 18:12 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -155,6 +155,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final _StringsGameEn game = _StringsGameEn._(_root);
 	late final _StringsLabEn lab = _StringsLabEn._(_root);
 	late final _StringsUiEn ui = _StringsUiEn._(_root);
+	late final _StringsAureaEn aurea = _StringsAureaEn._(_root);
 }
 
 // Path: app
@@ -246,6 +247,7 @@ class _StringsLabEn {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+	late final _StringsLabReferencesEn references = _StringsLabReferencesEn._(_root);
 	String get title => 'Haze Lab';
 	String feeling_now({required Object name}) => 'Current mood: ${name}';
 	String get boop_reaction => 'Boop! Dopamine and adrenaline stirred.';
@@ -284,6 +286,58 @@ class _StringsUiEn {
 	String get light_theme => 'Light Theme';
 	String get never_sleep => 'Never sleep';
 	String get never_sleep_description => 'Keep Haze awake while the app is open';
+}
+
+// Path: aurea
+class _StringsAureaEn {
+	_StringsAureaEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get title => 'Aurea · Haze Lab';
+	String get subtitle => 'The meaning behind a feeling';
+	String get prototype => 'INTERACTIVE PROTOTYPE';
+	String get introduction => 'One moment. Different ways to meet it.';
+	String get choose => 'Choose a moment';
+	String get interpretation => 'How does Haze read this?';
+	String get history => 'Earlier experiences';
+	String get firstTime => 'First time here';
+	String get practiced => 'With practice';
+	String get historyHint => 'An imagined history for this replay. Your companion\'s memory stays separate.';
+	String get play => 'Watch the response';
+	String get replay => 'Replay this moment';
+	String get pause => 'Pause';
+	String get resume => 'Continue';
+	String get reset => 'Reset experiment';
+	List<String> get phases => [
+		'Notice',
+		'Make sense of it',
+		'Choose a response',
+	];
+	String get why => 'Why this response?';
+	String get whyHint => 'Explore the ingredients from Aurea.';
+	String get forming => 'Taking shape';
+	String get emerging => 'Coming together';
+	String get incomplete => 'Something is missing';
+	String get ready => 'Press play to watch the feeling develop.';
+	String get sameEvent => 'The event stays the same. Meaning and experience change the response.';
+	String get practiceEffect => 'Practice gives the response more steadiness; the initial feeling remains.';
+	String get firstEffect => 'This is unfamiliar. The response is tentative, and can still take shape.';
+	String get modelNote => 'Inspired by Aurea\'s framework. Timing, signal levels and behavior are experimental design choices, not measurements of a person.';
+	String get signalNote => 'Bars show simulated ingredient strength, not scientific probabilities.';
+	String get source => 'Source: aureasystem.com · snapshot 21 Sep 2026';
+	String get chemistry => 'Original chemistry lab';
+	String get loadingError => 'The experiment could not load.';
+	String get retry => 'Try again';
+	String get timeline => 'Response timeline';
+	List<String> get layers => [
+		'Chemistry',
+		'Basic emotion',
+		'Appraisal',
+		'Value',
+		'Compound',
+	];
 }
 
 // Path: face_types.classic
@@ -328,6 +382,42 @@ class _StringsFaceTypesBeanEn {
 	// Translations
 	String get name => 'Bean Face';
 	String get description => 'Fall Guys inspired vertical bean eyes';
+}
+
+// Path: lab.references
+class _StringsLabReferencesEn {
+	_StringsLabReferencesEn._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+	String get title => 'Start with a reference';
+	List<String> get names => [
+		'Content',
+		'Excited',
+		'Affectionate',
+		'Tense',
+		'Sad',
+	];
+	List<String> get descriptions => [
+		'Comfortable and positive, with little excitement.',
+		'Full of energy and anticipation.',
+		'Warm and connected.',
+		'Agitated, with anger and anxiety together.',
+		'Low and withdrawn.',
+	];
+	String get model => 'Examples of Haze’s simulated emotions, not recipes for human brain chemistry.';
+	String try_change({required Object chemical}) => 'Try increasing ${chemical}. What changes?';
+	String get paused => 'Time paused — your changes stay still.';
+	String get running => 'Time is running — the mixture evolves.';
+	String get resume => 'Resume time';
+	String get pause => 'Pause time';
+	String get restore => 'Restore starting state';
+	String get free => 'Experiment freely';
+	String get no_change => 'No measurable change — this control may have reached its limit.';
+	String get comparison => 'Starting state → Now';
+	String changed({required Object chemical}) => 'Last ${chemical} adjustment (intensity points):';
+	String get unchanged => 'Make one change to compare its effect.';
 }
 
 // Path: lab.challenge
@@ -503,6 +593,7 @@ class _StringsPt extends Translations {
 	@override late final _StringsGamePt game = _StringsGamePt._(_root);
 	@override late final _StringsLabPt lab = _StringsLabPt._(_root);
 	@override late final _StringsUiPt ui = _StringsUiPt._(_root);
+	@override late final _StringsAureaPt aurea = _StringsAureaPt._(_root);
 }
 
 // Path: app
@@ -594,6 +685,7 @@ class _StringsLabPt extends _StringsLabEn {
 	@override final _StringsPt _root; // ignore: unused_field
 
 	// Translations
+	@override late final _StringsLabReferencesPt references = _StringsLabReferencesPt._(_root);
 	@override String get title => 'Laboratório do Haze';
 	@override String feeling_now({required Object name}) => 'Humor atual: ${name}';
 	@override String get boop_reaction => 'Boop! A dopamina e a adrenalina se agitaram.';
@@ -632,6 +724,58 @@ class _StringsUiPt extends _StringsUiEn {
 	@override String get light_theme => 'Tema Claro';
 	@override String get never_sleep => 'Nunca dormir';
 	@override String get never_sleep_description => 'Manter o Haze acordado enquanto o app estiver aberto';
+}
+
+// Path: aurea
+class _StringsAureaPt extends _StringsAureaEn {
+	_StringsAureaPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Aurea · Haze Lab';
+	@override String get subtitle => 'O sentido por trás de um sentimento';
+	@override String get prototype => 'PROTÓTIPO INTERATIVO';
+	@override String get introduction => 'Um momento. Diferentes formas de vivê-lo.';
+	@override String get choose => 'Escolha um momento';
+	@override String get interpretation => 'Como Haze interpreta isso?';
+	@override String get history => 'Experiências anteriores';
+	@override String get firstTime => 'Primeira vez';
+	@override String get practiced => 'Com prática';
+	@override String get historyHint => 'Um passado imaginado para esta cena. A memória do seu companheiro fica separada.';
+	@override String get play => 'Ver a reação';
+	@override String get replay => 'Rever este momento';
+	@override String get pause => 'Pausar';
+	@override String get resume => 'Continuar';
+	@override String get reset => 'Reiniciar experimento';
+	@override List<String> get phases => [
+		'Perceber',
+		'Entender o momento',
+		'Escolher uma resposta',
+	];
+	@override String get why => 'Por que essa reação?';
+	@override String get whyHint => 'Explore os ingredientes da Aurea.';
+	@override String get forming => 'Ganhando forma';
+	@override String get emerging => 'Se formando';
+	@override String get incomplete => 'Algo está faltando';
+	@override String get ready => 'Dê o play para ver o sentimento se desenvolver.';
+	@override String get sameEvent => 'O acontecimento é o mesmo. O sentido e a experiência mudam a reação.';
+	@override String get practiceEffect => 'A prática traz mais firmeza à resposta; o sentimento inicial permanece.';
+	@override String get firstEffect => 'Isso é novo para Haze. A resposta é hesitante e ainda pode ganhar forma.';
+	@override String get modelNote => 'Inspirado no modelo da Aurea. Tempos, níveis e comportamentos são escolhas experimentais, não medidas sobre uma pessoa.';
+	@override String get signalNote => 'As barras mostram a força simulada dos ingredientes, não probabilidades científicas.';
+	@override String get source => 'Fonte: aureasystem.com · versão de 21 set 2026';
+	@override String get chemistry => 'Laboratório de química original';
+	@override String get loadingError => 'Não foi possível carregar o experimento.';
+	@override String get retry => 'Tentar novamente';
+	@override String get timeline => 'Linha do tempo da resposta';
+	@override List<String> get layers => [
+		'Química',
+		'Emoção básica',
+		'Interpretação',
+		'Valor',
+		'Composto',
+	];
 }
 
 // Path: face_types.classic
@@ -676,6 +820,42 @@ class _StringsFaceTypesBeanPt extends _StringsFaceTypesBeanEn {
 	// Translations
 	@override String get name => 'Rosto Feijão';
 	@override String get description => 'Olhos verticais inspirados no Fall Guys';
+}
+
+// Path: lab.references
+class _StringsLabReferencesPt extends _StringsLabReferencesEn {
+	_StringsLabReferencesPt._(_StringsPt root) : this._root = root, super._(root);
+
+	@override final _StringsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Comece com uma referência';
+	@override List<String> get names => [
+		'Contente',
+		'Animado',
+		'Carinhoso',
+		'Tenso',
+		'Triste',
+	];
+	@override List<String> get descriptions => [
+		'Confortável e positivo, com pouca agitação.',
+		'Cheio de energia e expectativa.',
+		'Acolhedor e conectado.',
+		'Agitado, com raiva e ansiedade juntas.',
+		'Desanimado e retraído.',
+	];
+	@override String get model => 'Exemplos das emoções simuladas do Haze, não receitas da química cerebral humana.';
+	@override String try_change({required Object chemical}) => 'Experimente aumentar ${chemical}. O que muda?';
+	@override String get paused => 'Tempo pausado — suas mudanças ficam estáveis.';
+	@override String get running => 'O tempo está passando — a mistura evolui.';
+	@override String get resume => 'Retomar tempo';
+	@override String get pause => 'Pausar tempo';
+	@override String get restore => 'Restaurar estado inicial';
+	@override String get free => 'Experimentar livremente';
+	@override String get no_change => 'Nenhuma mudança mensurável — este controle pode ter atingido o limite.';
+	@override String get comparison => 'Estado inicial → Agora';
+	@override String changed({required Object chemical}) => 'Último ajuste de ${chemical} (pontos de intensidade):';
+	@override String get unchanged => 'Faça uma mudança para comparar o efeito.';
 }
 
 // Path: lab.challenge
@@ -863,6 +1043,29 @@ extension on Translations {
 			case 'game.score': return 'Score';
 			case 'game.streak': return 'Streak';
 			case 'game.play': return 'Feelings game';
+			case 'lab.references.title': return 'Start with a reference';
+			case 'lab.references.names.0': return 'Content';
+			case 'lab.references.names.1': return 'Excited';
+			case 'lab.references.names.2': return 'Affectionate';
+			case 'lab.references.names.3': return 'Tense';
+			case 'lab.references.names.4': return 'Sad';
+			case 'lab.references.descriptions.0': return 'Comfortable and positive, with little excitement.';
+			case 'lab.references.descriptions.1': return 'Full of energy and anticipation.';
+			case 'lab.references.descriptions.2': return 'Warm and connected.';
+			case 'lab.references.descriptions.3': return 'Agitated, with anger and anxiety together.';
+			case 'lab.references.descriptions.4': return 'Low and withdrawn.';
+			case 'lab.references.model': return 'Examples of Haze’s simulated emotions, not recipes for human brain chemistry.';
+			case 'lab.references.try_change': return ({required Object chemical}) => 'Try increasing ${chemical}. What changes?';
+			case 'lab.references.paused': return 'Time paused — your changes stay still.';
+			case 'lab.references.running': return 'Time is running — the mixture evolves.';
+			case 'lab.references.resume': return 'Resume time';
+			case 'lab.references.pause': return 'Pause time';
+			case 'lab.references.restore': return 'Restore starting state';
+			case 'lab.references.free': return 'Experiment freely';
+			case 'lab.references.no_change': return 'No measurable change — this control may have reached its limit.';
+			case 'lab.references.comparison': return 'Starting state → Now';
+			case 'lab.references.changed': return ({required Object chemical}) => 'Last ${chemical} adjustment (intensity points):';
+			case 'lab.references.unchanged': return 'Make one change to compare its effect.';
 			case 'lab.title': return 'Haze Lab';
 			case 'lab.feeling_now': return ({required Object name}) => 'Current mood: ${name}';
 			case 'lab.boop_reaction': return 'Boop! Dopamine and adrenaline stirred.';
@@ -922,6 +1125,45 @@ extension on Translations {
 			case 'ui.light_theme': return 'Light Theme';
 			case 'ui.never_sleep': return 'Never sleep';
 			case 'ui.never_sleep_description': return 'Keep Haze awake while the app is open';
+			case 'aurea.title': return 'Aurea · Haze Lab';
+			case 'aurea.subtitle': return 'The meaning behind a feeling';
+			case 'aurea.prototype': return 'INTERACTIVE PROTOTYPE';
+			case 'aurea.introduction': return 'One moment. Different ways to meet it.';
+			case 'aurea.choose': return 'Choose a moment';
+			case 'aurea.interpretation': return 'How does Haze read this?';
+			case 'aurea.history': return 'Earlier experiences';
+			case 'aurea.firstTime': return 'First time here';
+			case 'aurea.practiced': return 'With practice';
+			case 'aurea.historyHint': return 'An imagined history for this replay. Your companion\'s memory stays separate.';
+			case 'aurea.play': return 'Watch the response';
+			case 'aurea.replay': return 'Replay this moment';
+			case 'aurea.pause': return 'Pause';
+			case 'aurea.resume': return 'Continue';
+			case 'aurea.reset': return 'Reset experiment';
+			case 'aurea.phases.0': return 'Notice';
+			case 'aurea.phases.1': return 'Make sense of it';
+			case 'aurea.phases.2': return 'Choose a response';
+			case 'aurea.why': return 'Why this response?';
+			case 'aurea.whyHint': return 'Explore the ingredients from Aurea.';
+			case 'aurea.forming': return 'Taking shape';
+			case 'aurea.emerging': return 'Coming together';
+			case 'aurea.incomplete': return 'Something is missing';
+			case 'aurea.ready': return 'Press play to watch the feeling develop.';
+			case 'aurea.sameEvent': return 'The event stays the same. Meaning and experience change the response.';
+			case 'aurea.practiceEffect': return 'Practice gives the response more steadiness; the initial feeling remains.';
+			case 'aurea.firstEffect': return 'This is unfamiliar. The response is tentative, and can still take shape.';
+			case 'aurea.modelNote': return 'Inspired by Aurea\'s framework. Timing, signal levels and behavior are experimental design choices, not measurements of a person.';
+			case 'aurea.signalNote': return 'Bars show simulated ingredient strength, not scientific probabilities.';
+			case 'aurea.source': return 'Source: aureasystem.com · snapshot 21 Sep 2026';
+			case 'aurea.chemistry': return 'Original chemistry lab';
+			case 'aurea.loadingError': return 'The experiment could not load.';
+			case 'aurea.retry': return 'Try again';
+			case 'aurea.timeline': return 'Response timeline';
+			case 'aurea.layers.0': return 'Chemistry';
+			case 'aurea.layers.1': return 'Basic emotion';
+			case 'aurea.layers.2': return 'Appraisal';
+			case 'aurea.layers.3': return 'Value';
+			case 'aurea.layers.4': return 'Compound';
 			default: return null;
 		}
 	}
@@ -969,6 +1211,29 @@ extension on _StringsPt {
 			case 'game.score': return 'Pontos';
 			case 'game.streak': return 'Sequência';
 			case 'game.play': return 'Jogo dos sentimentos';
+			case 'lab.references.title': return 'Comece com uma referência';
+			case 'lab.references.names.0': return 'Contente';
+			case 'lab.references.names.1': return 'Animado';
+			case 'lab.references.names.2': return 'Carinhoso';
+			case 'lab.references.names.3': return 'Tenso';
+			case 'lab.references.names.4': return 'Triste';
+			case 'lab.references.descriptions.0': return 'Confortável e positivo, com pouca agitação.';
+			case 'lab.references.descriptions.1': return 'Cheio de energia e expectativa.';
+			case 'lab.references.descriptions.2': return 'Acolhedor e conectado.';
+			case 'lab.references.descriptions.3': return 'Agitado, com raiva e ansiedade juntas.';
+			case 'lab.references.descriptions.4': return 'Desanimado e retraído.';
+			case 'lab.references.model': return 'Exemplos das emoções simuladas do Haze, não receitas da química cerebral humana.';
+			case 'lab.references.try_change': return ({required Object chemical}) => 'Experimente aumentar ${chemical}. O que muda?';
+			case 'lab.references.paused': return 'Tempo pausado — suas mudanças ficam estáveis.';
+			case 'lab.references.running': return 'O tempo está passando — a mistura evolui.';
+			case 'lab.references.resume': return 'Retomar tempo';
+			case 'lab.references.pause': return 'Pausar tempo';
+			case 'lab.references.restore': return 'Restaurar estado inicial';
+			case 'lab.references.free': return 'Experimentar livremente';
+			case 'lab.references.no_change': return 'Nenhuma mudança mensurável — este controle pode ter atingido o limite.';
+			case 'lab.references.comparison': return 'Estado inicial → Agora';
+			case 'lab.references.changed': return ({required Object chemical}) => 'Último ajuste de ${chemical} (pontos de intensidade):';
+			case 'lab.references.unchanged': return 'Faça uma mudança para comparar o efeito.';
 			case 'lab.title': return 'Laboratório do Haze';
 			case 'lab.feeling_now': return ({required Object name}) => 'Humor atual: ${name}';
 			case 'lab.boop_reaction': return 'Boop! A dopamina e a adrenalina se agitaram.';
@@ -1028,6 +1293,45 @@ extension on _StringsPt {
 			case 'ui.light_theme': return 'Tema Claro';
 			case 'ui.never_sleep': return 'Nunca dormir';
 			case 'ui.never_sleep_description': return 'Manter o Haze acordado enquanto o app estiver aberto';
+			case 'aurea.title': return 'Aurea · Haze Lab';
+			case 'aurea.subtitle': return 'O sentido por trás de um sentimento';
+			case 'aurea.prototype': return 'PROTÓTIPO INTERATIVO';
+			case 'aurea.introduction': return 'Um momento. Diferentes formas de vivê-lo.';
+			case 'aurea.choose': return 'Escolha um momento';
+			case 'aurea.interpretation': return 'Como Haze interpreta isso?';
+			case 'aurea.history': return 'Experiências anteriores';
+			case 'aurea.firstTime': return 'Primeira vez';
+			case 'aurea.practiced': return 'Com prática';
+			case 'aurea.historyHint': return 'Um passado imaginado para esta cena. A memória do seu companheiro fica separada.';
+			case 'aurea.play': return 'Ver a reação';
+			case 'aurea.replay': return 'Rever este momento';
+			case 'aurea.pause': return 'Pausar';
+			case 'aurea.resume': return 'Continuar';
+			case 'aurea.reset': return 'Reiniciar experimento';
+			case 'aurea.phases.0': return 'Perceber';
+			case 'aurea.phases.1': return 'Entender o momento';
+			case 'aurea.phases.2': return 'Escolher uma resposta';
+			case 'aurea.why': return 'Por que essa reação?';
+			case 'aurea.whyHint': return 'Explore os ingredientes da Aurea.';
+			case 'aurea.forming': return 'Ganhando forma';
+			case 'aurea.emerging': return 'Se formando';
+			case 'aurea.incomplete': return 'Algo está faltando';
+			case 'aurea.ready': return 'Dê o play para ver o sentimento se desenvolver.';
+			case 'aurea.sameEvent': return 'O acontecimento é o mesmo. O sentido e a experiência mudam a reação.';
+			case 'aurea.practiceEffect': return 'A prática traz mais firmeza à resposta; o sentimento inicial permanece.';
+			case 'aurea.firstEffect': return 'Isso é novo para Haze. A resposta é hesitante e ainda pode ganhar forma.';
+			case 'aurea.modelNote': return 'Inspirado no modelo da Aurea. Tempos, níveis e comportamentos são escolhas experimentais, não medidas sobre uma pessoa.';
+			case 'aurea.signalNote': return 'As barras mostram a força simulada dos ingredientes, não probabilidades científicas.';
+			case 'aurea.source': return 'Fonte: aureasystem.com · versão de 21 set 2026';
+			case 'aurea.chemistry': return 'Laboratório de química original';
+			case 'aurea.loadingError': return 'Não foi possível carregar o experimento.';
+			case 'aurea.retry': return 'Tentar novamente';
+			case 'aurea.timeline': return 'Linha do tempo da resposta';
+			case 'aurea.layers.0': return 'Química';
+			case 'aurea.layers.1': return 'Emoção básica';
+			case 'aurea.layers.2': return 'Interpretação';
+			case 'aurea.layers.3': return 'Valor';
+			case 'aurea.layers.4': return 'Composto';
 			default: return null;
 		}
 	}
