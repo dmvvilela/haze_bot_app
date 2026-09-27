@@ -2,6 +2,14 @@
 
 Automation for shipping Haze Bot to the App Store (iOS) and Google Play (Android).
 
+## Current screenshot campaign
+
+The refreshed Aurea campaign is in [marketing/aurea](marketing/aurea/README.md):
+30 composed screenshots for iPhone, iPad, and Android, in English and Portuguese,
+plus previews, reproducible capture/render scripts, and draft 2.2.0 store copy.
+It is prepared locally and has not been uploaded. Select these exports explicitly
+when updating store screenshots; `release.sh` does not upload this directory.
+
 ## One-time setup
 
 ### App Store Connect (iOS)

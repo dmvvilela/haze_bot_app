@@ -1,0 +1,635 @@
+{
+  "storeUploaded": false,
+  "files": [
+    {
+      "file": "exports/iphone/en-US/01_companion.png",
+      "width": 1320,
+      "height": 2868,
+      "deviceBounds": [
+        180,
+        792,
+        1166,
+        2679
+      ],
+      "copyBounds": [
+        84.0,
+        228.0,
+        1236.0,
+        697.8000000000001
+      ],
+      "footerTop": 2713.0,
+      "sha256": "501f1359cbfec190d1091bbf8b26da6c8e702a95ca09c13df9a1d6d72b6f226e",
+      "title": "A little face.\nA lot of feeling.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/iphone/en-US/02_aurea.png",
+      "width": 1320,
+      "height": 2868,
+      "deviceBounds": [
+        258,
+        825,
+        1088,
+        2646
+      ],
+      "copyBounds": [
+        84.0,
+        228.0,
+        1236.0,
+        697.8000000000001
+      ],
+      "footerTop": 2713.0,
+      "sha256": "815649c2ed76d34896ae9c27f36549a2b84ca4869101f24f17a27b97fb6c699b",
+      "title": "See a feeling\ntake shape.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/iphone/en-US/03_play.png",
+      "width": 1320,
+      "height": 2868,
+      "deviceBounds": [
+        195,
+        798,
+        1151,
+        2673
+      ],
+      "copyBounds": [
+        84.0,
+        228.0,
+        1236.0,
+        697.8000000000001
+      ],
+      "footerTop": 2713.0,
+      "sha256": "32eee18bb1a789c0386bab3efa40c66c94ff7c2bd16b54fc59b4abefc97ad0c7",
+      "title": "Big feelings.\nLittle discoveries.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/iphone/en-US/04_focus.png",
+      "width": 1320,
+      "height": 2868,
+      "deviceBounds": [
+        210,
+        804,
+        1136,
+        2667
+      ],
+      "copyBounds": [
+        84.0,
+        228.0,
+        1236.0,
+        697.8000000000001
+      ],
+      "footerTop": 2713.0,
+      "sha256": "e372c11d9197bc7374de741ed319ecb7efc43803e811df937eb6ce7074dba11b",
+      "title": "A quiet moment.\nGood company.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/iphone/en-US/05_yours.png",
+      "width": 1320,
+      "height": 2868,
+      "deviceBounds": [
+        210,
+        804,
+        1136,
+        2667
+      ],
+      "copyBounds": [
+        84.0,
+        228.0,
+        1236.0,
+        697.8000000000001
+      ],
+      "footerTop": 2713.0,
+      "sha256": "f4b1027da32374d27ca4cd791a945a4511fcc062450c10c47acf518622fbdace",
+      "title": "Your colors.\nYour companion.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/ipad/en-US/01_companion.png",
+      "width": 2752,
+      "height": 2064,
+      "deviceBounds": [
+        1429,
+        191,
+        2671,
+        1929
+      ],
+      "copyBounds": [
+        112,
+        578,
+        1302,
+        1066.04
+      ],
+      "footerTop": 1864,
+      "sha256": "29bdd2b68e22941ce1bc5985ff186ae2be93af80ec015476edc242c9dfadaa7d",
+      "title": "A little face.\nA lot of feeling.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/ipad/en-US/02_aurea.png",
+      "width": 2752,
+      "height": 2064,
+      "deviceBounds": [
+        1429,
+        191,
+        2671,
+        1929
+      ],
+      "copyBounds": [
+        112,
+        578,
+        1302,
+        1066.04
+      ],
+      "footerTop": 1864,
+      "sha256": "475b5642b7de4f80aa8d4e453a04ea549ba7c801389c9da29984012a70c6a10e",
+      "title": "See a feeling\ntake shape.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/ipad/en-US/03_play.png",
+      "width": 2752,
+      "height": 2064,
+      "deviceBounds": [
+        1429,
+        191,
+        2671,
+        1929
+      ],
+      "copyBounds": [
+        112,
+        578,
+        1302,
+        1066.04
+      ],
+      "footerTop": 1864,
+      "sha256": "267a96e529ca08a36fe3e7145626ee90a36a4620a026db6b9833fe53b5514b0e",
+      "title": "Big feelings.\nLittle discoveries.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/ipad/en-US/04_focus.png",
+      "width": 2752,
+      "height": 2064,
+      "deviceBounds": [
+        1429,
+        191,
+        2671,
+        1929
+      ],
+      "copyBounds": [
+        112,
+        578,
+        1302,
+        1066.04
+      ],
+      "footerTop": 1864,
+      "sha256": "21a85bd2c61ec403cfa96da30be5bdb717a5281e173993bb191c7512a4431ed6",
+      "title": "A quiet moment.\nGood company.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/ipad/en-US/05_yours.png",
+      "width": 2752,
+      "height": 2064,
+      "deviceBounds": [
+        1429,
+        191,
+        2671,
+        1929
+      ],
+      "copyBounds": [
+        112,
+        578,
+        1302,
+        1066.04
+      ],
+      "footerTop": 1864,
+      "sha256": "888d414716bf0dbab54dd258568f7e8405a8032a442d2cdfcf3b7a72b8cde543",
+      "title": "Your colors.\nYour companion.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/android/en-US/01_companion.png",
+      "width": 1080,
+      "height": 1920,
+      "deviceBounds": [
+        229,
+        534,
+        872,
+        1750
+      ],
+      "copyBounds": [
+        68.72727272727273,
+        134.1818181818182,
+        1011.2727272727273,
+        507.96000000000004
+      ],
+      "footerTop": 1793.181818181818,
+      "sha256": "8e748ed4099ceae2e82dcc3610be98ab6a6c4bf140f14a413380b465fba9c85e",
+      "title": "A little face.\nA lot of feeling.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/android/en-US/02_aurea.png",
+      "width": 1080,
+      "height": 1920,
+      "deviceBounds": [
+        280,
+        556,
+        821,
+        1728
+      ],
+      "copyBounds": [
+        68.72727272727273,
+        134.1818181818182,
+        1011.2727272727273,
+        507.96000000000004
+      ],
+      "footerTop": 1793.181818181818,
+      "sha256": "1e6b54e1f47eeec3d1d5b57cf7263ed8cd10197aae7e6433e4fa75fc65dd818e",
+      "title": "See a feeling\ntake shape.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/android/en-US/03_play.png",
+      "width": 1080,
+      "height": 1920,
+      "deviceBounds": [
+        239,
+        538,
+        862,
+        1746
+      ],
+      "copyBounds": [
+        68.72727272727273,
+        134.1818181818182,
+        1011.2727272727273,
+        507.96000000000004
+      ],
+      "footerTop": 1793.181818181818,
+      "sha256": "961ce1f3b5b189abdec78cf9f80a72faced92b90487694559fa81abe89fc467d",
+      "title": "Big feelings.\nLittle discoveries.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/android/en-US/04_focus.png",
+      "width": 1080,
+      "height": 1920,
+      "deviceBounds": [
+        249,
+        542,
+        852,
+        1742
+      ],
+      "copyBounds": [
+        68.72727272727273,
+        134.1818181818182,
+        1011.2727272727273,
+        507.96000000000004
+      ],
+      "footerTop": 1793.181818181818,
+      "sha256": "0160c3fd248e4cb1e5d71ee90c479c0ac93b63f983cd95de34e423277cffc9f0",
+      "title": "A quiet moment.\nGood company.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/android/en-US/05_yours.png",
+      "width": 1080,
+      "height": 1920,
+      "deviceBounds": [
+        249,
+        542,
+        852,
+        1742
+      ],
+      "copyBounds": [
+        68.72727272727273,
+        134.1818181818182,
+        1011.2727272727273,
+        507.96000000000004
+      ],
+      "footerTop": 1793.181818181818,
+      "sha256": "18f5fd4ccf5efcf87e907e084af5cba60c15da1366f7cb1de916a8c1de7da02d",
+      "title": "Your colors.\nYour companion.",
+      "locale": "en-US"
+    },
+    {
+      "file": "exports/iphone/pt-BR/01_companion.png",
+      "width": 1320,
+      "height": 2868,
+      "deviceBounds": [
+        180,
+        792,
+        1166,
+        2679
+      ],
+      "copyBounds": [
+        84.0,
+        228.0,
+        1236.0,
+        697.8000000000001
+      ],
+      "footerTop": 2713.0,
+      "sha256": "45d123ce98741805f70cf08e1c08774b23bd0f0b9db70f0da4c9c4a936b15a06",
+      "title": "Um rostinho.\nTantas emo\u00e7\u00f5es.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/iphone/pt-BR/02_aurea.png",
+      "width": 1320,
+      "height": 2868,
+      "deviceBounds": [
+        258,
+        825,
+        1088,
+        2646
+      ],
+      "copyBounds": [
+        84.0,
+        228.0,
+        1236.0,
+        697.8000000000001
+      ],
+      "footerTop": 2713.0,
+      "sha256": "3a4b3980091d9e011d7303a9a952979e1534c539bf9b178dcc13774dfa6a943f",
+      "title": "Veja a emo\u00e7\u00e3o\nganhar forma.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/iphone/pt-BR/03_play.png",
+      "width": 1320,
+      "height": 2868,
+      "deviceBounds": [
+        195,
+        798,
+        1151,
+        2673
+      ],
+      "copyBounds": [
+        84.0,
+        228.0,
+        1236.0,
+        697.8000000000001
+      ],
+      "footerTop": 2713.0,
+      "sha256": "3a76abfac28f53ff2b78b2889d2f35c0ab030775ff44e64700146c63e9c86311",
+      "title": "Grandes emo\u00e7\u00f5es.\nNovas descobertas.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/iphone/pt-BR/04_focus.png",
+      "width": 1320,
+      "height": 2868,
+      "deviceBounds": [
+        210,
+        804,
+        1136,
+        2667
+      ],
+      "copyBounds": [
+        84.0,
+        228.0,
+        1236.0,
+        697.8000000000001
+      ],
+      "footerTop": 2713.0,
+      "sha256": "f4299fa05ecef155e949c9e90cd1290776e8598621231873bc3ad710210cea11",
+      "title": "Uma pausa.\nBoa companhia.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/iphone/pt-BR/05_yours.png",
+      "width": 1320,
+      "height": 2868,
+      "deviceBounds": [
+        210,
+        804,
+        1136,
+        2667
+      ],
+      "copyBounds": [
+        84.0,
+        228.0,
+        1236.0,
+        697.8000000000001
+      ],
+      "footerTop": 2713.0,
+      "sha256": "d2ed30d1e9f7b1c9405b4d3e302eac3a4f21af5cc8b20b2751c8e9f423a41de1",
+      "title": "Suas cores.\nSeu companheiro.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/ipad/pt-BR/01_companion.png",
+      "width": 2752,
+      "height": 2064,
+      "deviceBounds": [
+        1429,
+        191,
+        2671,
+        1929
+      ],
+      "copyBounds": [
+        112,
+        578,
+        1302,
+        1066.04
+      ],
+      "footerTop": 1864,
+      "sha256": "977abfe7e98944c27b892243e87efe6bbb567d29d6245aa96975a3ad5bf899ea",
+      "title": "Um rostinho.\nTantas emo\u00e7\u00f5es.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/ipad/pt-BR/02_aurea.png",
+      "width": 2752,
+      "height": 2064,
+      "deviceBounds": [
+        1429,
+        191,
+        2671,
+        1929
+      ],
+      "copyBounds": [
+        112,
+        578,
+        1302,
+        1066.04
+      ],
+      "footerTop": 1864,
+      "sha256": "8981d772bfd312450872e6635e98e840f47b6cb8ea188bc4f079bad82745dd21",
+      "title": "Veja a emo\u00e7\u00e3o\nganhar forma.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/ipad/pt-BR/03_play.png",
+      "width": 2752,
+      "height": 2064,
+      "deviceBounds": [
+        1429,
+        191,
+        2671,
+        1929
+      ],
+      "copyBounds": [
+        112,
+        578,
+        1302,
+        1066.04
+      ],
+      "footerTop": 1864,
+      "sha256": "e08bd019fa61c003e3dd7e771ec94d51b08b79ab80c189f36318e4e997635a55",
+      "title": "Grandes emo\u00e7\u00f5es.\nNovas descobertas.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/ipad/pt-BR/04_focus.png",
+      "width": 2752,
+      "height": 2064,
+      "deviceBounds": [
+        1429,
+        191,
+        2671,
+        1929
+      ],
+      "copyBounds": [
+        112,
+        578,
+        1302,
+        1066.04
+      ],
+      "footerTop": 1864,
+      "sha256": "874abc0793e602473717658f55061ecfbcac36874fa724d31645e1f26d3a4c61",
+      "title": "Uma pausa.\nBoa companhia.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/ipad/pt-BR/05_yours.png",
+      "width": 2752,
+      "height": 2064,
+      "deviceBounds": [
+        1429,
+        191,
+        2671,
+        1929
+      ],
+      "copyBounds": [
+        112,
+        578,
+        1302,
+        1066.04
+      ],
+      "footerTop": 1864,
+      "sha256": "d2d0523c7db16c5023b17ed872018b5cc93b0a4e85c519dacf1d23d1b92af96c",
+      "title": "Suas cores.\nSeu companheiro.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/android/pt-BR/01_companion.png",
+      "width": 1080,
+      "height": 1920,
+      "deviceBounds": [
+        229,
+        534,
+        872,
+        1750
+      ],
+      "copyBounds": [
+        68.72727272727273,
+        134.1818181818182,
+        1011.2727272727273,
+        507.96000000000004
+      ],
+      "footerTop": 1793.181818181818,
+      "sha256": "302144d4ae5a5247db42dd59623e862866ec48ef3469820c24703390338b657b",
+      "title": "Um rostinho.\nTantas emo\u00e7\u00f5es.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/android/pt-BR/02_aurea.png",
+      "width": 1080,
+      "height": 1920,
+      "deviceBounds": [
+        280,
+        556,
+        821,
+        1728
+      ],
+      "copyBounds": [
+        68.72727272727273,
+        134.1818181818182,
+        1011.2727272727273,
+        507.96000000000004
+      ],
+      "footerTop": 1793.181818181818,
+      "sha256": "149b37bfdb61647951b50d1099a699e5719cd31aea5a8cb8db11e7135ba1b717",
+      "title": "Veja a emo\u00e7\u00e3o\nganhar forma.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/android/pt-BR/03_play.png",
+      "width": 1080,
+      "height": 1920,
+      "deviceBounds": [
+        239,
+        538,
+        862,
+        1746
+      ],
+      "copyBounds": [
+        68.72727272727273,
+        134.1818181818182,
+        1011.2727272727273,
+        507.96000000000004
+      ],
+      "footerTop": 1793.181818181818,
+      "sha256": "e835a45d82728a39eae605d617c41ff6ea1171211725e1e6f03f6183eb4d629c",
+      "title": "Grandes emo\u00e7\u00f5es.\nNovas descobertas.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/android/pt-BR/04_focus.png",
+      "width": 1080,
+      "height": 1920,
+      "deviceBounds": [
+        249,
+        542,
+        852,
+        1742
+      ],
+      "copyBounds": [
+        68.72727272727273,
+        134.1818181818182,
+        1011.2727272727273,
+        507.96000000000004
+      ],
+      "footerTop": 1793.181818181818,
+      "sha256": "6da762e7ccea5de6b60cdd96ff8e1c778e5965be2195fbab247c6d8cb12a9252",
+      "title": "Uma pausa.\nBoa companhia.",
+      "locale": "pt-BR"
+    },
+    {
+      "file": "exports/android/pt-BR/05_yours.png",
+      "width": 1080,
+      "height": 1920,
+      "deviceBounds": [
+        249,
+        542,
+        852,
+        1742
+      ],
+      "copyBounds": [
+        68.72727272727273,
+        134.1818181818182,
+        1011.2727272727273,
+        507.96000000000004
+      ],
+      "footerTop": 1793.181818181818,
+      "sha256": "fc7a7076d029b1c52cba793755ed126c9f2583fd4884d04d1c199d2c66f32287",
+      "title": "Suas cores.\nSeu companheiro.",
+      "locale": "pt-BR"
+    }
+  ]
+}

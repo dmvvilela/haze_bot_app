@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "screenshots": 30,
+  "locales": [
+    "en-US",
+    "pt-BR"
+  ],
+  "platforms": [
+    "iphone",
+    "ipad",
+    "android"
+  ],
+  "opaque": true,
+  "dimensionsAndHashes": true,
+  "noLayoutOverlaps": true,
+  "metadataLengths": {
+    "en-US": {
+      "subtitle": 22,
+      "shortDescription": 75,
+      "promotionalText": 146,
+      "keywords": 98,
+      "description": 1234,
+      "whatsNew": 439
+    },
+    "pt-BR": {
+      "subtitle": 29,
+      "shortDescription": 75,
+      "promotionalText": 145,
+      "keywords": 90,
+      "description": 1328,
+      "whatsNew": 454
+    }
+  },
+  "storeUploaded": false
+}
