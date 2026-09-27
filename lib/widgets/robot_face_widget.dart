@@ -8,22 +8,22 @@ import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
 import '../cubits/robot_face_cubit.dart';
-import '../models/robot_config.dart';
 import '../services/robot_voice_service.dart';
-import 'alive_face.dart';
-import 'classic_face.dart';
 import 'haze_face.dart';
-import 'looi_face.dart';
-import 'minimal_face.dart';
-import 'bean_face.dart';
 
 class RobotFaceWidget extends StatefulWidget {
   /// Optional interaction overrides for screens where touching Haze has a
   /// more specific meaning (for example, a controlled experiment in Lab).
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final bool framed;
 
-  const RobotFaceWidget({super.key, this.onTap, this.onLongPress});
+  const RobotFaceWidget({
+    super.key,
+    this.onTap,
+    this.onLongPress,
+    this.framed = true,
+  });
 
   @override
   State<RobotFaceWidget> createState() => _RobotFaceWidgetState();
@@ -73,10 +73,6 @@ class _RobotFaceWidgetState extends State<RobotFaceWidget> {
   Widget build(BuildContext context) {
     return BlocBuilder<RobotFaceCubit, RobotFaceState>(
       builder: (context, state) {
-        final isV2 = state.config.faceType == FaceType.hazeV2;
-        final isV3 = state.config.faceType == FaceType.hazeV3;
-        // V3 is a full "screen face" — let it take most of the display, the
-        // way mall companion robots do.
         final media = MediaQuery.sizeOf(context);
         return LayoutBuilder(
           builder: (context, constraints) {
@@ -88,12 +84,8 @@ class _RobotFaceWidgetState extends State<RobotFaceWidget> {
             final maxH = constraints.hasBoundedHeight
                 ? constraints.maxHeight
                 : media.height;
-            final width = isV3
-                ? math.min(maxW * 0.94, 540.0)
-                : math.min(isV2 ? 360.0 : 300.0, maxW);
-            final height = isV3
-                ? math.min(maxH * 0.8, 640.0)
-                : math.min(isV2 ? 440.0 : 400.0, maxH);
+            final width = math.min(maxW * .94, 540.0);
+            final height = math.min(maxH * (widget.framed ? .8 : .94), 640.0);
             final cubit = context.read<RobotFaceCubit>();
 
             // Convert a touch position into a normalized look direction so
@@ -141,36 +133,20 @@ class _RobotFaceWidgetState extends State<RobotFaceWidget> {
                   duration: const Duration(milliseconds: 150),
                   curve: Curves.easeOut,
                   scale: state.isPressed ? 1.05 : 1.0,
-                  child: Container(
+                  child: SizedBox(
                     width: width,
                     height: height,
-                    decoration: (isV2 || isV3)
-                        ? null
-                        : BoxDecoration(
-                            color: state.config.isDarkTheme
-                                ? Colors.grey[900]
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(40),
-                            boxShadow: [
-                              if (state.isPressed)
-                                BoxShadow(
-                                  color: state.config.eyeColor.withValues(
-                                    alpha: 0.16,
-                                  ),
-                                  blurRadius: 10,
-                                  spreadRadius: 2,
-                                ),
-                              BoxShadow(
-                                color: state.config.isDarkTheme
-                                    ? Colors.black.withValues(alpha: 0.5)
-                                    : Colors.grey.withValues(alpha: 0.2),
-                                blurRadius: 15,
-                                spreadRadius: 1,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                    child: _buildFaceType(state.config.faceType, state, cubit),
+                    child: HazeFace(
+                      state: state,
+                      mood: cubit.mood,
+                      companion: cubit.companion,
+                      framed: widget.framed,
+                      voiceLevel:
+                          state.isSpeaking ||
+                              state.mimicStatus != MimicStatus.idle
+                          ? cubit.voice.level
+                          : null,
+                    ),
                   ),
                 ),
               ),
@@ -179,37 +155,5 @@ class _RobotFaceWidgetState extends State<RobotFaceWidget> {
         );
       },
     );
-  }
-
-  Widget _buildFaceType(
-    FaceType faceType,
-    RobotFaceState state,
-    RobotFaceCubit cubit,
-  ) {
-    switch (faceType) {
-      case FaceType.classic:
-        return ClassicFace(state: state);
-      case FaceType.looi:
-        return LooiFace(state: state);
-      case FaceType.minimal:
-        return MinimalFace(state: state);
-      case FaceType.bean:
-        return BeanFace(state: state);
-      case FaceType.hazeV2:
-        return AliveFace(
-          state: state,
-          voiceLevel: state.isSpeaking || state.mimicStatus != MimicStatus.idle
-              ? cubit.voice.level
-              : null,
-        );
-      case FaceType.hazeV3:
-        return HazeFace(
-          state: state,
-          voiceLevel: state.isSpeaking || state.mimicStatus != MimicStatus.idle
-              ? cubit.voice.level
-              : null,
-          mood: cubit.mood,
-        );
-    }
   }
 }

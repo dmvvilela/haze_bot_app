@@ -7,6 +7,7 @@ import 'package:flutter/scheduler.dart';
 
 import '../chemistry/chemistry.dart';
 import '../aurea/aurea_model.dart';
+import '../aurea/aurea_companion.dart';
 import '../cubits/robot_face_cubit.dart';
 import '../models/robot_config.dart';
 import '../services/haze_mood.dart';
@@ -39,6 +40,7 @@ class HazeFace extends StatefulWidget {
 
   /// A continuous performance from the Aurea experiment, independent of mood.
   final AureaExpression? affect;
+  final AureaCompanion? companion;
   final bool framed;
 
   const HazeFace({
@@ -47,6 +49,7 @@ class HazeFace extends StatefulWidget {
     this.voiceLevel,
     this.mood,
     this.affect,
+    this.companion,
     this.framed = true,
   });
 
@@ -67,7 +70,7 @@ class _HazeFaceState extends State<HazeFace>
   Offset _gaze = Offset.zero;
   Offset _gazeTarget = Offset.zero;
   double _nextSaccadeAt = 1.6;
-  // Small underdamped scale spring, kicked on every expression change.
+  // A small, strongly damped emphasis on expression changes.
   double _pop = 0;
   double _popVelocity = 0;
 
@@ -88,7 +91,7 @@ class _HazeFaceState extends State<HazeFace>
       // The blink masks the morph between poses and the little scale bounce
       // sells the mood change.
       _blinkT = 0;
-      _popVelocity += 2.4;
+      _popVelocity = .7;
     }
   }
 
@@ -109,7 +112,7 @@ class _HazeFaceState extends State<HazeFace>
         _affectTarget() ??
         _moodTarget() ??
         _FacePose.of(widget.state.config.expression);
-    _pose = _FacePose.lerp(_pose, target, 1 - math.exp(-dt * 7.5));
+    _pose = _FacePose.lerp(_pose, target, 1 - math.exp(-dt * 5));
 
     if (_blinkT < 1) _blinkT = math.min(1, _blinkT + dt / 0.30);
 
@@ -135,10 +138,10 @@ class _HazeFaceState extends State<HazeFace>
     _gaze = Offset.lerp(
       _gaze,
       _gazeTarget,
-      1 - math.exp(-dt * (look != null ? 14 : 6.5)),
+      1 - math.exp(-dt * (look != null ? 14 : 3.5)),
     )!;
 
-    final springAccel = -_pop * 110 - _popVelocity * 10;
+    final springAccel = -_pop * 110 - _popVelocity * 22;
     _popVelocity += springAccel * dt;
     _pop += _popVelocity * dt;
 
@@ -152,7 +155,9 @@ class _HazeFaceState extends State<HazeFace>
   }
 
   _FacePose? _affectTarget() {
-    final a = widget.affect;
+    final a = widget.affect ??
+        (widget.mood?.moodDriven != false && widget.mood?.labControlled != true
+            ? widget.companion?.expression : null);
     if (a == null) return null;
     final eye = _EyePose(
       open: .85 + a.openness * .24 + a.surprise * .2 - a.sorrow * .18,
@@ -620,10 +625,12 @@ class _HazeFacePainter extends CustomPainter {
 
     if (framed) _drawPanel(canvas);
 
-    final bob = math.sin(t * (1.0 + pose.energy)) * (1.5 + pose.energy * 2.5);
-    final breath = 1 + 0.008 * math.sin(t * 0.9) + pop * 0.05;
-    final sway = pose.tilt + math.sin(t * 0.6) * 0.012;
-    final shiver = math.sin(t * 26) * 1.8 * pose.shiver;
+    // Emotion changes amplitude only. Multiplying time by a changing energy
+    // level jumps phase and makes transitions jitter after longer sessions.
+    final bob = math.sin(t * 1.15) * (.6 + pose.energy * .8);
+    final breath = 1 + 0.004 * math.sin(t * 0.9) + pop * 0.05;
+    final sway = pose.tilt + math.sin(t * 0.6) * 0.006;
+    final shiver = math.sin(t * 8) * .45 * pose.shiver;
     canvas.save();
     canvas.translate(200 + shiver, 240 + bob);
     canvas.rotate(sway);
@@ -909,6 +916,11 @@ class _HazeFacePainter extends CustomPainter {
       return;
     }
 
+    if (pose.mouthO > .02 && pose.mouthO < .9999) {
+      _drawBlendedMouth(canvas, c);
+      return;
+    }
+
     final curveAlpha =
         (1 - pose.mouthO).clamp(0.0, 1.0) * (1 - pose.mouthWave).clamp(0.0, 1.0);
     final halfW = 38.0 * pose.mouthWide;
@@ -975,6 +987,63 @@ class _HazeFacePainter extends CustomPainter {
           ..color = mouthColor.withValues(alpha: 0.92 * pose.mouthWave),
       );
     }
+  }
+
+  void _drawBlendedMouth(Canvas canvas, Offset c) {
+    // Blend geometry, not independently painted mouth silhouettes. A partial
+    // surprise should open the existing curve, never put an oval over it.
+    final round = pose.mouthO.clamp(0.0, 1.0);
+    final wave = pose.mouthWave.clamp(0.0, 1.0);
+    final laugh = ((pose.mouthOpen - .3) / .3).clamp(0.0, 1.0);
+    final halfW = 38.0 * pose.mouthWide;
+    final radius = 13 + pose.mouthOpen * 9;
+    final mouth = Path();
+    const segments = 64;
+    for (var i = 0; i <= segments; i++) {
+      final angle = math.pi * 2 * i / segments;
+      final x = -math.cos(angle);
+      final u = (x + 1) / 2;
+      final v = 1 - u;
+      final curveY =
+          v * v * -pose.mouthCurve * 7 +
+          2 * v * u * pose.mouthCurve * 22 +
+          u * u * (-pose.mouthCurve * 7 - pose.smirk * 4);
+      final q = u < .5 ? u * 2 : (u - .5) * 2;
+      final waveY = u < .5
+          ? 2 * (1 - q) * (1 - q) - 18 * (1 - q) * q
+          : 18 * (1 - q) * q - 2 * q * q;
+      final lineY = ui.lerpDouble(curveY, waveY, wave)!;
+      final laughY =
+          -6 + 2 * v * u * (i <= segments ~/ 2 ? 10 : 18 + pose.mouthOpen * 34);
+      final baseY = ui.lerpDouble(lineY, laughY, laugh * (1 - wave))!;
+      final point =
+          c +
+          Offset(
+            ui.lerpDouble(x * halfW, x * radius * .85, round)!,
+            ui.lerpDouble(baseY, -math.sin(angle) * radius * 1.05, round)!,
+          );
+      if (i == 0) {
+        mouth.moveTo(point.dx, point.dy);
+      } else {
+        mouth.lineTo(point.dx, point.dy);
+      }
+    }
+    mouth.close();
+    final fill = laugh * (1 - round) * (1 - wave);
+    if (fill > 0) {
+      canvas.drawPath(
+        mouth,
+        Paint()..color = mouthColor.withValues(alpha: .95 * fill),
+      );
+    }
+    canvas.drawPath(
+      mouth,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = ui.lerpDouble(8.5, 7.5, round)!
+        ..strokeJoin = StrokeJoin.round
+        ..color = mouthColor.withValues(alpha: .92),
+    );
   }
 
   void _drawAccents(Canvas canvas) {

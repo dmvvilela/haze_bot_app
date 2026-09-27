@@ -5,6 +5,7 @@ import '../cubits/feelings_game_cubit.dart';
 import '../cubits/robot_face_cubit.dart';
 import '../i18n/strings.g.dart';
 import 'robot_face_widget.dart';
+import '../theme/haze_theme.dart';
 
 /// The feelings game: Haze acts an emotion, the player names it.
 class FeelingsGameScreen extends StatelessWidget {
@@ -17,11 +18,11 @@ class FeelingsGameScreen extends StatelessWidget {
         final isDark = faceState.config.isDarkTheme;
         final accent = faceState.config.eyeColor;
         return Theme(
-          data: isDark ? ThemeData.dark() : ThemeData.light(),
+          data: HazeTheme.of(isDark),
           child: Scaffold(
-            backgroundColor: isDark ? Colors.black : Colors.grey[100],
+            backgroundColor: isDark ? HazeTheme.ink : HazeTheme.paper,
             appBar: AppBar(
-              backgroundColor: isDark ? Colors.black : Colors.grey[100],
+              backgroundColor: isDark ? HazeTheme.ink : HazeTheme.paper,
               elevation: 0,
               title: Text(t.game.title),
               actions: [

@@ -13,20 +13,6 @@ expressions:
   sad: Estou um pouco triste...
   scared: Ai! Que medo!
 
-face_types:
-  classic:
-    name: Clássico
-    description: Olhos circulares completos com pupilas expressivas
-  looi:
-    name: Estilo LOOI
-    description: Olhos inspirados no LOOI com sobrancelhas
-  minimal:
-    name: Minimalista
-    description: Design simples e limpo
-  bean:
-    name: Rosto Feijão
-    description: Olhos verticais inspirados no Fall Guys
-
 emotion_names:
   happy: Feliz
   surprised: Surpreso
@@ -126,7 +112,6 @@ lab:
 
 ui:
   choose_colors: Escolher Cores
-  choose_face_type: Escolher Tipo de Rosto
   settings: Configurações
   eye_color: Cor dos Olhos
   mouth_color: Cor da Boca
@@ -173,6 +158,9 @@ aurea:
   firstEffect: Isso é novo para Haze. A resposta é hesitante e ainda pode ganhar forma.
   modelNote: Inspirado no modelo da Aurea. Tempos, níveis e comportamentos são escolhas experimentais, não medidas sobre uma pessoa.
   signalNote: As barras mostram a força simulada dos ingredientes, não probabilidades científicas.
+  website: Sobre Aurea · aureasystem.com
+  websiteError: Não foi possível abrir o site. Você pode copiar o link.
+  copyLink: Copiar link
   source: "Fonte: aureasystem.com · versão de 21 set 2026"
   chemistry: Laboratório de química original
   loadingError: Não foi possível carregar o experimento.
@@ -184,3 +172,52 @@ aurea:
     - Interpretação
     - Valor
     - Composto
+
+home:
+  companion: Um pouco de companhia.
+  greeting: Aqui com você.
+  hint: Toque para brincar · segure para fazer carinho
+  talk: Conversar
+  play: Brincar
+  lab: Lab
+  explore: Explore um sentimento
+  exploreHint: Um pequeno momento no laboratório Aurea.
+  mimic: Imitar
+  timer: Timer
+  say: Diga alguma coisa
+  more: Mais
+  colors: Cores
+  light: Tema claro
+  dark: Tema escuro
+  hide: Modo tranquilo
+  show: Mostrar controles
+  listening: Ouvindo você…
+  replaying: Repetindo…
+  thinking: Pensando um pouquinho…
+  speaking: Haze está falando
+  done: Pronto
+  close: Fechar
+  send: Enviar
+  chat: Um momento com Haze
+  chatHint: Diga algo para Haze…
+  fallback: Usando respostas prontas por enquanto.
+  resume: Continuar
+  pause: Pausar
+  stop: Parar
+  start: Começar
+  cancel: Cancelar
+  timerTitle: Um tempinho juntos
+  timerHint: Escolha quanto tempo ficar com Haze.
+  timerRunning: Tempo juntos
+  timerPaused: Uma pequena pausa
+  minutes: "$n min"
+  colorHint: Deixe Haze um pouco mais com a sua cara.
+  colorNames:
+    - Ciano
+    - Azul
+    - Verde
+    - Roxo
+    - Laranja
+    - Vermelho
+    - Amarelo
+    - Rosa

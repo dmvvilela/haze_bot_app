@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubits/robot_face_cubit.dart';
 import '../services/haze_brain.dart';
+import '../theme/haze_theme.dart';
+import '../i18n/strings.g.dart';
 
 /// Inline chat composer for talking to Haze without leaving the main face.
 class TalkComposer extends StatefulWidget {
@@ -32,16 +34,13 @@ class _TalkComposerState extends State<TalkComposer> {
   Widget build(BuildContext context) {
     return BlocBuilder<RobotFaceCubit, RobotFaceState>(
       builder: (context, state) {
-        final isPt = state.config.language.toLowerCase().startsWith('pt');
         final unavailable = state.brainStatus == BrainStatus.unavailable;
         final colors = Theme.of(context).colorScheme;
 
-        return Material(
-          elevation: 12,
-          color: colors.surface.withValues(alpha: 0.96),
-          borderRadius: BorderRadius.circular(24),
+        return HazePanel(
+          padding: EdgeInsets.zero,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+            padding: const EdgeInsets.fromLTRB(16, 10, 12, 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -50,11 +49,18 @@ class _TalkComposerState extends State<TalkComposer> {
                   children: [
                     Icon(Icons.chat_bubble_outline, color: colors.primary),
                     const SizedBox(width: 8),
-                    Expanded(child: Text(isPt ? 'Modo chat' : 'Chat mode', style: Theme.of(context).textTheme.titleSmall)),
+                    Expanded(
+                      child: Text(
+                        t.home.chat,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                    ),
                     IconButton(
-                      tooltip: isPt ? 'Fechar' : 'Close',
+                      tooltip: t.home.close,
                       icon: const Icon(Icons.close),
-                      onPressed: context.read<RobotFaceCubit>().toggleChatComposer,
+                      onPressed: context
+                          .read<RobotFaceCubit>()
+                          .toggleChatComposer,
                     ),
                   ],
                 ),
@@ -62,9 +68,7 @@ class _TalkComposerState extends State<TalkComposer> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
-                      isPt
-                          ? 'O cérebro local não carregou. Usando respostas prontas por enquanto.'
-                          : "Haze's local brain could not load. Using built-in replies for now.",
+                      t.home.fallback,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
@@ -77,15 +81,22 @@ class _TalkComposerState extends State<TalkComposer> {
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => _send(context),
                   decoration: InputDecoration(
-                    hintText: isPt ? 'Digite uma mensagem para o Haze...' : 'Say something to Haze...',
-                    border: const OutlineInputBorder(),
+                    hintText: t.home.chatHint,
                     isDense: true,
                     suffixIcon: state.isLoadingAI
                         ? const Padding(
                             padding: EdgeInsets.all(12),
-                            child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
                           )
-                        : IconButton(tooltip: isPt ? 'Enviar' : 'Send', icon: const Icon(Icons.send), onPressed: () => _send(context)),
+                        : IconButton(
+                            tooltip: t.home.send,
+                            icon: const Icon(Icons.send),
+                            onPressed: () => _send(context),
+                          ),
                   ),
                 ),
               ],

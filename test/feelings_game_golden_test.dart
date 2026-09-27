@@ -16,7 +16,7 @@ import 'package:haze_bot_app/widgets/feelings_game_screen.dart';
 void main() {
   testWidgets('feelings game screen', (tester) async {
     SharedPreferences.setMockInitialValues({});
-    LocaleSettings.setLocale(AppLocale.en);
+    LocaleSettings.setLocaleSync(AppLocale.en);
     tester.view.physicalSize = const Size(420, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
@@ -57,7 +57,7 @@ void main() {
 
   testWidgets('game answers advance and score', (tester) async {
     SharedPreferences.setMockInitialValues({});
-    LocaleSettings.setLocale(AppLocale.en);
+    LocaleSettings.setLocaleSync(AppLocale.en);
 
     final robot = RobotFaceCubit();
     addTearDown(robot.close);

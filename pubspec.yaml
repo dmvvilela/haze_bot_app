@@ -1,5 +1,5 @@
 name: haze_bot_app
-description: "A cute robot face app inspired by LOOI with expressive emotions and speech capabilities."
+description: "An expressive pocket companion with Aurea-inspired simulated feelings."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -38,11 +38,11 @@ dependencies:
   cupertino_icons: ^1.0.8
   
   # State management
-  flutter_bloc: ^8.1.6
+  flutter_bloc: ^9.1.1
   
   # Code generation
-  freezed_annotation: ^2.4.4
-  json_annotation: ^4.9.0
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.12.0
   
   # Text to speech
   flutter_tts: ^4.0.2
@@ -51,19 +51,20 @@ dependencies:
   audioplayers: ^6.1.0
 
   # Internationalization
-  slang: ^3.31.2
-  slang_flutter: ^3.31.0
+  slang: ^4.19.2
+  slang_flutter: ^4.19.0
   
   # On-device AI (local inference, no server)
-  flutter_gemma: ^0.16.4
+  flutter_gemma: ^1.10.0
 
   # Utilities
   wakelock_plus: ^1.2.8
-  flutter_dotenv: ^5.1.0
+  flutter_dotenv: ^6.0.1
   shared_preferences: ^2.3.2
   flutter_soloud: ^4.0.12
   record: ^7.1.1
-  sensors_plus: ^6.1.1
+  sensors_plus: ^7.1.0
+  url_launcher: ^6.3.2
 dev_dependencies:
   flutter_driver:
     sdk: flutter
@@ -77,14 +78,14 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   
   # Code generation
   build_runner: ^2.4.12 # dart run build_runner watch --delete-conflicting-outputs
-  freezed: ^2.5.7
+  freezed: ^4.0.2
   json_serializable: ^6.8.0
   icons_launcher: ^3.0.1 # dart run icons_launcher:create
-  slang_build_runner: ^3.31.0 # dart run slang watch
+  slang_build_runner: ^4.19.0 # dart run slang watch
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

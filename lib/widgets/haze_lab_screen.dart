@@ -13,6 +13,7 @@ import '../services/sound_service.dart';
 import '../services/haze_brain.dart';
 import 'ai_consent_dialog.dart';
 import 'robot_face_widget.dart';
+import '../theme/haze_theme.dart';
 
 /// The Haze Lab: repeatable references and controlled mood experiments.
 ///
@@ -86,11 +87,11 @@ class _HazeLabScreenState extends State<HazeLabScreen> {
         final emotions = cubit.mood.emotions();
         final game = context.watch<MixGameCubit>().state;
         return Theme(
-          data: isDark ? ThemeData.dark() : ThemeData.light(),
+          data: HazeTheme.of(isDark),
           child: Scaffold(
-            backgroundColor: isDark ? Colors.black : Colors.grey[100],
+            backgroundColor: isDark ? HazeTheme.ink : HazeTheme.paper,
             appBar: AppBar(
-              backgroundColor: isDark ? Colors.black : Colors.grey[100],
+              backgroundColor: isDark ? HazeTheme.ink : HazeTheme.paper,
               elevation: 0,
               title: Text(t.lab.title),
               bottom: game.phase == MixPhase.idle

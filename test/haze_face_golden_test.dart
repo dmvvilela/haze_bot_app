@@ -11,21 +11,17 @@ import 'package:haze_bot_app/widgets/haze_face.dart';
 const _faceKey = Key('face');
 
 Widget _host(RobotFaceState state) => MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: const Color(0xFF17191D),
-        body: Center(
-          child: RepaintBoundary(
-            key: _faceKey,
-            child: SizedBox(
-              width: 640,
-              height: 768,
-              child: HazeFace(state: state),
-            ),
-          ),
-        ),
+  debugShowCheckedModeBanner: false,
+  home: Scaffold(
+    backgroundColor: const Color(0xFF17191D),
+    body: Center(
+      child: RepaintBoundary(
+        key: _faceKey,
+        child: SizedBox(width: 640, height: 768, child: HazeFace(state: state)),
       ),
-    );
+    ),
+  ),
+);
 
 // Advance in small frames so the pose spring settles naturally; stay under
 // the first gaze saccade (t = 1.6s) to keep goldens deterministic.
@@ -43,14 +39,7 @@ void main() {
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(
-        _host(
-          RobotFaceState(
-            config: RobotConfig(
-              expression: expression,
-              faceType: FaceType.hazeV3,
-            ),
-          ),
-        ),
+        _host(RobotFaceState(config: RobotConfig(expression: expression))),
       );
       await _settle(tester);
       await expectLater(
@@ -66,12 +55,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      _host(
-        const RobotFaceState(
-          config: RobotConfig(faceType: FaceType.hazeV3),
-          isSpeaking: true,
-        ),
-      ),
+      _host(const RobotFaceState(config: RobotConfig(), isSpeaking: true)),
     );
     await _settle(tester);
     await expectLater(
@@ -98,10 +82,7 @@ void main() {
                 height: 768,
                 child: HazeFace(
                   state: RobotFaceState(
-                    config: RobotConfig(
-                      faceType: FaceType.hazeV3,
-                      isDarkTheme: false,
-                    ),
+                    config: RobotConfig(isDarkTheme: false),
                   ),
                 ),
               ),
@@ -123,12 +104,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      _host(
-        const RobotFaceState(
-          config: RobotConfig(faceType: FaceType.hazeV3),
-          isLoadingAI: true,
-        ),
-      ),
+      _host(const RobotFaceState(config: RobotConfig(), isLoadingAI: true)),
     );
     await _settle(tester);
     await expectLater(

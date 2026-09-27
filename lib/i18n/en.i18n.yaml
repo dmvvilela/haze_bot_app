@@ -13,20 +13,6 @@ expressions:
   sad: I feel a little sad...
   scared: Eek! That is scary!
 
-face_types:
-  classic:
-    name: Classic
-    description: Full circular eyes with expressive pupils
-  looi:
-    name: LOOI Style
-    description: LOOI-inspired eyes with eyebrows
-  minimal:
-    name: Minimal
-    description: Simple and clean design
-  bean:
-    name: Bean Face
-    description: Fall Guys inspired vertical bean eyes
-
 emotion_names:
   happy: Happy
   surprised: Surprised
@@ -126,7 +112,6 @@ lab:
 
 ui:
   choose_colors: Choose Colors
-  choose_face_type: Choose Face Type
   settings: Settings
   eye_color: Eye Color
   mouth_color: Mouth Color
@@ -173,6 +158,9 @@ aurea:
   firstEffect: This is unfamiliar. The response is tentative, and can still take shape.
   modelNote: Inspired by Aurea's framework. Timing, signal levels and behavior are experimental design choices, not measurements of a person.
   signalNote: Bars show simulated ingredient strength, not scientific probabilities.
+  website: About Aurea · aureasystem.com
+  websiteError: Could not open the website. You can copy the link instead.
+  copyLink: Copy link
   source: "Source: aureasystem.com · snapshot 21 Sep 2026"
   chemistry: Original chemistry lab
   loadingError: The experiment could not load.
@@ -184,3 +172,52 @@ aurea:
     - Appraisal
     - Value
     - Compound
+
+home:
+  companion: A little company.
+  greeting: Here with you.
+  hint: Tap to play · hold to cuddle
+  talk: Talk
+  play: Play
+  lab: Lab
+  explore: Explore a feeling
+  exploreHint: A little moment in the Aurea lab.
+  mimic: Mimic
+  timer: Timer
+  say: Say something
+  more: More
+  colors: Colors
+  light: Light theme
+  dark: Dark theme
+  hide: Quiet mode
+  show: Show controls
+  listening: Listening to you…
+  replaying: Playing it back…
+  thinking: A little thinking…
+  speaking: Haze is speaking
+  done: Done
+  close: Close
+  send: Send
+  chat: A moment with Haze
+  chatHint: Say something to Haze…
+  fallback: Using built-in replies for now.
+  resume: Resume
+  pause: Pause
+  stop: Stop
+  start: Start
+  cancel: Cancel
+  timerTitle: A little time together
+  timerHint: Choose how long to stay with Haze.
+  timerRunning: Time together
+  timerPaused: Taking a pause
+  minutes: "$n min"
+  colorHint: Make Haze feel a little more like you.
+  colorNames:
+    - Cyan
+    - Blue
+    - Green
+    - Purple
+    - Orange
+    - Red
+    - Yellow
+    - Pink

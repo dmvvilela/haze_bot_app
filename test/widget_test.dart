@@ -57,7 +57,7 @@ void main() {
 
   testWidgets('Haze app renders main controls', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
-    LocaleSettings.setLocale(AppLocale.en);
+    LocaleSettings.setLocaleSync(AppLocale.en);
 
     final cubit = RobotFaceCubit();
     addTearDown(cubit.close);
@@ -73,30 +73,21 @@ void main() {
       ),
     );
 
-    expect(find.byIcon(Icons.smart_toy), findsOneWidget);
+    expect(find.text(t.home.talk), findsOneWidget);
+    expect(find.text(t.home.play), findsOneWidget);
+    expect(find.text(t.home.lab), findsOneWidget);
     expect(find.byIcon(Icons.chat_bubble_outline), findsOneWidget);
     expect(find.byIcon(Icons.timer), findsOneWidget);
 
-    // Haze V3 is the default face.
-    expect(cubit.state.config.faceType, FaceType.hazeV3);
     expect(find.bySemanticsLabel('Haze face'), findsOneWidget);
-
-    // Other faces stay reachable through the face-type picker's cubit path.
-    cubit.updateFaceType(FaceType.hazeV2);
-    await tester.pump(const Duration(milliseconds: 200));
-    expect(find.bySemanticsLabel('Haze V2 face'), findsOneWidget);
-
-    // Switch to the static classic face so pumpAndSettle below can settle
-    // (V2/V3 animate forever).
-    cubit.updateFaceType(FaceType.classic);
-    await tester.pump(const Duration(milliseconds: 200));
-    expect(cubit.state.config.faceType, FaceType.classic);
 
     // Settings now lives in the overflow menu.
     await tester.tap(find.byIcon(Icons.more_vert));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.text('Settings'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('AI Brain'), findsOneWidget);
     expect(find.text('Haze mood'), findsOneWidget);
@@ -106,7 +97,8 @@ void main() {
     expect(find.text('Voice style'), findsNothing);
     expect(find.text('Voice'), findsNothing);
     await tester.tap(find.text('Done'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
 
     cubit.startTimer(1);
     await tester.pump();
@@ -147,9 +139,11 @@ void main() {
     );
 
     await tester.tap(find.text('Open'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.text('Not now'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(resolved, isTrue);
     expect(cubit.state.aiConsent, AiConsent.unknown);

@@ -12,7 +12,7 @@ void main() {
         tester.view.physicalSize = const Size(390, 844);
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
-        LocaleSettings.setLocale(locale);
+        LocaleSettings.setLocaleSync(locale);
         rootBundle.evict('assets/aurea/prototype.json');
         await tester.pumpWidget(
           TranslationProvider(child: MaterialApp(home: const AureaLabScreen())),
@@ -109,7 +109,7 @@ void main() {
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
-      LocaleSettings.setLocale(AppLocale.pt);
+      LocaleSettings.setLocaleSync(AppLocale.pt);
       rootBundle.evict('assets/aurea/prototype.json');
       await tester.pumpWidget(
         TranslationProvider(

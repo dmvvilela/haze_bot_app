@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../aurea/aurea_model.dart';
 import '../cubits/robot_face_cubit.dart';
 import '../i18n/strings.g.dart';
 import 'haze_face.dart';
+import '../theme/haze_theme.dart';
 
 /// A self-contained counterfactual lab. It never writes companion chemistry,
 /// chat history or personality, and needs no model download or network access.
@@ -51,6 +53,29 @@ class _AureaLabScreenState extends State<AureaLabScreen>
     super.dispose();
   }
 
+  static final _projectUrl = Uri.parse('https://aureasystem.com');
+
+  Future<void> _openProject() async {
+    try {
+      if (await launchUrl(_projectUrl, mode: LaunchMode.externalApplication)) {
+        return;
+      }
+    } catch (_) {
+      // Offer a usable fallback if this platform has no browser available.
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(t.aurea.websiteError),
+        action: SnackBarAction(
+          label: t.aurea.copyLink,
+          onPressed: () =>
+              Clipboard.setData(ClipboardData(text: _projectUrl.toString())),
+        ),
+      ),
+    );
+  }
+
   void _reset() {
     _clock.reset();
     _started = false;
@@ -61,16 +86,7 @@ class _AureaLabScreenState extends State<AureaLabScreen>
     final language = TranslationProvider.of(context).flutterLocale.languageCode;
     final copy = t.aurea;
     return Theme(
-      data: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: _gold,
-          brightness: Brightness.dark,
-          surface: const Color(0xFF131B23),
-        ),
-        scaffoldBackgroundColor: const Color(0xFF0A1018),
-      ),
+      data: HazeTheme.of(true),
       child: Scaffold(
         appBar: AppBar(
           title: Text(copy.title),
@@ -523,6 +539,11 @@ class _AureaLabScreenState extends State<AureaLabScreen>
                                   color: Colors.white60,
                                   height: 1.5,
                                 ),
+                              ),
+                              TextButton.icon(
+                                onPressed: _openProject,
+                                icon: const Icon(Icons.open_in_new, size: 18),
+                                label: Text(copy.website),
                               ),
                               const SizedBox(height: 8),
                               Text(

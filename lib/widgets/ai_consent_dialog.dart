@@ -38,7 +38,7 @@ class AiConsentDialog extends StatelessWidget {
               if (!busy && !ready && !failed) ...[
                 const Text(
                   'Haze can run a small AI model right on your phone so it can '
-                  'chat and react with real feelings.\n',
+                  'understand new situations and find its own words.\n',
                 ),
                 _bullet(
                   context,
@@ -53,7 +53,7 @@ class AiConsentDialog extends StatelessWidget {
                 _bullet(
                   context,
                   Icons.toys,
-                  'Totally optional — Haze still works without it, using built-in replies.',
+                  'Optional — Haze’s simulated feelings work without it, with simple built-in replies.',
                 ),
               ],
               if (busy) ...[

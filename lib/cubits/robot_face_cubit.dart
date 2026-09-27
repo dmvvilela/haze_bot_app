@@ -12,6 +12,8 @@ import 'dart:math' as math;
 import 'dart:async';
 
 import '../models/robot_config.dart';
+import '../aurea/aurea_companion.dart';
+import '../aurea/aurea_model.dart';
 import '../i18n/strings.g.dart';
 import '../services/haze_brain.dart';
 import '../services/haze_mood.dart';
@@ -50,7 +52,8 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   static const automaticVoiceId = '__automatic_voice__';
 
   final FlutterTts _flutterTts = FlutterTts();
-  final HazeBrain _brain = HazeBrain();
+  final HazeBrain _brain;
+  AureaCompanion? companion;
   final TimerService _timerService = TimerService();
   final SoundService sounds = SoundService();
   final RobotVoiceService voice = RobotVoiceService();
@@ -71,7 +74,9 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   String? _activeVoiceLocale;
   String? _activeVoiceId;
 
-  RobotFaceCubit() : super(const RobotFaceState()) {
+  RobotFaceCubit({HazeBrain? brain})
+    : _brain = brain ?? HazeBrain(),
+      super(const RobotFaceState()) {
     _initializeTts();
     _initializeTimer();
     if (FlutterGemma.hasActiveModel()) {
@@ -157,7 +162,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
           ),
         );
         if (restoredConfig != null) {
-          LocaleSettings.setLocale(
+          LocaleSettings.setLocaleSync(
             restoredConfig.language.toLowerCase().startsWith('pt')
                 ? AppLocale.pt
                 : AppLocale.en,
@@ -301,15 +306,12 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       'share audio',
     );
     await _safeTtsCall(
-      () => _flutterTts.setIosAudioCategory(
-        IosTextToSpeechAudioCategory.playback,
-        [
-          IosTextToSpeechAudioCategoryOptions.mixWithOthers,
-          IosTextToSpeechAudioCategoryOptions.allowBluetooth,
-          IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
-        ],
-        IosTextToSpeechAudioMode.voicePrompt,
-      ),
+      () => _flutterTts
+          .setIosAudioCategory(IosTextToSpeechAudioCategory.playback, [
+            IosTextToSpeechAudioCategoryOptions.mixWithOthers,
+            IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+            IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+          ], IosTextToSpeechAudioMode.voicePrompt),
       'set iOS audio category',
     );
     await _applyTtsSettings();
@@ -385,11 +387,6 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
 
   void updateMouthColor(Color color) {
     final newConfig = state.config.copyWith(mouthColor: color);
-    emit(state.copyWith(config: newConfig));
-  }
-
-  void updateFaceType(FaceType faceType) {
-    final newConfig = state.config.copyWith(faceType: faceType);
     emit(state.copyWith(config: newConfig));
   }
 
@@ -801,6 +798,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   Future<void> _speak(
     String text, {
     RobotExpression? emotion,
+    AureaExpression? affect,
     bool ignoreSpeechEnabled = false,
     String? characterClipId,
   }) async {
@@ -810,8 +808,16 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     }
     try {
       await _applyTtsSettings();
-      if (emotion != null) {
-        final (pitchFactor, rateFactor) = _emotionVoice(emotion);
+      if (emotion != null || affect != null) {
+        final (pitchFactor, rateFactor) = affect == null
+            ? _emotionVoice(emotion!)
+            : (
+                1 + affect.activation * .08 - affect.sorrow * .06,
+                .95 +
+                    affect.activation * .06 -
+                    affect.sorrow * .12 -
+                    affect.tension * .06,
+              );
         await _safeTtsCall(
           () => _flutterTts.setPitch(
             (state.config.speechPitch * pitchFactor).clamp(0.5, 2.0),
@@ -874,7 +880,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         data.offsetInBytes,
         data.lengthInBytes,
       );
-      return voice.playWavBytes(
+      return await voice.playWavBytes(
         bytes,
         preset: state.config.robotVoiceEnabled
             ? VoicePreset.robot
@@ -1175,7 +1181,12 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   void startTimer(int minutes) {
     _timerService.startTimer(minutes);
     mood.timerStarted();
-    _respond(_timerStartPrompt(minutes), bias: _timerPromptBias);
+    _respond(
+      _timerStartPrompt(minutes),
+      builtInReply: state.config.language.startsWith('pt')
+          ? 'Vamos com calma. Estou aqui com você por $minutes minutos.'
+          : 'Let’s settle in. I’m here with you for $minutes minutes.',
+    );
   }
 
   void stopTimer() {
@@ -1194,7 +1205,12 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     // Audible even with speech off — a silent timer isn't a timer.
     sounds.play(HazeSound.chime);
     mood.timerFinished();
-    _respond(_timerCompletePrompt, bias: _timerPromptBias);
+    _respond(
+      _timerCompletePrompt,
+      builtInReply: state.config.language.startsWith('pt')
+          ? 'Seu tempo terminou. Respire e volte no seu ritmo.'
+          : 'Your timer is done. Take a breath and come back at your own pace.',
+    );
   }
 
   /// Easter egg: long-press the face and Haze sings a little tune.
@@ -1208,9 +1224,6 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       state.personality == HazePersonality.sleepy ||
       state.personality == HazePersonality.zen ||
       state.personality == HazePersonality.meditative;
-
-  RobotExpression get _timerPromptBias =>
-      _usesCalmTimerVoice ? RobotExpression.sleepy : RobotExpression.excited;
 
   String _timerStartPrompt(int minutes) => _usesCalmTimerVoice
       ? '(The user just started a $minutes-minute calm focus or meditation timer. Invite them to breathe, settle in, and go gently in one soft sentence.)'
@@ -1242,82 +1255,62 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     return _respond(trimmed, speakEvenIfSpeechDisabled: true);
   }
 
-  /// "Say something" button: Haze comments on the face it currently shows.
+  /// Invite a short conversational moment.
   Future<void> getAIResponse() {
     _recordActivity();
-    final emotion = state.config.expression;
     return _respond(
-      '(The user tapped you while your face shows "${emotion.name}". '
-      'Say something in character about how you feel right now.)',
-      bias: emotion,
+      'The user would like a little company. Say something gentle and relevant to our conversation.',
     );
   }
 
   /// Shared path for every Haze utterance: make sure the brain is ready, ask it
-  /// for a {emotion, say}, drive the face, remember the line, then speak.
+  /// to interpret the event, let Aurea respond, then find words and speak.
   Future<void> _respond(
     String userText, {
-    RobotExpression bias = RobotExpression.happy,
     bool speakEvenIfSpeechDisabled = false,
+    String? builtInReply,
   }) async {
+    if (isClosed || state.isLoadingAI) return;
     _secretMessageTimer?.cancel();
     emit(state.copyWith(isLoadingAI: true, chemistryReaction: ''));
     // Only ever download / load the model once the user has opted in. Without
     // consent the brain stays unloaded and respond() returns a canned line.
-    if (state.aiConsent == AiConsent.granted &&
-        state.brainStatus != BrainStatus.unavailable) {
-      await prepareBrain();
-    }
-
     try {
+      if (state.aiConsent == AiConsent.granted &&
+          state.brainStatus != BrainStatus.unavailable) {
+        await prepareBrain();
+      }
+      if (isClosed) return;
+      companion ??= AureaCompanion(
+        AureaCatalog.decode(
+          await rootBundle.loadString('assets/aurea/prototype.json'),
+        ),
+      );
+      final appraisal = await _brain.appraise(
+        userText,
+        useModel: state.aiConsent == AiConsent.granted,
+      );
+      if (isClosed) return;
+      companion!.observe(appraisal);
+      mood.releaseExpression();
       final reply = await _brain.respond(
         userText: userText,
         languageCode: state.config.language,
-        fallbackEmotion: bias,
-        currentChemistry: mood.levels(),
+        companion: companion!,
+        builtInReply: builtInReply,
+        useModel: state.aiConsent == AiConsent.granted,
       );
-
-      mood.releaseExpression();
-      final appliedImpulses = [...reply.impulses];
-      if (reply.impulses.isNotEmpty) {
-        mood.applyImpulses(reply.impulses);
-      } else {
-        // Offline/legacy model output still enters through chemistry.
-        mood.reactedTo(reply.emotion, sourceId: 'chat');
-      }
-
-      // Gemma 1B sometimes names the right feeling but under-doses it. Keep
-      // the readout, face, and spoken intent coherent by correcting the
-      // chemistry—not by painting a contradictory preset face over it.
-      appliedImpulses.addAll(mood.reinforceBrainIntent(reply.emotion));
-      final expression = mood.dominantExpression();
-      final chemistryReaction = appliedImpulses
-          .map(
-            (impulse) =>
-                '${impulse.chemical.name} '
-                '${impulse.delta >= 0 ? '+' : ''}'
-                '${impulse.delta.toStringAsFixed(2)}',
-          )
-          .join(' · ');
-      final newConfig = state.config.copyWith(expression: expression);
-      emit(
-        state.copyWith(
-          config: newConfig,
-          aiMessage: reply.say,
-          chemistryReaction: chemistryReaction,
-          isLoadingAI: false,
-        ),
-      );
-
+      if (isClosed) return;
+      emit(state.copyWith(aiMessage: reply, isLoadingAI: false));
       if (state.config.speechEnabled || speakEvenIfSpeechDisabled) {
         await _speak(
-          reply.say,
-          emotion: expression,
+          reply,
+          affect: companion!.expression,
           ignoreSpeechEnabled: speakEvenIfSpeechDisabled,
         );
       }
     } catch (e) {
-      emit(state.copyWith(isLoadingAI: false));
+      if (!isClosed) emit(state.copyWith(isLoadingAI: false));
     }
   }
 

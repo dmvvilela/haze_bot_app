@@ -18,7 +18,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       SharedPreferences.setMockInitialValues({});
-      LocaleSettings.setLocale(locale);
+      LocaleSettings.setLocaleSync(locale);
       final robot = RobotFaceCubit();
       final game = MixGameCubit(robot);
 

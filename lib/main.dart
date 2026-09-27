@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'theme/haze_theme.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -14,7 +16,6 @@ import 'widgets/haze_lab_screen.dart';
 import 'widgets/aurea_lab_screen.dart';
 import 'widgets/robot_face_widget.dart';
 import 'widgets/color_picker_dialog.dart';
-import 'widgets/face_type_picker_dialog.dart';
 import 'widgets/settings_dialog.dart';
 import 'widgets/timer_dialog.dart';
 import 'widgets/talk_dialog.dart';
@@ -42,7 +43,7 @@ void main() async {
         : null,
   );
 
-  LocaleSettings.setLocale(
+  LocaleSettings.setLocaleSync(
     AppLocale.en,
   ); // Start with English to match robot config default
   runApp(TranslationProvider(child: const HazeBotApp()));
@@ -55,22 +56,8 @@ class HazeBotApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: t.app.title,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-        scaffoldBackgroundColor: Colors.grey[100],
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        scaffoldBackgroundColor: Colors.black,
-      ),
+      theme: HazeTheme.of(false),
+      darkTheme: HazeTheme.of(true),
       locale: TranslationProvider.of(context).flutterLocale,
       supportedLocales: AppLocale.values.map((locale) => locale.flutterLocale),
       localizationsDelegates: const [
@@ -89,7 +76,7 @@ class HazeBotApp extends StatelessWidget {
   }
 }
 
-enum _MenuAction { lab, colors, faceStyle, theme, settings }
+enum _MenuAction { lab, say, colors, theme, settings }
 
 PopupMenuItem<_MenuAction> _menuItem(
   _MenuAction action,
@@ -99,7 +86,11 @@ PopupMenuItem<_MenuAction> _menuItem(
   return PopupMenuItem(
     value: action,
     child: Row(
-      children: [Icon(icon, size: 20), const SizedBox(width: 12), Text(label)],
+      children: [
+        Icon(icon, size: 20),
+        const SizedBox(width: 12),
+        Expanded(child: Text(label)),
+      ],
     ),
   );
 }
@@ -110,243 +101,320 @@ class RobotFaceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RobotFaceCubit, RobotFaceState>(
-      builder: (context, state) {
-        return Theme(
-          data: state.config.isDarkTheme ? ThemeData.dark() : ThemeData.light(),
-          child: Scaffold(
-            backgroundColor: state.config.isDarkTheme
-                ? Colors.black
-                : Colors.grey[100],
-            appBar: AppBar(
-              backgroundColor: state.config.isDarkTheme
-                  ? Colors.black
-                  : Colors.grey[100],
-              elevation: 0,
-              toolbarHeight: kToolbarHeight,
-              actions: [
-                AnimatedOpacity(
-                  opacity: state.showControls ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  child: IgnorePointer(
-                    ignoring: !state.showControls,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+      builder: (context, state) => Theme(
+        data: HazeTheme.of(state.config.isDarkTheme),
+        child: Builder(
+          builder: (context) {
+            final colors = Theme.of(context).colorScheme;
+            final cubit = context.read<RobotFaceCubit>();
+            final visible = state.showControls;
+            return Scaffold(
+              appBar: visible
+                  ? AppBar(
+                      toolbarHeight:
+                          76 *
+                          (MediaQuery.textScalerOf(context).scale(14) / 14)
+                              .clamp(1, 1.5),
+                      titleSpacing: 24,
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Haze',
+                            style: TextStyle(
+                              fontSize: 27,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -.7,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            t.home.companion,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        IconButton(
+                          tooltip: t.home.hide,
+                          icon: const Icon(Icons.visibility_off_outlined),
+                          onPressed: cubit.toggleControls,
+                        ),
+                        _toolsMenu(context, state),
+                        const SizedBox(width: 12),
+                      ],
+                    )
+                  : null,
+              body: SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final landscape =
+                        constraints.maxWidth > 620 &&
+                        constraints.maxWidth > constraints.maxHeight * 1.3;
+                    final hero = Stack(
+                      alignment: Alignment.center,
                       children: [
-                        // Mimic — Haze listens, then repeats it in a silly voice
-                        IconButton(
-                          icon: Icon(switch (state.mimicStatus) {
-                            MimicStatus.idle => Icons.mic_none,
-                            MimicStatus.listening => Icons.mic,
-                            MimicStatus.replaying => Icons.graphic_eq,
-                          }),
-                          color: state.mimicStatus == MimicStatus.listening
-                              ? Colors.redAccent
-                              : null,
-                          tooltip: 'Mimic',
-                          onPressed: () =>
-                              context.read<RobotFaceCubit>().toggleMimic(),
-                        ),
-                        // Feelings game — Haze acts, the player names the emotion
-                        IconButton(
-                          icon: Icon(Icons.emoji_emotions_outlined),
-                          tooltip: t.game.play,
-                          onPressed: () => _showGame(context),
-                        ),
-                        // Timer button with indicator
-                        Stack(
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.timer),
-                              onPressed: () => _showTimer(context),
-                            ),
-                            if (state.isTimerRunning)
-                              Positioned(
-                                right: 8,
-                                top: 8,
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        // "Say something" button — Haze reacts to its current face
-                        Stack(
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.smart_toy),
-                              onPressed: () => _withAiConsent(
-                                context,
-                                () => context
-                                    .read<RobotFaceCubit>()
-                                    .getAIResponse(),
-                              ),
-                            ),
-                            if (state.isLoadingAI)
-                              Positioned.fill(
-                                child: Center(
-                                  child: SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
+                        Positioned.fill(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: visible ? null : cubit.toggleControls,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: RadialGradient(
+                                  radius: .75,
+                                  colors: [
+                                    state.config.eyeColor.withValues(
+                                      alpha: state.config.isDarkTheme
+                                          ? .09
+                                          : .06,
                                     ),
-                                  ),
+                                    Colors.transparent,
+                                  ],
                                 ),
                               ),
-                          ],
-                        ),
-                        // Talk-to-Haze button — type a message, Haze replies + emotes
-                        IconButton(
-                          icon: Icon(Icons.chat_bubble_outline),
-                          onPressed: () => _withAiConsent(
-                            context,
-                            () => context
-                                .read<RobotFaceCubit>()
-                                .toggleChatComposer(),
+                            ),
                           ),
                         ),
-                        // Everything else lives in the overflow menu — nine
-                        // inline actions overflowed the app bar on phones.
-                        PopupMenuButton<_MenuAction>(
-                          icon: const Icon(Icons.more_vert),
-                          tooltip: 'More',
-                          onSelected: (action) {
-                            final cubit = context.read<RobotFaceCubit>();
-                            switch (action) {
-                              case _MenuAction.lab:
-                                _showLab(context);
-                              case _MenuAction.colors:
-                                _showColorPicker(context);
-                              case _MenuAction.faceStyle:
-                                _showFaceTypePicker(context);
-                              case _MenuAction.theme:
-                                cubit.toggleTheme();
-                              case _MenuAction.settings:
-                                _showSettings(context);
-                            }
-                          },
-                          itemBuilder: (_) => [
-                            // The window into Haze's simulated neurochemistry
-                            _menuItem(
-                              _MenuAction.lab,
-                              Icons.science_outlined,
-                              t.lab.title,
+                        const Center(child: RobotFaceWidget(framed: false)),
+                        if (state.mimicStatus != MimicStatus.idle ||
+                            state.isSpeaking)
+                          Positioned(
+                            top: 12,
+                            left: 60,
+                            right: 60,
+                            child: VoiceWaveform(
+                              voice: cubit.voice,
+                              color: state.mimicStatus == MimicStatus.listening
+                                  ? colors.error
+                                  : colors.primary,
                             ),
-                            _menuItem(
-                              _MenuAction.colors,
-                              Icons.palette,
-                              'Colors',
+                          ),
+                        if (!visible)
+                          Positioned(
+                            top: 8,
+                            right: 12,
+                            child: IconButton(
+                              tooltip: t.home.show,
+                              icon: Icon(
+                                Icons.visibility_outlined,
+                                color: colors.onSurfaceVariant.withValues(
+                                  alpha: .65,
+                                ),
+                              ),
+                              onPressed: cubit.toggleControls,
                             ),
-                            _menuItem(
-                              _MenuAction.faceStyle,
-                              Icons.face,
-                              'Face style',
-                            ),
-                            _menuItem(
-                              _MenuAction.theme,
-                              state.config.isDarkTheme
-                                  ? Icons.light_mode
-                                  : Icons.dark_mode,
-                              state.config.isDarkTheme
-                                  ? 'Light theme'
-                                  : 'Dark theme',
-                            ),
-                            _menuItem(
-                              _MenuAction.settings,
-                              Icons.settings,
-                              'Settings',
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.visibility_off),
-                          onPressed: () =>
-                              context.read<RobotFaceCubit>().toggleControls(),
-                        ),
+                          ),
                       ],
-                    ),
-                  ),
+                    );
+                    Widget controls() => Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (visible && !state.showChatComposer) ...[
+                            Text(
+                              _status(state),
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              t.home.hint,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: colors.onSurfaceVariant),
+                            ),
+                            const SizedBox(height: 18),
+                          ],
+                          if (state.aiMessage.isNotEmpty)
+                            _HazeSpeechBubble(
+                              message: state.aiMessage,
+                              speaking: state.isSpeaking,
+                              accent: colors.primary,
+                            ),
+                          if (state.timerSeconds > 0 || state.isTimerRunning)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 10,
+                                bottom: 10,
+                              ),
+                              child: _TimerOverlay(state: state),
+                            ),
+                          if (visible && state.showChatComposer)
+                            const TalkComposer()
+                          else if (visible)
+                            _homeActions(context, state),
+                        ],
+                      ),
+                    );
+                    return Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1000),
+                        child: landscape && visible
+                            ? Row(
+                                children: [
+                                  Expanded(child: hero),
+                                  SizedBox(
+                                    width: constraints.maxWidth * .42 > 380
+                                        ? 380
+                                        : constraints.maxWidth * .42,
+                                    child: SingleChildScrollView(
+                                      child: controls(),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  Expanded(child: hero),
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxHeight:
+                                          constraints.maxHeight *
+                                          (state.showChatComposer ? .65 : .55),
+                                    ),
+                                    child: SingleChildScrollView(
+                                      child: controls(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    );
+                  },
                 ),
-              ],
-            ),
-            body: Stack(
-              children: [
-                // With controls hidden, tapping the empty screen brings them
-                // back. This sits UNDER the face so the face stays touchable
-                // (poke to emote, drag so the eyes follow) in ambient mode.
-                if (!state.showControls)
-                  Positioned.fill(
-                    child: GestureDetector(
-                      onTap: () {
-                        context.read<RobotFaceCubit>().toggleControls();
-                      },
-                      child: Container(color: Colors.transparent),
-                    ),
-                  ),
-                // Robot face always centered
-                Padding(
-                  padding: EdgeInsets.only(
-                    bottom: AppBar().preferredSize.height,
-                  ),
-                  child: Center(child: const RobotFaceWidget()),
-                ),
-                if (state.showChatComposer)
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: (state.timerSeconds > 0 || state.isTimerRunning)
-                        ? 92
-                        : 20,
-                    child: const TalkComposer(),
-                  ),
-                // Whatever Haze last said, as a fading speech bubble — so its
-                // lines are readable even with the voice turned off.
-                if (state.aiMessage.isNotEmpty)
-                  Positioned(
-                    left: 24,
-                    right: 24,
-                    bottom: state.showChatComposer
-                        ? 96
-                        : (state.timerSeconds > 0 || state.isTimerRunning)
-                        ? 104
-                        : 36,
-                    child: _HazeSpeechBubble(
-                      message: state.aiMessage,
-                      speaking: state.isSpeaking,
-                      accent: state.config.eyeColor,
-                    ),
-                  ),
-                if (state.timerSeconds > 0 || state.isTimerRunning)
-                  Positioned(
-                    left: 20,
-                    right: 20,
-                    bottom: 28,
-                    child: _TimerOverlay(state: state),
-                  ),
-                // Live waveform of Haze's ears (listening) or voice (talking).
-                if (state.mimicStatus != MimicStatus.idle || state.isSpeaking)
-                  Positioned(
-                    left: 60,
-                    right: 60,
-                    top: 12,
-                    child: VoiceWaveform(
-                      voice: context.read<RobotFaceCubit>().voice,
-                      color: state.mimicStatus == MimicStatus.listening
-                          ? Colors.redAccent
-                          : state.config.eyeColor,
-                    ),
-                  ),
-              ],
-            ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  String _status(RobotFaceState state) {
+    if (state.mimicStatus == MimicStatus.listening) return t.home.listening;
+    if (state.mimicStatus == MimicStatus.replaying) return t.home.replaying;
+    if (state.isLoadingAI) return t.home.thinking;
+    if (state.isSpeaking) return t.home.speaking;
+    return t.home.greeting;
+  }
+
+  Widget _toolsMenu(BuildContext context, RobotFaceState state) =>
+      PopupMenuButton<_MenuAction>(
+        tooltip: t.home.more,
+        icon: const Icon(Icons.more_vert),
+        onSelected: (action) {
+          final cubit = context.read<RobotFaceCubit>();
+          switch (action) {
+            case _MenuAction.lab:
+              _showLab(context);
+            case _MenuAction.say:
+              _withAiConsent(context, cubit.getAIResponse);
+            case _MenuAction.colors:
+              _showColorPicker(context);
+            case _MenuAction.theme:
+              cubit.toggleTheme();
+            case _MenuAction.settings:
+              _showSettings(context);
+          }
+        },
+        itemBuilder: (_) => [
+          _menuItem(_MenuAction.say, Icons.smart_toy, t.home.say),
+          _menuItem(_MenuAction.lab, Icons.science_outlined, t.lab.title),
+          const PopupMenuDivider(),
+          _menuItem(_MenuAction.colors, Icons.palette_outlined, t.home.colors),
+          _menuItem(
+            _MenuAction.theme,
+            state.config.isDarkTheme
+                ? Icons.light_mode_outlined
+                : Icons.dark_mode_outlined,
+            state.config.isDarkTheme ? t.home.light : t.home.dark,
           ),
-        );
-      },
+          _menuItem(
+            _MenuAction.settings,
+            Icons.settings_outlined,
+            t.ui.settings,
+          ),
+        ],
+      );
+
+  Widget _homeActions(BuildContext context, RobotFaceState state) {
+    final cubit = context.read<RobotFaceCubit>();
+    final colors = Theme.of(context).colorScheme;
+    return HazePanel(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _HomeAction(
+                  icon: Icons.chat_bubble_outline,
+                  label: t.home.talk,
+                  primary: true,
+                  onTap: () =>
+                      _withAiConsent(context, cubit.toggleChatComposer),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _HomeAction(
+                  icon: Icons.emoji_emotions_outlined,
+                  label: t.home.play,
+                  onTap: () => _showGame(context),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _HomeAction(
+                  icon: Icons.auto_awesome_outlined,
+                  label: t.home.lab,
+                  onTap: () => _showLab(context),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Divider(height: 16),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            children: [
+              TextButton.icon(
+                onPressed: cubit.toggleMimic,
+                icon: Icon(
+                  state.mimicStatus == MimicStatus.listening
+                      ? Icons.stop_circle_outlined
+                      : Icons.mic_none,
+                  color: state.mimicStatus == MimicStatus.listening
+                      ? colors.error
+                      : null,
+                  size: 19,
+                ),
+                label: Text(
+                  state.mimicStatus == MimicStatus.listening
+                      ? t.home.stop
+                      : t.home.mimic,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () => _showTimer(context),
+                icon: const Icon(Icons.timer, size: 19),
+                label: Text(t.home.timer),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -393,16 +461,6 @@ class RobotFaceScreen extends StatelessWidget {
       builder: (dialogContext) => BlocProvider.value(
         value: context.read<RobotFaceCubit>(),
         child: const ColorPickerDialog(),
-      ),
-    );
-  }
-
-  void _showFaceTypePicker(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => BlocProvider.value(
-        value: context.read<RobotFaceCubit>(),
-        child: const FaceTypePickerDialog(),
       ),
     );
   }
@@ -510,6 +568,7 @@ class _HazeSpeechBubbleState extends State<_HazeSpeechBubble> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    if (!_visible) return const SizedBox.shrink();
     return IgnorePointer(
       ignoring: !_visible,
       child: AnimatedSlide(
@@ -607,13 +666,13 @@ class _TimerOverlay extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               IconButton.filledTonal(
-                tooltip: paused ? 'Resume' : 'Pause',
+                tooltip: paused ? t.home.resume : t.home.pause,
                 onPressed: paused ? cubit.resumeTimer : cubit.pauseTimer,
                 icon: Icon(paused ? Icons.play_arrow : Icons.pause),
               ),
               const SizedBox(width: 6),
               IconButton(
-                tooltip: 'Stop',
+                tooltip: t.home.stop,
                 onPressed: cubit.stopTimer,
                 icon: const Icon(Icons.stop),
               ),
@@ -628,5 +687,55 @@ class _TimerOverlay extends StatelessWidget {
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+}
+
+class _HomeAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool primary;
+  const _HomeAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.primary = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Semantics(
+      button: true,
+      label: label,
+      onTap: onTap,
+      excludeSemantics: true,
+      child: Material(
+        color: primary ? colors.primary : colors.primary.withValues(alpha: .07),
+        borderRadius: BorderRadius.circular(17),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: primary ? colors.onPrimary : colors.primary),
+                const SizedBox(height: 8),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: primary ? colors.onPrimary : colors.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

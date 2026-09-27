@@ -58,10 +58,8 @@ class SettingsDialog extends StatelessWidget {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<HazePersonality>(
                     initialValue: state.personality,
-                    decoration: const InputDecoration(
-                      labelText: 'Haze mood',
-                      border: OutlineInputBorder(),
-                    ),
+                    isExpanded: true,
+                    decoration: const InputDecoration(labelText: 'Haze mood'),
                     items: HazePersonality.values
                         .map(
                           (personality) => DropdownMenuItem(
@@ -81,10 +79,8 @@ class SettingsDialog extends StatelessWidget {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: state.config.language,
-                    decoration: InputDecoration(
-                      labelText: t.ui.language,
-                      border: const OutlineInputBorder(),
-                    ),
+                    isExpanded: true,
+                    decoration: InputDecoration(labelText: t.ui.language),
                     items: const [
                       DropdownMenuItem(value: 'en-US', child: Text('English')),
                       DropdownMenuItem(
@@ -96,9 +92,9 @@ class SettingsDialog extends StatelessWidget {
                       if (value != null) {
                         context.read<RobotFaceCubit>().updateLanguage(value);
                         if (value == 'pt-BR') {
-                          LocaleSettings.setLocale(AppLocale.pt);
+                          LocaleSettings.setLocaleSync(AppLocale.pt);
                         } else {
-                          LocaleSettings.setLocale(AppLocale.en);
+                          LocaleSettings.setLocaleSync(AppLocale.en);
                         }
                       }
                     },
@@ -182,7 +178,6 @@ class SettingsDialog extends StatelessWidget {
                             RobotFaceCubit.automaticVoiceId,
                         decoration: const InputDecoration(
                           labelText: 'Device fallback voice',
-                          border: OutlineInputBorder(),
                         ),
                         items: [
                           const DropdownMenuItem(
@@ -242,7 +237,7 @@ class SettingsDialog extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Done'),
+              child: Text(t.home.done),
             ),
           ],
         );
@@ -323,7 +318,14 @@ class _SectionHeader extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: colors.primary),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: colors.primary.withValues(alpha: .1),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(icon, color: colors.primary, size: 22),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(

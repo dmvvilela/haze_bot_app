@@ -17,7 +17,7 @@ import 'package:haze_bot_app/widgets/feelings_game_screen.dart';
 /// Run per device class:
 ///   flutter drive --driver=test_driver/integration_test.dart \
 ///     --target=integration_test/store_screenshots_test.dart \
-///     -d <SIMULATOR_UDID> --dart-define=SHOT_DEVICE=iphone69
+///     -d `SIMULATOR_UDID` --dart-define=SHOT_DEVICE=iphone69
 const _device = String.fromEnvironment('SHOT_DEVICE', defaultValue: 'iphone69');
 
 void main() {
@@ -54,7 +54,7 @@ void main() {
       ('en-US', AppLocale.en, 'en-US'),
       ('pt-BR', AppLocale.pt, 'pt-BR'),
     ]) {
-      LocaleSettings.setLocale(appLocale);
+      LocaleSettings.setLocaleSync(appLocale);
       cubit.updateLanguage(language);
 
       // 1) Hero: happy face, ambient mode (controls hidden).
