@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:record/record.dart';
 
+import 'tiny_companion_voice.dart';
+
 /// Where Haze's ears/voice are in the mimic flow.
 enum MimicStatus { idle, listening, replaying }
 
@@ -53,6 +55,9 @@ class RobotVoiceService {
   Timer? _playbackTicker;
   SoundHandle? _playingHandle;
   AudioSource? _playingSource;
+  Completer<void>? _playbackDone;
+  int _playbackRequest = 0;
+  bool _disposed = false;
 
   /// TTS-through-SoLoud needs `synthesizeToFile`. Android writes PCM WAV.
   /// iOS can write float WAV, so we normalize it before handing it to SoLoud.
@@ -167,10 +172,16 @@ class RobotVoiceService {
   /// Plays WAV bytes through the funny-voice pipe. Resolves when the clip
   /// finishes (or is stopped). Returns false when the engine refused the clip.
   Future<bool> playWavBytes(Uint8List wav, {required VoicePreset preset}) =>
-      _play(loadPath: null, wavBytes: wav, preset: preset);
+      _play(
+        loadPath: null,
+        wavBytes: wav,
+        preset: preset,
+        request: ++_playbackRequest,
+      );
 
   /// Same pipe, for clips flutter_tts already wrote to disk.
   Future<bool> playWavFile(String path, {required VoicePreset preset}) async {
+    final request = ++_playbackRequest;
     String? convertedPath;
     var loadName = path;
     try {
@@ -193,7 +204,13 @@ class RobotVoiceService {
         );
         return false;
       }
-      return await _play(loadPath: loadName, wavBytes: wav, preset: preset);
+      if (_disposed || request != _playbackRequest) return true;
+      return await _play(
+        loadPath: loadName,
+        wavBytes: wav,
+        preset: preset,
+        request: request,
+      );
     } catch (e) {
       debugPrint('RobotVoice: failed to read $path: $e');
       return false;
@@ -206,33 +223,35 @@ class RobotVoiceService {
     required String? loadPath,
     required Uint8List wavBytes,
     required VoicePreset preset,
+    required int request,
   }) async {
+    bool current() => !_disposed && request == _playbackRequest;
     try {
+      await _stopPlayback();
+      if (!current()) return true;
       if (!await _ensureEngine()) return false;
-      await stopPlayback();
+      if (!current()) return true;
 
       final playbackBytes = preset == VoicePreset.robot
-          ? _boostPcm16Wav(wavBytes)
+          ? await compute(renderCompanionWav, wavBytes)
           : wavBytes;
+      if (!current()) return true;
       final envelope = _envelopeFromWav(playbackBytes);
       final source = await SoLoud.instance.loadMem(
         loadPath ?? 'haze_clip_${_clipCounter++}.wav',
         playbackBytes,
       );
+      if (!current()) {
+        await SoLoud.instance.disposeSource(source);
+        return true;
+      }
       _playingSource = source;
 
-      if (preset == VoicePreset.robot) {
-        source.filters.robotizeFilter.activate();
-      }
       final handle = SoLoud.instance.play(source);
       _playingHandle = handle;
       switch (preset) {
         case VoicePreset.robot:
-          source.filters.robotizeFilter.wet(soundHandle: handle).value = 0.72;
-          source.filters.robotizeFilter.frequency(soundHandle: handle).value =
-              42;
-          source.filters.robotizeFilter.waveform(soundHandle: handle).value = 0;
-          debugPrint('RobotVoice: playing with robot filter');
+          debugPrint('RobotVoice: playing with Tiny Companion voice');
           break;
         case VoicePreset.chipmunk:
           SoLoud.instance.setRelativePlaySpeed(handle, 1.45);
@@ -245,32 +264,41 @@ class RobotVoiceService {
       }
 
       final done = Completer<void>();
+      _playbackDone = done;
       _playbackTicker = Timer.periodic(
         const Duration(milliseconds: _envelopeWindowMs),
         (_) {
-          final h = _playingHandle;
-          if (h == null || !SoLoud.instance.getIsValidVoiceHandle(h)) {
+          if (!current() || !SoLoud.instance.getIsValidVoiceHandle(handle)) {
             if (!done.isCompleted) done.complete();
             return;
           }
-          final position = SoLoud.instance.getPosition(h);
+          final position = SoLoud.instance.getPosition(handle);
           final index = position.inMilliseconds ~/ _envelopeWindowMs;
           _pushLevel(index < envelope.length ? envelope[index] : 0);
         },
       );
       await done.future;
-      await stopPlayback();
+      if (current()) await _stopPlayback();
       return true;
     } catch (e) {
       debugPrint('RobotVoice: playback failed: $e');
-      await stopPlayback();
+      if (!current()) return true;
+      await _stopPlayback();
       return false;
     }
   }
 
   Future<void> stopPlayback() async {
+    _playbackRequest++;
+    await _stopPlayback();
+  }
+
+  Future<void> _stopPlayback() async {
     _playbackTicker?.cancel();
     _playbackTicker = null;
+    final done = _playbackDone;
+    _playbackDone = null;
+    if (done != null && !done.isCompleted) done.complete();
     final handle = _playingHandle;
     _playingHandle = null;
     final source = _playingSource;
@@ -290,6 +318,7 @@ class RobotVoiceService {
   }
 
   Future<void> dispose() async {
+    _disposed = true;
     await stopListening(cancel: true);
     await stopPlayback();
     try {
@@ -396,41 +425,47 @@ class RobotVoiceService {
     return _pcm16ToWav(pcm, info.sampleRate, channels: info.channels);
   }
 
-  static Uint8List _boostPcm16Wav(Uint8List wav) {
+  /// Renders a PCM WAV with the companion treatment, including WAV decoding.
+  /// Exposed for offline auditions and verification of the actual audio path.
+  static Uint8List renderCompanionWav(Uint8List wav) {
     final info = _wavInfo(wav);
-    if (info == null || info.audioFormat != 1 || info.bitsPerSample != 16) {
+    if (info == null ||
+        info.audioFormat != 1 ||
+        (info.bitsPerSample != 8 && info.bitsPerSample != 16) ||
+        info.channels < 1 ||
+        info.sampleRate < 8000) {
       return wav;
     }
-
+    final clock = Stopwatch()..start();
     final data = ByteData.sublistView(wav);
-    var peak = 0;
-    for (
-      var offset = info.dataStart;
-      offset + 1 < info.dataStart + info.dataLength;
-      offset += 2
-    ) {
-      peak = math.max(peak, data.getInt16(offset, Endian.little).abs());
+    final bytesPerSample = info.bitsPerSample ~/ 8;
+    final frameBytes = bytesPerSample * info.channels;
+    final count = info.dataLength ~/ frameBytes;
+    final mono = Float64List(count);
+    for (var frame = 0; frame < count; frame++) {
+      for (var channel = 0; channel < info.channels; channel++) {
+        final offset =
+            info.dataStart + frame * frameBytes + channel * bytesPerSample;
+        mono[frame] += info.bitsPerSample == 16
+            ? data.getInt16(offset, Endian.little) / 32768
+            : (data.getUint8(offset) - 128) / 128;
+      }
+      mono[frame] /= info.channels;
     }
-    if (peak == 0) return wav;
-
-    final gain = math.min(1.45, 30000 / peak);
-    if (gain <= 1.01) return wav;
-
-    final boosted = Uint8List.fromList(wav);
-    final boostedData = ByteData.sublistView(boosted);
-    for (
-      var offset = info.dataStart;
-      offset + 1 < info.dataStart + info.dataLength;
-      offset += 2
-    ) {
-      final sample = data.getInt16(offset, Endian.little);
-      boostedData.setInt16(
-        offset,
-        (sample * gain).round().clamp(-32768, 32767),
+    final processed = TinyCompanionVoice.process(mono, info.sampleRate);
+    final pcm = Uint8List(processed.length * 2);
+    final encoded = ByteData.sublistView(pcm);
+    for (var i = 0; i < processed.length; i++) {
+      encoded.setInt16(
+        i * 2,
+        (processed[i] * 32767).round().clamp(-32768, 32767),
         Endian.little,
       );
     }
-    return boosted;
+    debugPrint(
+      'Tiny Companion: processed ${count / info.sampleRate}s in ${clock.elapsedMilliseconds}ms',
+    );
+    return _pcm16ToWav(pcm, info.sampleRate);
   }
 
   static _WavInfo? _wavInfo(Uint8List wav) {

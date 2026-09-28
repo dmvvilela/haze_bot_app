@@ -127,46 +127,70 @@ class SettingsDialog extends StatelessWidget {
                         context.read<RobotFaceCubit>().toggleSpeech(),
                   ),
                   if (state.config.speechEnabled) ...[
-                    Text(
-                      'Haze character voice',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Used for authored reactions',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(height: 10),
-                    _VoiceGroup(
-                      label: 'Female voices',
-                      voices: HazeVoice.values
-                          .where((voice) => !voice.isMale)
-                          .toList(),
-                      selected: state.config.hazeVoice,
-                      onSelected: context
-                          .read<RobotFaceCubit>()
-                          .updateHazeVoice,
-                    ),
-                    const SizedBox(height: 10),
-                    _VoiceGroup(
-                      label: 'Male voices',
-                      voices: HazeVoice.values
-                          .where((voice) => voice.isMale)
-                          .toList(),
-                      selected: state.config.hazeVoice,
-                      onSelected: context
-                          .read<RobotFaceCubit>()
-                          .updateHazeVoice,
-                    ),
-                    const SizedBox(height: 6),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Robot voice'),
-                      subtitle: const Text('Adds the local robot texture'),
+                      title: Text(
+                        state.config.language.startsWith('pt')
+                            ? 'Voz de pequeno companheiro'
+                            : 'Tiny companion voice',
+                      ),
+                      subtitle: Text(
+                        state.config.language.startsWith('pt')
+                            ? 'Leve e acolhedora, com um toque eletrônico'
+                            : 'Light and warm, with a gentle electronic touch',
+                      ),
                       value: state.config.robotVoiceEnabled,
                       onChanged: (_) =>
                           context.read<RobotFaceCubit>().toggleRobotVoice(),
                     ),
+                    if (!state.config.robotVoiceEnabled) ...[
+                      Text(
+                        'Haze character voice',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Used for authored reactions',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 10),
+                      _VoiceGroup(
+                        label: 'Female voices',
+                        voices: HazeVoice.values
+                            .where((voice) => !voice.isMale)
+                            .toList(),
+                        selected: state.config.hazeVoice,
+                        onSelected: context
+                            .read<RobotFaceCubit>()
+                            .updateHazeVoice,
+                      ),
+                      const SizedBox(height: 10),
+                      _VoiceGroup(
+                        label: 'Male voices',
+                        voices: HazeVoice.values
+                            .where((voice) => voice.isMale)
+                            .toList(),
+                        selected: state.config.hazeVoice,
+                        onSelected: context
+                            .read<RobotFaceCubit>()
+                            .updateHazeVoice,
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          onPressed: context
+                              .read<RobotFaceCubit>()
+                              .previewReactionVoice,
+                          icon: const Icon(Icons.play_arrow),
+                          label: Text(
+                            state.config.language.startsWith('pt')
+                                ? 'Ouvir reação gravada'
+                                : 'Preview reaction clip',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                    ],
                     if (showVoicePicker) ...[
                       DropdownButtonFormField<String>(
                         key: ValueKey(
@@ -176,8 +200,10 @@ class SettingsDialog extends StatelessWidget {
                         initialValue:
                             state.selectedTtsVoiceId ??
                             RobotFaceCubit.automaticVoiceId,
-                        decoration: const InputDecoration(
-                          labelText: 'Device fallback voice',
+                        decoration: InputDecoration(
+                          labelText: state.config.language.startsWith('pt')
+                              ? 'Voz das conversas'
+                              : 'Conversation voice',
                         ),
                         items: [
                           const DropdownMenuItem(
@@ -204,7 +230,11 @@ class SettingsDialog extends StatelessWidget {
                       child: OutlinedButton.icon(
                         onPressed: context.read<RobotFaceCubit>().previewVoice,
                         icon: const Icon(Icons.volume_up),
-                        label: const Text('Test voice'),
+                        label: Text(
+                          state.config.language.startsWith('pt')
+                              ? 'Testar voz das conversas'
+                              : 'Test speaking voice',
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),

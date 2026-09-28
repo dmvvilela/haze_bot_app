@@ -1,1 +1,1 @@
-sentimentos,emoções,criança,autismo,aprender,amigo,virtual,mesa,educativo,olhos,fofinho,bebê
+sentimentos,emoções,virtual,amigo,olhos,animado,mesa,foco,timer,compaixão,coragem,gratidão

@@ -571,42 +571,45 @@ class _HazeSpeechBubbleState extends State<_HazeSpeechBubble> {
     if (!_visible) return const SizedBox.shrink();
     return IgnorePointer(
       ignoring: !_visible,
-      child: AnimatedSlide(
-        offset: _visible ? Offset.zero : const Offset(0, 0.3),
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        child: AnimatedOpacity(
-          opacity: _visible ? 1 : 0,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: AnimatedSlide(
+          offset: _visible ? Offset.zero : const Offset(0, 0.3),
           duration: const Duration(milliseconds: 250),
-          child: Center(
-            child: GestureDetector(
-              onTap: () => setState(() => _visible = false),
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 420),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: colors.surface.withValues(alpha: 0.94),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: widget.accent.withValues(alpha: 0.35),
+          curve: Curves.easeOutCubic,
+          child: AnimatedOpacity(
+            opacity: _visible ? 1 : 0,
+            duration: const Duration(milliseconds: 250),
+            child: Center(
+              child: GestureDetector(
+                onTap: () => setState(() => _visible = false),
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 12,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.25),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+                  decoration: BoxDecoration(
+                    color: colors.surface.withValues(alpha: 0.94),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: widget.accent.withValues(alpha: 0.35),
                     ),
-                  ],
-                ),
-                child: Text(
-                  widget.message,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(height: 1.35),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    widget.message,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(height: 1.35),
+                  ),
                 ),
               ),
             ),

@@ -1,1 +1,12 @@
-Haze 2.0: the all-new living V3 face, the Feelings Game for kids, a robot chirp sound library (long-press Haze — it sings!), optional on-device AI chat, focus & meditation timers, new sad and scared expressions, and settings that finally remember you.
+Meet a more expressive Haze.
+
+• Explore compassion, courage, and gratitude in the new Aurea Lab
+• See how a different interpretation changes the same moment
+• Enjoy smoother expressions and calmer movement
+• Discover a refreshed home, colors, settings, and timer
+• One unified Haze face replaces the old face styles
+• Optional local conversations now connect to Haze's simulated feeling state
+• Updated dependencies and compatibility fixes
+• A softer Tiny Companion voice for new replies and reactions
+• More reliable speech playback and voice selection
+• Cleaner captions with better spacing

@@ -51,12 +51,15 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   static const _chemistryKey = 'haze_chemistry';
   static const automaticVoiceId = '__automatic_voice__';
 
-  final FlutterTts _flutterTts = FlutterTts();
+  final FlutterTts _flutterTts;
   final HazeBrain _brain;
   AureaCompanion? companion;
   final TimerService _timerService = TimerService();
   final SoundService sounds = SoundService();
-  final RobotVoiceService voice = RobotVoiceService();
+  final RobotVoiceService voice;
+  late final Future<void> _ttsReady;
+  late final Future<void> _preferencesReady;
+  int _speechRequest = 0;
 
   /// Haze's simulated neurochemistry — what the idle face and the lab read.
   final HazeMood mood = HazeMood();
@@ -74,15 +77,17 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   String? _activeVoiceLocale;
   String? _activeVoiceId;
 
-  RobotFaceCubit({HazeBrain? brain})
+  RobotFaceCubit({HazeBrain? brain, FlutterTts? tts, RobotVoiceService? voice})
     : _brain = brain ?? HazeBrain(),
+      _flutterTts = tts ?? FlutterTts(),
+      voice = voice ?? RobotVoiceService(),
       super(const RobotFaceState()) {
-    _initializeTts();
+    _ttsReady = _initializeTts();
     _initializeTimer();
     if (FlutterGemma.hasActiveModel()) {
       emit(state.copyWith(aiConsent: AiConsent.granted));
     }
-    _restorePreferences();
+    _preferencesReady = _restorePreferences();
     // Persist the chemistry on every change — impulses are user-paced and
     // the snapshot is tiny, and mobile apps are killed, not closed, so any
     // throttling here is a window where a cuddle can be lost.
@@ -191,6 +196,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         // decay away from it.
         if (!chemistryRestored) mood.resetToBaseline();
         if (restoredVoiceId != null || restoredConfig != null) {
+          await _ttsReady;
           _activeVoiceLocale = null;
           _activeVoiceId = null;
           await _applyTtsSettings();
@@ -762,11 +768,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         emit(state.copyWith(aiMessage: ''));
       }
     });
-    _speak(
-      line,
-      emotion: emotion,
-      characterClipId: _characterClipForExpression(emotion),
-    );
+    _speak(line, emotion: emotion);
   }
 
   void _scheduleNextBlink() {
@@ -806,7 +808,14 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     if ((!ignoreSpeechEnabled && !state.config.speechEnabled) || line.isEmpty) {
       return;
     }
+    final request = ++_speechRequest;
+    bool current() => !isClosed && request == _speechRequest;
     try {
+      await Future.wait([_ttsReady, _preferencesReady]);
+      if (!current()) return;
+      await _flutterTts.stop();
+      await voice.stopPlayback();
+      if (!current()) return;
       await _applyTtsSettings();
       if (emotion != null || affect != null) {
         final (pitchFactor, rateFactor) = affect == null
@@ -831,13 +840,15 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
           'set emotion rate',
         );
       }
-      await _flutterTts.stop();
-      await voice.stopPlayback();
+      if (!current()) return;
       if (!isClosed) emit(state.copyWith(isSpeaking: true));
-      var spoken = characterClipId == null
+      // Tiny Companion uses the same on-demand voice for reactions and chat.
+      var spoken = characterClipId == null || state.config.robotVoiceEnabled
           ? false
-          : await _playCharacterClip(characterClipId);
-      if (!spoken) spoken = await _speakCaptured(line);
+          : await _playCharacterClip(characterClipId, isCurrent: current);
+      if (!current()) return;
+      if (!spoken) spoken = await _speakCaptured(line, isCurrent: current);
+      if (!current()) return;
       if (!spoken) {
         final result = await _flutterTts.speak(line, focus: true);
         if (result != 1) {
@@ -847,7 +858,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     } catch (e) {
       debugPrint('Haze TTS: failed to speak: $e');
     } finally {
-      if (!isClosed) emit(state.copyWith(isSpeaking: false));
+      if (current()) emit(state.copyWith(isSpeaking: false));
     }
   }
 
@@ -863,7 +874,10 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         RobotExpression.scared => 'scared',
       };
 
-  Future<bool> _playCharacterClip(String clipId) async {
+  Future<bool> _playCharacterClip(
+    String clipId, {
+    required bool Function() isCurrent,
+  }) async {
     try {
       final language = state.config.language.toLowerCase();
       final localePath = language.startsWith('pt')
@@ -876,6 +890,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
           'assets/voices/haze/${state.config.hazeVoice.assetId}'
           '$localePath/$clipId.wav';
       final data = await rootBundle.load(asset);
+      if (!isCurrent()) return true;
       final bytes = data.buffer.asUint8List(
         data.offsetInBytes,
         data.lengthInBytes,
@@ -895,7 +910,10 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   /// Capture platform TTS to a file and replay it through SoLoud so the mouth
   /// and waveform always follow real audio. Robot texture is an independent
   /// optional filter; unsupported platforms still fall back to plain TTS.
-  Future<bool> _speakCaptured(String line) async {
+  Future<bool> _speakCaptured(
+    String line, {
+    required bool Function() isCurrent,
+  }) async {
     if (!voice.isTtsCaptureSupported) return false;
     // Unique file per utterance: iOS AVAudioFile appends into an existing
     // file, and SoLoud keys loaded sources by path — reusing one path could
@@ -905,6 +923,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
         '${Directory.systemTemp.path}/haze_tts_${DateTime.now().microsecondsSinceEpoch}.$extension';
     try {
       final result = await _flutterTts.synthesizeToFile(line, path, true);
+      if (!isCurrent()) return true;
       if (result != 1) {
         debugPrint('Haze TTS: synthesizeToFile returned $result');
         return false;
@@ -963,24 +982,26 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   }
 
   Future<void> previewVoice() =>
-      _speak(_voicePreviewLine, characterClipId: 'hello');
+      _speak(_voicePreviewLine, ignoreSpeechEnabled: true);
 
-  String get _voicePreviewLine => switch (state.personality) {
-    HazePersonality.sleepy =>
-      'Haze voice check... sleepy circuits online... zzz.',
-    HazePersonality.zen || HazePersonality.meditative =>
-      'Haze voice check. Breathe in gently, and let the little robot hum settle.',
-    HazePersonality.sarcastic =>
-      'Haze voice check. Miraculously, the tiny speaker has opinions.',
-    HazePersonality.playful =>
-      'Haze voice check! Beep boop, local voice systems are online.',
-  };
+  Future<void> previewReactionVoice() => _speak(
+    _voicePreviewLine,
+    ignoreSpeechEnabled: true,
+    characterClipId: 'hello',
+  );
+
+  String get _voicePreviewLine => state.config.language.startsWith('pt')
+      ? 'Ah! Você chegou. Guardei um cantinho aqui do meu lado para você.'
+      : 'Oh! There you are. I saved you a little spot next to me.';
 
   Future<void> _applyTtsSettings() async {
-    await _safeTtsCall(
-      () => _flutterTts.setLanguage(state.config.language),
-      'set language',
-    );
+    // iOS setLanguage clears the selected voice. Preserve it between lines.
+    if (_activeVoiceLocale != state.config.language) {
+      await _safeTtsCall(
+        () => _flutterTts.setLanguage(state.config.language),
+        'set language',
+      );
+    }
     await _safeTtsCall(
       () => _flutterTts.setSpeechRate(state.config.speechRate),
       'set speech rate',
@@ -1338,6 +1359,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
 
   @override
   Future<void> close() async {
+    _speechRequest++;
     _idleTimer?.cancel();
     _dizzyTimer?.cancel();
     _secretMessageTimer?.cancel();

@@ -1,1 +1,12 @@
-Haze 2.0: novo rosto V3 vivo, o Jogo dos Sentimentos para crianças, biblioteca de sons de robô (segure o rosto — ele canta!), chat com IA no aparelho, timers de foco e meditação, novas expressões triste e assustado, e configurações que agora ficam salvas.
+Conheça um Haze mais expressivo.
+
+• Explore compaixão, coragem e gratidão no novo Lab Aurea
+• Veja como outra interpretação muda o mesmo momento
+• Aproveite expressões mais suaves e movimentos mais calmos
+• Descubra a nova tela inicial, cores, ajustes e timer
+• Um único rosto do Haze substitui os estilos antigos
+• As conversas locais opcionais agora se conectam ao estado emocional simulado
+• Atualizações de dependências e correções de compatibilidade
+• Uma voz mais suave para novas respostas e reações
+• Reprodução de fala e seleção de voz mais confiáveis
+• Legendas mais limpas e com melhor espaçamento

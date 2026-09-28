@@ -8,6 +8,19 @@ void main() {
   AureaCompanion companion() => AureaCompanion(
     AureaCatalog.decode(File('assets/aurea/prototype.json').readAsStringSync()),
   );
+  test('neutral offline replies do not repeat a generic subtitle', () async {
+    for (final language in ['en-US', 'pt-BR']) {
+      expect(
+        await HazeBrain().respond(
+          userText: 'Hello',
+          companion: companion(),
+          languageCode: language,
+          useModel: false,
+        ),
+        isEmpty,
+      );
+    }
+  });
   test(
     'appraisals bound finite evidence and ignore emotion/chemical commands',
     () {

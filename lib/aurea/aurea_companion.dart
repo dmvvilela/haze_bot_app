@@ -194,8 +194,8 @@ class AureaCompanion {
           ? 'Obrigado pelo carinho. Estou aqui com você.'
           : 'Thank you for that kindness. I’m here with you.';
     }
-    return pt
-        ? 'Estou aqui. Me conta um pouco mais?'
-        : 'I’m here. Could you tell me a little more?';
+    // A neutral appraisal has no useful canned reply. Let the face respond
+    // quietly instead of repeating a generic request for more information.
+    return '';
   }
 }

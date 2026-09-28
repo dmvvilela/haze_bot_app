@@ -48,6 +48,51 @@ Edit `tool/haze_voice_design.json` to change personas and audition lines.
 Generated files appear under `tool/voice_output/` and remain ignored by Git
 until a final voice pack is deliberately copied into app assets.
 
+## Compare robotic sound treatments
+
+Use the existing voice-studio environment plus `ffmpeg` to render three
+sound sketches from the same bundled recording:
+
+```sh
+.voice-studio/bin/python tool/audition_robot_voices.py
+```
+
+The output is in `tool/voice_output/robot_auditions/`: an unprocessed reference,
+a soft sci-fi blend, a musical vocoder, and a retro robot. All four use the
+same timing and a -21 LUFS loudness target. A manifest records the source,
+duration, and output peaks. These are offline auditions, not a mobile runtime
+implementation or an approved replacement for the app's voice.
+
+To compare Brazilian Portuguese with the same processing:
+
+```sh
+.voice-studio/bin/python tool/audition_robot_voices.py \
+  --source assets/voices/haze/compact_wit/pt/hello.wav \
+  --output tool/voice_output/robot_auditions_pt
+```
+
+## Audition lighter character voices
+
+For lighter character sketches generated from fresh macOS system speech:
+
+```sh
+.voice-studio/bin/python tool/audition_cute_voices.py \
+  --text "Oh! There you are. I saved you a little spot next to me."
+```
+
+This writes two gently pitched, lightly synthetic variants to
+`tool/voice_output/cute_auditions/`. It requires permission to use macOS speech
+services. These auditions use arbitrary input text, but their processing still
+serves as a sound reference rather than the mobile runtime itself.
+
+The approved first sketch is implemented in `lib/services/tiny_companion_voice.dart`:
+a 2.5-semitone pitch lift with duration-preserving overlap-add, plus a 12% synthetic
+layer. `RobotVoiceService` runs it in a background isolate after TTS synthesis,
+and computes the mouth envelope from the resulting audio. Tiny Companion mode
+uses generated speech for both reactions and conversations. The portable DSP
+uses different filters from the Python audition, so listen to the in-app preview
+when judging the final sound; installed system voices can also vary by device.
+
 ## Freeze consistent voice packs
 
 VoiceDesign may invent a slightly different speaker on every call. Once an

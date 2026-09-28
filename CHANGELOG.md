@@ -5,6 +5,23 @@ All notable changes to Haze Bot are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-09-28
+
+### Added
+- Aurea Lab experiments for compassion, courage, and gratitude
+- Continuous, context-driven expressions linked to optional local conversations
+- Tiny Companion voice processing for generated replies and reactions
+- Professional localized store screenshots for iPhone, iPad, and Android
+
+### Changed
+- Refreshed home, settings, timer, colors, and one unified Haze face
+- Calmer movement and smoother expression transitions
+- Removed the repetitive neutral fallback caption and improved caption spacing
+
+### Fixed
+- Voice selection persistence, localized previews, and interrupted audio playback
+- Updated major dependencies and platform compatibility
+
 ## [2.1.0] - 2026-07-22
 
 ### Added
