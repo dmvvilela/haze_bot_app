@@ -16,7 +16,7 @@ Five distinct feature stories, in English and Brazilian Portuguese:
 All 30 exports are opaque RGB. Filenames define store order.
 
 `preview-<locale>-<device>.jpg` contact sheets show each complete set.
-`source/metadata.json` contains proposed 2.2.0 store descriptions, subtitles,
+`source/metadata.json` contains the 2.2.0 store descriptions, subtitles,
 keywords, promotional copy, and release notes. Old five-face-style claims have
 been removed. No scientific or clinical effectiveness claims are made.
 
@@ -48,30 +48,27 @@ and Google's [preview asset guidance](https://support.google.com/googleplay/andr
 checked on 2026-09-27. `verification.json` checks dimensions, opacity, hashes,
 ordering, framing, copy clearance, and metadata length limits.
 
-## Release handoff
+## Release 2.2.0 · build 6
 
-Prepared locally; **nothing has been uploaded or submitted**. Existing store
-assets and old release metadata have not been replaced.
+On 2026-09-28, all 30 screenshots were uploaded: 20 to App Store Connect
+(iPhone and iPad) and 10 to Google Play (phone). The saved store assets were
+checked against local checksums and ordering; all Apple assets reached COMPLETE.
+Inherited iPad screenshots from the previous version were removed from the new
+version. English and Portuguese store descriptions were also updated.
 
-App Store Connect was checked on 2026-09-27: live iOS version **2.1.0**, latest
-uploaded build **5**, processing VALID. Suggested next version: **2.2.0**, with
-build 6 available on iOS at the time of that check. Google Play's current track
-and version code still need a fresh check before choosing its build number.
+The app release commit is `97e7668`. All 112 app tests passed, all 30 captures
+rendered, and the artwork validator passed. Signed iOS and Android release
+artifacts were built and uploaded; artifact identities and hashes were checked.
+All 22 Android 64-bit native libraries have at least 16 KB ELF load alignment.
+The simulator voice smoke tests passed. Optional physical-device AI inference
+remains unverified; the user requested simulator-only testing.
 
-The preceding app commit is `475a448`; its 104 tests, analyzer, iOS simulator build,
-and Android debug build passed. The optional upgraded Gemma model still needs
-a physical-device conversation smoke test before shipping. A debug/simulator
-build does not validate release signing or physical-device inference.
+App Store review submission and Google Play production review preparation are
+recorded in [the release record](../../releases/2.2.0.json). These are submission
+states, not proof of public availability. iOS releases automatically after
+approval with a seven-day phased rollout; Google Play managed publishing is off.
 
-Validation repeated on 2026-09-27: all 104 app tests passed, the capture test
-rendered all 30 localized scenes successfully, static analysis found no issues,
-and regenerated exports passed `source/verify.py`. A fresh simulator restart
-and Lab navigation reported no runtime errors. A physical-device launch was
-attempted, but Xcode could not obtain build settings and `devicectl` reported
-the wireless iPhone as `unavailable`. Physical AI inference remains unverified;
-retry with the phone unlocked and connected, preferably by USB.
-
-Before submission: approve the artwork, finalize the version/build numbers,
-apply the proposed metadata, build signed release artifacts, upload the new
-screenshot sets explicitly, and verify the resulting store state. The existing
-`release.sh` does not automatically select this campaign directory.
+Rendering and local validation do not establish store state. The manifest and
+verification report describe the local artwork; the versioned release record
+contains the separate upload and submission evidence. `release.sh` does not
+automatically select this campaign directory.

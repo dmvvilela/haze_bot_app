@@ -165,5 +165,5 @@ if __name__=='__main__':
         for kind in ['iphone','ipad','android']:
             for index in range(5): manifest.append(compose(locale,kind,index))
             overview(locale,kind)
-    (ROOT/'manifest.json').write_text(json.dumps({'storeUploaded':False,'files':manifest},indent=2)+'\n')
+    (ROOT/'manifest.json').write_text(json.dumps({'files':manifest},indent=2)+'\n')
     print(f'Rendered {len(manifest)} store assets and six contact sheets.')

@@ -6,7 +6,6 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 manifest = json.loads((ROOT/'manifest.json').read_text())
-assert manifest['storeUploaded'] is False
 assert len(manifest['files']) == 30
 counts = {}
 for item in manifest['files']:
@@ -34,6 +33,6 @@ for locale, fields in metadata['locales'].items():
 result = {'passed':True, 'screenshots':30, 'locales':['en-US','pt-BR'],
           'platforms':['iphone','ipad','android'], 'opaque':True,
           'dimensionsAndHashes':True, 'noLayoutOverlaps':True,
-          'metadataLengths':lengths, 'storeUploaded':False}
+          'metadataLengths':lengths}
 (ROOT/'verification.json').write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps(result,indent=2))

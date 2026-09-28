@@ -1,0 +1,317 @@
+{
+  "version": "2.2.0",
+  "buildNumber": 6,
+  "appCommit": "97e7668",
+  "recordedAt": "2026-09-28T04:54:02.938214+00:00",
+  "validation": {
+    "flutterTestsPassed": 112,
+    "artworkExportsVerified": 30,
+    "simulatorVoiceSmokeTestsPassed": 2,
+    "physicalDeviceAIInference": "not verified; simulator-only testing requested"
+  },
+  "ios": {
+    "appId": "6747320369",
+    "bundleId": "com.d2vsolutions.hazeBotApp",
+    "versionId": "88a21de5-b34a-4d16-9f34-c83ef87225f6",
+    "buildId": "ac8772d9-c535-4a6d-88b4-362ccad7e263",
+    "buildProcessingState": "VALID",
+    "submissionId": "6cf11959-eb96-4646-bd3c-a4761e703689",
+    "submittedDate": "2026-09-28T04:52:59.681Z",
+    "state": "WAITING_FOR_REVIEW",
+    "releasePolicy": "Automatic after approval; seven-day phased rollout",
+    "artifact": {
+      "CFBundleIdentifier": "com.d2vsolutions.hazeBotApp",
+      "CFBundleShortVersionString": "2.2.0",
+      "CFBundleVersion": "6",
+      "MinimumOSVersion": "16.0",
+      "ITSAppUsesNonExemptEncryption": false,
+      "sha256": "559a9232cb0bff91439417f9066b6130e6fa08d1306c6eaaa2f85f914b06c142"
+    },
+    "signatureVerified": true,
+    "readiness": {
+      "errors": 0,
+      "warnings": 0,
+      "infos": 1,
+      "blocking": 0
+    },
+    "screenshots": [
+      {
+        "locale": "en-US",
+        "device": "iphone",
+        "fileName": "01_companion.png",
+        "assetId": "06000019-22bf-8031-8035-949229a9d81b",
+        "md5": "3199386bd2f9045dc2c759d1a923fd2a",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "en-US",
+        "device": "iphone",
+        "fileName": "02_aurea.png",
+        "assetId": "2c800019-22bf-8031-801b-76f154a7f60e",
+        "md5": "a613c8efc11ab85838a48aee54072e19",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "en-US",
+        "device": "iphone",
+        "fileName": "03_play.png",
+        "assetId": "eac00019-22bf-8031-8018-40c64fd3fc4d",
+        "md5": "f7b02f36609df1c941e51af926f94dcd",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "en-US",
+        "device": "iphone",
+        "fileName": "04_focus.png",
+        "assetId": "ccc00019-22bf-8031-8010-85c6b7b10ae9",
+        "md5": "6ed760e62e5564524d2d0de06185c812",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "en-US",
+        "device": "iphone",
+        "fileName": "05_yours.png",
+        "assetId": "08400019-22bf-8031-8035-e532adb299e1",
+        "md5": "ee973a831dbb016b04017753becc0ade",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "en-US",
+        "device": "ipad",
+        "fileName": "01_companion.png",
+        "assetId": "1e800019-22bf-8031-8011-0a1c53e421c0",
+        "md5": "7458fc054a79153516a57286d00816f0",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "en-US",
+        "device": "ipad",
+        "fileName": "02_aurea.png",
+        "assetId": "b9800019-22bf-8031-801b-37044d59638f",
+        "md5": "e3606f607d5c12c219263aee7131baea",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "en-US",
+        "device": "ipad",
+        "fileName": "03_play.png",
+        "assetId": "2bc00019-22bf-8031-8031-6c57ef90dc68",
+        "md5": "d7891f2e83703e90031ba03463a5469e",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "en-US",
+        "device": "ipad",
+        "fileName": "04_focus.png",
+        "assetId": "f9000019-22bf-8031-8031-ae927c715153",
+        "md5": "0b5ceae38ca43583ae2d5067071cda74",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "en-US",
+        "device": "ipad",
+        "fileName": "05_yours.png",
+        "assetId": "4dc00019-22bf-8031-803a-0e9383c18e10",
+        "md5": "ab6b80aec6cbaab065a5a8e8c55509df",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "pt-BR",
+        "device": "iphone",
+        "fileName": "01_companion.png",
+        "assetId": "fb800019-22bf-8031-8030-6f614eb75911",
+        "md5": "e66cc1c8df74f9e6a905fff335b8bc2c",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "pt-BR",
+        "device": "iphone",
+        "fileName": "02_aurea.png",
+        "assetId": "4e000019-22bf-8031-8019-efece3381cd0",
+        "md5": "c01b4867b87885dff616656885b1bea4",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "pt-BR",
+        "device": "iphone",
+        "fileName": "03_play.png",
+        "assetId": "68c00019-22bf-8031-803e-fe49cc4f8a3b",
+        "md5": "e40da922c071a69df25e44f4c1ff8f78",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "pt-BR",
+        "device": "iphone",
+        "fileName": "04_focus.png",
+        "assetId": "1c000019-22bf-8031-8025-52b491c7da76",
+        "md5": "1bd1cf5ee74df56d433ebaead6399cf4",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "pt-BR",
+        "device": "iphone",
+        "fileName": "05_yours.png",
+        "assetId": "c0000019-22bf-8031-800a-997a574c617a",
+        "md5": "4feab0e431eab4cf77a080b4e95dd6e3",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "pt-BR",
+        "device": "ipad",
+        "fileName": "01_companion.png",
+        "assetId": "0d800019-22bf-8031-8000-ffd9df9f8f43",
+        "md5": "fcc4b86014ea2ea33873232081e49a60",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "pt-BR",
+        "device": "ipad",
+        "fileName": "02_aurea.png",
+        "assetId": "d2000019-22bf-8031-803d-df4a48cba4ba",
+        "md5": "c314e2f9906f444c8ff95b24ebf8f635",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "pt-BR",
+        "device": "ipad",
+        "fileName": "03_play.png",
+        "assetId": "ee800019-22bf-8031-8010-7b56f5ee2bcb",
+        "md5": "6944a222de3140bbab21b4d34576c591",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "pt-BR",
+        "device": "ipad",
+        "fileName": "04_focus.png",
+        "assetId": "04800019-22bf-8031-801c-3fb1d2a49f6d",
+        "md5": "7a7f59e357377d4a958c4545705a01b1",
+        "state": "COMPLETE"
+      },
+      {
+        "locale": "pt-BR",
+        "device": "ipad",
+        "fileName": "05_yours.png",
+        "assetId": "51c00019-22bf-8031-8027-9cfc63abd0ce",
+        "md5": "e46ef1a9259ac8708d9e1dca53600e58",
+        "state": "COMPLETE"
+      }
+    ],
+    "url": "https://appstoreconnect.apple.com/apps/6747320369"
+  },
+  "android": {
+    "package": "com.d2vsolutions.haze_bot_app",
+    "productionTrack": {
+      "releases": [
+        {
+          "name": "2.2.0",
+          "release_notes": [
+            {
+              "language": "en-US",
+              "text": "Meet the refreshed Haze: explore compassion, courage and gratitude in Aurea Lab, enjoy smoother expressions and a softer companion voice, play the feelings game, and settle in with the focus timer. Includes improved speech playback and cleaner captions.\n"
+            },
+            {
+              "language": "pt-BR",
+              "text": "Conhe\u00e7a o novo Haze: explore compaix\u00e3o, coragem e gratid\u00e3o no Lab Aurea, aproveite express\u00f5es suaves e uma voz mais acolhedora, brinque com o jogo dos sentimentos e concentre-se com o timer. Inclui melhorias na fala e legendas mais limpas.\n"
+            }
+          ],
+          "status": "completed",
+          "version_codes": [
+            "6"
+          ]
+        }
+      ],
+      "track": "production"
+    },
+    "bundle": {
+      "sha1": "91406ec6992ad398cefd42010e330869826e6b2a",
+      "sha256": "c1ce6bd7022766452686d16ab9fdb981a42dc0527e97814f6df850ec5719197f",
+      "version_code": 6
+    },
+    "artifactManifest": {
+      "package": "com.d2vsolutions.haze_bot_app",
+      "versionCode": "6",
+      "versionName": "2.2.0",
+      "compileSdkVersion": "36",
+      "platformBuildVersionCode": "36",
+      "compileSdkVersionCodename": "16",
+      "platformBuildVersionName": "16"
+    },
+    "all64BitLibraries16KBAligned": true,
+    "nativeLibrariesVerified": 22,
+    "screenshots": {
+      "en-US": [
+        {
+          "file": "01_companion.png",
+          "id": "16208735528385147387",
+          "sha256": "8e748ed4099ceae2e82dcc3610be98ab6a6c4bf140f14a413380b465fba9c85e",
+          "url": "https://lh3.googleusercontent.com/vgcTs0h0E_6AGOxBg-2N-jrNOorPo9zrYdLc23Klxw8-sMUtmmJqsW5b6Ovam4j_dA"
+        },
+        {
+          "file": "02_aurea.png",
+          "id": "12209136748612459367",
+          "sha256": "47c8233cc6eba4601eecf3a56a1c5d19cf2bc6bf14b9b7723882e1013f1ef108",
+          "url": "https://lh3.googleusercontent.com/-i8pJDDUhP_51GED0dpnK3pwDWRkkzrOYYjBpQ3R3quB4CLEyeFHvYHLVPBOtuga-w"
+        },
+        {
+          "file": "03_play.png",
+          "id": "8316376177726766241",
+          "sha256": "961ce1f3b5b189abdec78cf9f80a72faced92b90487694559fa81abe89fc467d",
+          "url": "https://lh3.googleusercontent.com/D2HHFfcuYUAeu_WLmzt6ITq-516JDW4sJc7n9rVpLIw7_iGXg4Y6z3KTEtoECy4A0A"
+        },
+        {
+          "file": "04_focus.png",
+          "id": "2892282415763278048",
+          "sha256": "751cd051babb3b36fc5f1de4f05fc814394a6f7ef3d10f722c30eb6b95e586b0",
+          "url": "https://lh3.googleusercontent.com/TdMmQ27j3QujXqsq_HuT67uOXu0n1ioZ1J3koo1u5106Tupz2hwGPW80Nap6FdRQ6A"
+        },
+        {
+          "file": "05_yours.png",
+          "id": "2939705406827855343",
+          "sha256": "18f5fd4ccf5efcf87e907e084af5cba60c15da1366f7cb1de916a8c1de7da02d",
+          "url": "https://lh3.googleusercontent.com/1PfDcaQANcHeJyfIJBCp0IzVbDPPcnZYtpYqRVeU-3wkkQNVZXj94vlCaZVe7wt9FxTm"
+        }
+      ],
+      "pt-BR": [
+        {
+          "file": "01_companion.png",
+          "id": "8337865706354519592",
+          "sha256": "302144d4ae5a5247db42dd59623e862866ec48ef3469820c24703390338b657b",
+          "url": "https://lh3.googleusercontent.com/bFm4_yUHLN65yTSY08PSjoDkw7JAntIr5rpKn18eFhw0X9rIlqFwRS7vTOkhHwNkzYc"
+        },
+        {
+          "file": "02_aurea.png",
+          "id": "8790776691086008060",
+          "sha256": "b78c6b675fe334926f2125bc16ff74863659fe9c7122129639dee4affcd486bc",
+          "url": "https://lh3.googleusercontent.com/I0k3wHslCfYRTPYyc47jCfMHrqZ30LWUYbPq8K2mecfbLgYG8682tGn5JBUbnHRiI7E"
+        },
+        {
+          "file": "03_play.png",
+          "id": "9939983346393734228",
+          "sha256": "e835a45d82728a39eae605d617c41ff6ea1171211725e1e6f03f6183eb4d629c",
+          "url": "https://lh3.googleusercontent.com/FgsHnXFvCJDO3kHKGX-BtfMSoHfyDQCSNuN9In5ihZforVulL494dInIRQ_9TCD3b3Y"
+        },
+        {
+          "file": "04_focus.png",
+          "id": "10193749350902160676",
+          "sha256": "812524023e5c1bdebccaeb5127e80b6416d4d43d82a17b03c1e6b14ae5f569e9",
+          "url": "https://lh3.googleusercontent.com/xdjVZPzZipXznMqzctp91vS1B1eDolH0v7mnxi8ETpR6_MwJhGBsx4xfYPZQtDgaXA"
+        },
+        {
+          "file": "05_yours.png",
+          "id": "8678045760142823639",
+          "sha256": "fc7a7076d029b1c52cba793755ed126c9f2583fd4884d04d1c199d2c66f32287",
+          "url": "https://lh3.googleusercontent.com/pJFi7hSKx2omPjSi27bNTTytHNLwIv_y-zOqGX9KPQSVu3w3bkSJKah8E349PwtjM0w"
+        }
+      ]
+    },
+    "metadataMatches": true,
+    "reviewState": "Quick checks running; automatically queued for review afterwards",
+    "reviewStateSource": "Google Play Console publishing overview, observed 2026-09-28T04:52Z",
+    "managedPublishing": false,
+    "releasePolicy": "Full production rollout after approval",
+    "url": "https://play.google.com/console/u/0/developers/8548192502907187809/app/4973745021824151866/publishing"
+  },
+  "publicAvailability": "Not yet verified; both submissions awaiting store processing/review",
+  "campaign": "release/marketing/aurea",
+  "artworkManifestSHA256": "3eacbf2fa9561651febab08be93f860471158475aac686d56e48f62ed04aeb82"
+}
