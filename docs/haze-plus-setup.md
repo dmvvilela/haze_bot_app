@@ -28,9 +28,11 @@ create or activate an Apple/Google store product and cannot process payments.
 
 After explicit user approval, the Google Play service-account file from this
 app's release setup was uploaded and saved in RevenueCat. A full page reload
-confirmed **File saved** and **Valid credentials**. No Google Cloud or Play
-permissions were changed. The notification-topic selector currently has no
-options, so real-time developer notifications are not connected.
+confirmed **File saved** and **Valid credentials**. That credential-upload step
+did not change Google Cloud or Play permissions. On November 1, real-time
+developer notifications were connected through a
+dedicated Haze Pub/Sub topic, and Google Play test delivery was confirmed
+in RevenueCat. See the notification verification section below.
 
 On November 1, 2026, the user explicitly approved reusing shared Apple in-app
 purchase key `8K2ZK6K749`. Haze's Apple app was created with the correct bundle
@@ -125,13 +127,12 @@ is `release/products/haze-plus-google-draft.json`.
 
 ## Remaining store setup
 
-1. Google validation credentials are saved and valid. Connect Google developer
-   notifications for purchase changes; no notification topics were available
-   in RevenueCat's selector. Do not expand unrelated apps' permissions.
-2. Apple purchase-validation credentials are saved and valid. Configure
-   server notifications and, if desired, the separate catalog-management API
-   connection. No notification forwarding or purchase-tracking settings were
-   changed.
+1. Google validation credentials are saved and valid. Real-time notifications
+   are connected and test delivery passed. Access is scoped to Haze resources.
+2. Apple purchase-validation credentials are saved and valid. Production and
+   sandbox server notification URLs are configured; both delivery tests passed.
+   The separate catalog-management API connection remains optional. No
+   forwarding or new-purchase tracking settings were changed.
 3. Apple Haze Plus and iOS 2.3.0 / build 7 are submitted together and
    `WAITING_FOR_REVIEW`, with approved US$4.99 / R$19.90 prices. Google's purchase option is now ACTIVE
    at the approved prices. Android license-test purchase, cold restart, explicit
@@ -187,6 +188,28 @@ loaded the real $4.99 store price and displayed Restore Purchases. No iOS
 purchase or restore transaction was completed; Android test success does not
 prove iOS transaction behavior. The Apple purchase-history privacy declaration
 was published, and the native purchase-controls screenshot completed upload.
+
+## Store notification verification
+
+On November 1, both stores were connected to RevenueCat. Apple production
+and sandbox test notifications returned `SUCCESS` from Apple's test-status
+API. Google Play has notifications enabled for subscriptions, voided
+purchases, and all one-time products. RevenueCat confirmed receipt of the
+Play Console test notification at 2026-11-02 01:37 UTC (November 1, 22:37 BRT).
+
+Google uses dedicated topic `Haze-Play-Store-Notifications` and subscription
+`RevenueCat-Subscriber-app705571950e` in `d-fit-dev`. The existing billing
+service account has Pub/Sub Editor directly on these two resources. A custom
+project role permits topic-name listing and subscription creation; it does
+not grant access to other apps' messages. Google Play has Publisher only on
+Haze's topic. The initial conditional binding did not permit subscription
+attachment, so it was replaced with the approved direct resource bindings.
+
+Full sanitized evidence is in
+`release/products/haze-plus-notifications-evidence.json`. Notification URL
+tokens and private keys are intentionally omitted. New-purchase tracking
+from notifications remains off because Haze reports purchases through the
+SDK; existing purchase and refund notifications remain enabled.
 
 ## Runtime behavior
 

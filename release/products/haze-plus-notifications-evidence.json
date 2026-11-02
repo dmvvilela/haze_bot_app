@@ -1,0 +1,101 @@
+{
+  "verifiedAt": "2026-11-02T01:40:56.975075+00:00",
+  "project": "Haze",
+  "revenueCatProjectId": "d9d7200f",
+  "apple": {
+    "appId": "6747320369",
+    "productionUrlConfigured": true,
+    "sandboxUrlConfigured": true,
+    "destination": "RevenueCat Haze App Store app",
+    "endpointTokenOmitted": true,
+    "tests": {
+      "production": {
+        "requestHttp": 200,
+        "statusHttp": 200,
+        "sendAttempts": [
+          {
+            "attemptDate": 1793582181398,
+            "sendAttemptResult": "SUCCESS"
+          }
+        ],
+        "payloadSummary": {
+          "notificationType": "TEST",
+          "notificationUUID": "439ec1ed-cd1e-44fc-b6ba-3dde808491a0",
+          "version": "2.0"
+        }
+      },
+      "sandbox": {
+        "requestHttp": 200,
+        "statusHttp": 200,
+        "sendAttempts": [
+          {
+            "attemptDate": 1793582181971,
+            "sendAttemptResult": "SUCCESS"
+          }
+        ],
+        "payloadSummary": {
+          "notificationType": "TEST",
+          "notificationUUID": "13110298-0091-4b21-9ff5-fc5b77d0de18",
+          "version": "2.0"
+        }
+      }
+    }
+  },
+  "google": {
+    "packageName": "com.d2vsolutions.haze_bot_app",
+    "topic": "projects/d-fit-dev/topics/Haze-Play-Store-Notifications",
+    "subscription": "projects/d-fit-dev/subscriptions/RevenueCat-Subscriber-app705571950e",
+    "pushHost": "api.revenuecat.com",
+    "playNotificationsEnabled": true,
+    "content": "subscriptions_voided_purchases_and_all_one_time_products",
+    "testNotificationSentFromPlayConsole": true,
+    "revenueCatLastReceivedUtc": "2026-11-02T01:37:00Z",
+    "connectionState": "CONNECTED",
+    "topicIam": {
+      "bindings": [
+        {
+          "members": [
+            "serviceAccount:codemagic@d-fit-dev.iam.gserviceaccount.com"
+          ],
+          "role": "roles/pubsub.editor"
+        },
+        {
+          "members": [
+            "serviceAccount:google-play-developer-notifications@system.gserviceaccount.com"
+          ],
+          "role": "roles/pubsub.publisher"
+        }
+      ],
+      "etag": "BwZfQO9TlCM=",
+      "version": 1
+    },
+    "subscriptionIam": {
+      "bindings": [
+        {
+          "members": [
+            "serviceAccount:codemagic@d-fit-dev.iam.gserviceaccount.com"
+          ],
+          "role": "roles/pubsub.editor"
+        }
+      ],
+      "etag": "BwZfQQpaaOs=",
+      "version": 1
+    },
+    "projectRolesForExistingServiceAccount": [
+      {
+        "bindings": {
+          "role": "projects/d-fit-dev/roles/hazeRevenueCatPubSubDiscovery"
+        }
+      },
+      {
+        "bindings": {
+          "role": "roles/iam.serviceAccountUser"
+        }
+      }
+    ],
+    "broadPubSubEditorAtProjectLevel": false,
+    "screenshot": "build/haze-plus-proof/google-notification-received.png"
+  },
+  "trackNewPurchasesFromNotifications": false,
+  "forwardingToOtherServers": false
+}
