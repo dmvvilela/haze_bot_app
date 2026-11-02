@@ -17,6 +17,7 @@ import 'widgets/aurea_lab_screen.dart';
 import 'widgets/robot_face_widget.dart';
 import 'widgets/color_picker_dialog.dart';
 import 'widgets/settings_dialog.dart';
+import 'widgets/haze_plus_screen.dart';
 import 'widgets/timer_dialog.dart';
 import 'widgets/talk_dialog.dart';
 import 'widgets/ai_consent_dialog.dart';
@@ -76,7 +77,7 @@ class HazeBotApp extends StatelessWidget {
   }
 }
 
-enum _MenuAction { lab, say, colors, theme, settings }
+enum _MenuAction { lab, say, colors, theme, settings, plus }
 
 PopupMenuItem<_MenuAction> _menuItem(
   _MenuAction action,
@@ -306,44 +307,52 @@ class RobotFaceScreen extends StatelessWidget {
     return t.home.greeting;
   }
 
-  Widget _toolsMenu(BuildContext context, RobotFaceState state) =>
-      PopupMenuButton<_MenuAction>(
-        tooltip: t.home.more,
-        icon: const Icon(Icons.more_vert),
-        onSelected: (action) {
-          final cubit = context.read<RobotFaceCubit>();
-          switch (action) {
-            case _MenuAction.lab:
-              _showLab(context);
-            case _MenuAction.say:
-              _withAiConsent(context, cubit.getAIResponse);
-            case _MenuAction.colors:
-              _showColorPicker(context);
-            case _MenuAction.theme:
-              cubit.toggleTheme();
-            case _MenuAction.settings:
-              _showSettings(context);
-          }
-        },
-        itemBuilder: (_) => [
-          _menuItem(_MenuAction.say, Icons.smart_toy, t.home.say),
-          _menuItem(_MenuAction.lab, Icons.science_outlined, t.lab.title),
-          const PopupMenuDivider(),
-          _menuItem(_MenuAction.colors, Icons.palette_outlined, t.home.colors),
-          _menuItem(
-            _MenuAction.theme,
-            state.config.isDarkTheme
-                ? Icons.light_mode_outlined
-                : Icons.dark_mode_outlined,
-            state.config.isDarkTheme ? t.home.light : t.home.dark,
-          ),
-          _menuItem(
-            _MenuAction.settings,
-            Icons.settings_outlined,
-            t.ui.settings,
-          ),
-        ],
-      );
+  Widget _toolsMenu(
+    BuildContext context,
+    RobotFaceState state,
+  ) => PopupMenuButton<_MenuAction>(
+    tooltip: t.home.more,
+    icon: const Icon(Icons.more_vert),
+    onSelected: (action) {
+      final cubit = context.read<RobotFaceCubit>();
+      switch (action) {
+        case _MenuAction.lab:
+          _showLab(context);
+        case _MenuAction.say:
+          _withAiConsent(context, cubit.getAIResponse);
+        case _MenuAction.colors:
+          _showColorPicker(context);
+        case _MenuAction.theme:
+          cubit.toggleTheme();
+        case _MenuAction.plus:
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => Theme(
+                data: HazeTheme.of(state.config.isDarkTheme),
+                child: HazePlusScreen(controller: cubit.plus, faceState: state),
+              ),
+            ),
+          );
+        case _MenuAction.settings:
+          _showSettings(context);
+      }
+    },
+    itemBuilder: (_) => [
+      _menuItem(_MenuAction.say, Icons.smart_toy, t.home.say),
+      _menuItem(_MenuAction.lab, Icons.science_outlined, t.lab.title),
+      const PopupMenuDivider(),
+      _menuItem(_MenuAction.plus, Icons.auto_awesome_outlined, t.plus.title),
+      _menuItem(_MenuAction.colors, Icons.palette_outlined, t.home.colors),
+      _menuItem(
+        _MenuAction.theme,
+        state.config.isDarkTheme
+            ? Icons.light_mode_outlined
+            : Icons.dark_mode_outlined,
+        state.config.isDarkTheme ? t.home.light : t.home.dark,
+      ),
+      _menuItem(_MenuAction.settings, Icons.settings_outlined, t.ui.settings),
+    ],
+  );
 
   Widget _homeActions(BuildContext context, RobotFaceState state) {
     final cubit = context.read<RobotFaceCubit>();

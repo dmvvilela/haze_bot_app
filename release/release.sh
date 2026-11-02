@@ -94,6 +94,8 @@ preflight() {
   fi
   command -v fastlane >/dev/null || fail "fastlane not installed (brew install fastlane)"
   command -v flutter >/dev/null  || fail "flutter not installed"
+  [ -f release/haze-plus-public.json ] \
+    || fail "release/haze-plus-public.json not found — Haze Plus SDK configuration is required"
 
   if $ANDROID_ONLY; then
     [ -f release/fastlane/play-console-key.json ] \
@@ -140,9 +142,9 @@ fi
 do_ios() {
   step "Flutter build iOS (.ipa) — v$BUILD_NAME${BUILD_NUMBER:+ ($BUILD_NUMBER)}"
   if [ -n "$BUILD_NUMBER" ]; then
-    flutter build ipa --release --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
+    flutter build ipa --release --dart-define-from-file=release/haze-plus-public.json --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
   else
-    flutter build ipa --release --build-name "$BUILD_NAME"
+    flutter build ipa --release --dart-define-from-file=release/haze-plus-public.json --build-name "$BUILD_NAME"
   fi
   IPA=$(ls -t build/ios/ipa/*.ipa 2>/dev/null | head -n1 || true)
   [ -n "$IPA" ] || fail "No .ipa produced at build/ios/ipa/"
@@ -200,9 +202,9 @@ do_ios() {
 do_android() {
   step "Flutter build Android (.aab) — v$BUILD_NAME${BUILD_NUMBER:+ ($BUILD_NUMBER)}"
   if [ -n "$BUILD_NUMBER" ]; then
-    flutter build appbundle --release --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
+    flutter build appbundle --release --dart-define-from-file=release/haze-plus-public.json --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
   else
-    flutter build appbundle --release --build-name "$BUILD_NAME"
+    flutter build appbundle --release --dart-define-from-file=release/haze-plus-public.json --build-name "$BUILD_NAME"
   fi
   AAB=$(ls -t build/app/outputs/bundle/release/*.aab 2>/dev/null | head -n1 || true)
   [ -n "$AAB" ] || fail "No .aab produced at build/app/outputs/bundle/release/"

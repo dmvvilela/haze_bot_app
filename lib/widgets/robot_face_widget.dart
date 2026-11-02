@@ -136,16 +136,21 @@ class _RobotFaceWidgetState extends State<RobotFaceWidget> {
                   child: SizedBox(
                     width: width,
                     height: height,
-                    child: HazeFace(
-                      state: state,
-                      mood: cubit.mood,
-                      companion: cubit.companion,
-                      framed: widget.framed,
-                      voiceLevel:
-                          state.isSpeaking ||
-                              state.mimicStatus != MimicStatus.idle
-                          ? cubit.voice.level
-                          : null,
+                    child: ListenableBuilder(
+                      listenable: cubit.plus,
+                      builder: (context, _) => HazeFace(
+                        look: cubit.plus.look,
+                        state: state,
+                        mood: cubit.mood,
+                        companion: cubit.companion,
+                        framed: widget.framed,
+                        unmeteredSpeech: cubit.voice.unmeteredSpeech,
+                        voiceLevel:
+                            state.isSpeaking ||
+                                state.mimicStatus != MimicStatus.idle
+                            ? cubit.voice.level
+                            : null,
+                      ),
                     ),
                   ),
                 ),

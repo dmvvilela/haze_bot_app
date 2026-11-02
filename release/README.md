@@ -41,6 +41,14 @@ cp .env.release.example .env.release
 
 ## Shipping
 
+Release builds load Haze's public RevenueCat SDK keys from
+`release/haze-plus-public.json`. This file contains client SDK keys only;
+never add Apple signing keys, service-account JSON, or RevenueCat secret API
+keys to it. For a local native billing build, use
+`flutter run --dart-define-from-file=release/haze-plus-public.json`.
+The store product and sandbox purchase checklist is in
+[Haze Plus setup](../docs/haze-plus-setup.md).
+
 ```bash
 # Production release, both stores:
 ./release/release.sh 1.0.1

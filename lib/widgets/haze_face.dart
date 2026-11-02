@@ -11,6 +11,10 @@ import '../aurea/aurea_companion.dart';
 import '../cubits/robot_face_cubit.dart';
 import '../models/robot_config.dart';
 import '../services/haze_mood.dart';
+import '../services/robot_voice_service.dart';
+import 'face_performance.dart';
+import '../models/haze_look.dart';
+import 'haze_cosmetics.dart';
 
 /// Haze V3 — the signature face.
 ///
@@ -34,6 +38,9 @@ class HazeFace extends StatefulWidget {
   /// Null (e.g. in golden tests) falls back to the pseudo-syllable mouth.
   final ValueListenable<double>? voiceLevel;
 
+  /// Explicit fallback when system TTS cannot expose an audio envelope.
+  final ValueListenable<bool>? unmeteredSpeech;
+
   /// Haze's neurochemistry. Null (golden tests, previews) keeps the classic
   /// expression-driven behavior exactly as it was.
   final HazeMood? mood;
@@ -42,15 +49,18 @@ class HazeFace extends StatefulWidget {
   final AureaExpression? affect;
   final AureaCompanion? companion;
   final bool framed;
+  final HazeLook look;
 
   const HazeFace({
     super.key,
     required this.state,
     this.voiceLevel,
+    this.unmeteredSpeech,
     this.mood,
     this.affect,
     this.companion,
     this.framed = true,
+    this.look = const HazeLook(),
   });
 
   @override
@@ -73,6 +83,14 @@ class _HazeFaceState extends State<HazeFace>
   // A small, strongly damped emphasis on expression changes.
   double _pop = 0;
   double _popVelocity = 0;
+  final _performance = FacePerformance();
+  bool _reducedMotion = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _reducedMotion = MediaQuery.disableAnimationsOf(context);
+  }
 
   @override
   void initState() {
@@ -116,15 +134,33 @@ class _HazeFaceState extends State<HazeFace>
 
     if (_blinkT < 1) _blinkT = math.min(1, _blinkT + dt / 0.30);
 
+    final listening = widget.state.mimicStatus == MimicStatus.listening;
+    _performance.advance(
+      dt: dt,
+      activity: listening
+          ? FaceActivity.listening
+          : widget.state.isLoadingAI
+          ? FaceActivity.thinking
+          : widget.state.isSpeaking
+          ? FaceActivity.speaking
+          : FaceActivity.resting,
+      level: widget.unmeteredSpeech?.value == true
+          ? null
+          : widget.voiceLevel?.value,
+      reducedMotion: _reducedMotion,
+    );
+
     final look = widget.state.lookTarget;
     if (look != null) {
       // A finger on the face wins over everything — the eyes track it.
       _gazeTarget = Offset(look.dx.clamp(-1.2, 1.2), look.dy.clamp(-1.0, 1.0));
+    } else if (listening) {
+      _gazeTarget = const Offset(0, -.04);
     } else if (widget.state.isLoadingAI) {
       // Thinking: glance up and to the side, like recalling something.
-      _gazeTarget = const Offset(0.45, -0.5);
+      _gazeTarget = const Offset(0.25, -0.3);
     } else if (widget.state.isSpeaking) {
-      _gazeTarget = const Offset(0, -0.08);
+      _gazeTarget = Offset(.035 * _performance.emphasis, -0.04);
     } else if (_t >= _nextSaccadeAt) {
       _gazeTarget = _random.nextDouble() < 0.3
           ? Offset.zero
@@ -132,7 +168,8 @@ class _HazeFaceState extends State<HazeFace>
               (_random.nextDouble() * 2 - 1) * (0.35 + target.wander * 0.45),
               (_random.nextDouble() * 2 - 1) * 0.22,
             );
-      _nextSaccadeAt = _t + 1.1 + _random.nextDouble() * (2.6 - target.wander * 1.4);
+      _nextSaccadeAt =
+          _t + 1.1 + _random.nextDouble() * (2.6 - target.wander * 1.4);
     }
     // Track a finger snappily; wander lazily.
     _gaze = Offset.lerp(
@@ -155,9 +192,11 @@ class _HazeFaceState extends State<HazeFace>
   }
 
   _FacePose? _affectTarget() {
-    final a = widget.affect ??
+    final a =
+        widget.affect ??
         (widget.mood?.moodDriven != false && widget.mood?.labControlled != true
-            ? widget.companion?.expression : null);
+            ? widget.companion?.expression
+            : null);
     if (a == null) return null;
     final eye = _EyePose(
       open: .85 + a.openness * .24 + a.surprise * .2 - a.sorrow * .18,
@@ -230,15 +269,15 @@ class _HazeFaceState extends State<HazeFace>
     final oxytocin = mood.level(Chemical.oxytocin);
 
     _EyePose gateEye(_EyePose eye) => _EyePose(
-          open: eye.open,
-          width: eye.width,
-          smile: eye.smile,
-          droop: eye.droop,
-          slant: eye.slant,
-          round: eye.round,
-          heart: gate(eye.heart),
-          arc: gate(eye.arc),
-        );
+      open: eye.open,
+      width: eye.width,
+      smile: eye.smile,
+      droop: eye.droop,
+      slant: eye.slant,
+      round: eye.round,
+      heart: gate(eye.heart),
+      arc: gate(eye.arc),
+    );
 
     return _FacePose(
       left: gateEye(base.left),
@@ -267,26 +306,29 @@ class _HazeFaceState extends State<HazeFace>
   @override
   Widget build(BuildContext context) {
     final close = _blinkClose;
-    // The ticker rebuilds every frame, so reading the current loudness here
-    // keeps the mouth in sync with the real sound without extra plumbing.
-    final voiceLevel = widget.voiceLevel?.value ?? 0;
     return Semantics(
       label: 'Haze face',
       child: CustomPaint(
         painter: _HazeFacePainter(
           pose: _pose,
           framed: widget.framed,
-          t: _t,
-          blinkMul: 1 - close * 0.97,
-          blinkStretch: 1 + close * 0.07,
-          pop: _pop,
-          gaze: _gaze + _pose.gazeBias,
+          t: _reducedMotion ? 0 : _t,
+          blinkMul: _reducedMotion ? 1 : 1 - close * 0.97,
+          blinkStretch: _reducedMotion ? 1 : 1 + close * 0.07,
+          pop: _reducedMotion ? 0 : _pop,
+          gaze: (_reducedMotion ? Offset.zero : _gaze) + _pose.gazeBias,
           eyeColor: widget.state.config.eyeColor,
           mouthColor: widget.state.config.mouthColor,
           isDark: widget.state.config.isDarkTheme,
           speaking: widget.state.isSpeaking,
           thinking: widget.state.isLoadingAI,
-          voiceLevel: voiceLevel,
+          look: widget.look,
+          voiceLevel: _performance.mouth,
+          gestureTilt: _performance.tilt,
+          gestureNod: _performance.nod,
+          attention: _performance.attention,
+          asymmetry: _performance.asymmetry,
+          emphasis: _performance.emphasis,
         ),
         child: const SizedBox.expand(),
       ),
@@ -343,15 +385,15 @@ class _EyePose {
   }
 
   static _EyePose lerp(_EyePose a, _EyePose b, double t) => _EyePose(
-        open: ui.lerpDouble(a.open, b.open, t)!,
-        width: ui.lerpDouble(a.width, b.width, t)!,
-        smile: ui.lerpDouble(a.smile, b.smile, t)!,
-        droop: ui.lerpDouble(a.droop, b.droop, t)!,
-        slant: ui.lerpDouble(a.slant, b.slant, t)!,
-        round: ui.lerpDouble(a.round, b.round, t)!,
-        heart: ui.lerpDouble(a.heart, b.heart, t)!,
-        arc: ui.lerpDouble(a.arc, b.arc, t)!,
-      );
+    open: ui.lerpDouble(a.open, b.open, t)!,
+    width: ui.lerpDouble(a.width, b.width, t)!,
+    smile: ui.lerpDouble(a.smile, b.smile, t)!,
+    droop: ui.lerpDouble(a.droop, b.droop, t)!,
+    slant: ui.lerpDouble(a.slant, b.slant, t)!,
+    round: ui.lerpDouble(a.round, b.round, t)!,
+    heart: ui.lerpDouble(a.heart, b.heart, t)!,
+    arc: ui.lerpDouble(a.arc, b.arc, t)!,
+  );
 }
 
 /// The full parametric pose for one expression. Adding a new emotion is just
@@ -433,14 +475,12 @@ class _FacePose {
     }
 
     return _FacePose(
-      left: _EyePose.blend(
-        [for (final (pose, weight) in parts) (pose.left, weight)],
-        total,
-      ),
-      right: _EyePose.blend(
-        [for (final (pose, weight) in parts) (pose.right, weight)],
-        total,
-      ),
+      left: _EyePose.blend([
+        for (final (pose, weight) in parts) (pose.left, weight),
+      ], total),
+      right: _EyePose.blend([
+        for (final (pose, weight) in parts) (pose.right, weight),
+      ], total),
       mouthCurve: f((p) => p.mouthCurve),
       mouthOpen: f((p) => p.mouthOpen),
       mouthWide: f((p) => p.mouthWide),
@@ -560,31 +600,32 @@ class _FacePose {
   };
 
   static _FacePose lerp(_FacePose a, _FacePose b, double t) => _FacePose(
-        left: _EyePose.lerp(a.left, b.left, t),
-        right: _EyePose.lerp(a.right, b.right, t),
-        mouthCurve: ui.lerpDouble(a.mouthCurve, b.mouthCurve, t)!,
-        mouthOpen: ui.lerpDouble(a.mouthOpen, b.mouthOpen, t)!,
-        mouthWide: ui.lerpDouble(a.mouthWide, b.mouthWide, t)!,
-        mouthO: ui.lerpDouble(a.mouthO, b.mouthO, t)!,
-        mouthWave: ui.lerpDouble(a.mouthWave, b.mouthWave, t)!,
-        smirk: ui.lerpDouble(a.smirk, b.smirk, t)!,
-        blush: ui.lerpDouble(a.blush, b.blush, t)!,
-        tilt: ui.lerpDouble(a.tilt, b.tilt, t)!,
-        energy: ui.lerpDouble(a.energy, b.energy, t)!,
-        wander: ui.lerpDouble(a.wander, b.wander, t)!,
-        sparkle: ui.lerpDouble(a.sparkle, b.sparkle, t)!,
-        zzz: ui.lerpDouble(a.zzz, b.zzz, t)!,
-        hearts: ui.lerpDouble(a.hearts, b.hearts, t)!,
-        tear: ui.lerpDouble(a.tear, b.tear, t)!,
-        shiver: ui.lerpDouble(a.shiver, b.shiver, t)!,
-        gazeBias: Offset.lerp(a.gazeBias, b.gazeBias, t)!,
-      );
+    left: _EyePose.lerp(a.left, b.left, t),
+    right: _EyePose.lerp(a.right, b.right, t),
+    mouthCurve: ui.lerpDouble(a.mouthCurve, b.mouthCurve, t)!,
+    mouthOpen: ui.lerpDouble(a.mouthOpen, b.mouthOpen, t)!,
+    mouthWide: ui.lerpDouble(a.mouthWide, b.mouthWide, t)!,
+    mouthO: ui.lerpDouble(a.mouthO, b.mouthO, t)!,
+    mouthWave: ui.lerpDouble(a.mouthWave, b.mouthWave, t)!,
+    smirk: ui.lerpDouble(a.smirk, b.smirk, t)!,
+    blush: ui.lerpDouble(a.blush, b.blush, t)!,
+    tilt: ui.lerpDouble(a.tilt, b.tilt, t)!,
+    energy: ui.lerpDouble(a.energy, b.energy, t)!,
+    wander: ui.lerpDouble(a.wander, b.wander, t)!,
+    sparkle: ui.lerpDouble(a.sparkle, b.sparkle, t)!,
+    zzz: ui.lerpDouble(a.zzz, b.zzz, t)!,
+    hearts: ui.lerpDouble(a.hearts, b.hearts, t)!,
+    tear: ui.lerpDouble(a.tear, b.tear, t)!,
+    shiver: ui.lerpDouble(a.shiver, b.shiver, t)!,
+    gazeBias: Offset.lerp(a.gazeBias, b.gazeBias, t)!,
+  );
 }
 
 /// Paints in a fixed 400x480 design space, uniformly scaled and centered
 /// inside whatever box the widget gets.
 class _HazeFacePainter extends CustomPainter {
   final bool framed;
+  final HazeLook look;
   final _FacePose pose;
   final double t;
   final double blinkMul;
@@ -597,6 +638,11 @@ class _HazeFacePainter extends CustomPainter {
   final bool speaking;
   final bool thinking;
   final double voiceLevel;
+  final double gestureTilt;
+  final double gestureNod;
+  final double attention;
+  final double asymmetry;
+  final double emphasis;
 
   _HazeFacePainter({
     required this.pose,
@@ -604,6 +650,7 @@ class _HazeFacePainter extends CustomPainter {
     required this.blinkMul,
     required this.blinkStretch,
     this.framed = true,
+    this.look = const HazeLook(),
     required this.pop,
     required this.gaze,
     required this.eyeColor,
@@ -612,12 +659,26 @@ class _HazeFacePainter extends CustomPainter {
     required this.speaking,
     required this.thinking,
     this.voiceLevel = 0,
+    this.gestureTilt = 0,
+    this.gestureNod = 0,
+    this.attention = 0,
+    this.asymmetry = 0,
+    this.emphasis = 0,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final viewWidth = framed ? 400.0 : 320.0;
-    final viewHeight = framed ? 480.0 : 230.0;
+    final decorated = look.accessory != HazeAccessory.none;
+    final viewWidth = framed
+        ? 400.0
+        : decorated
+        ? 370.0
+        : 320.0;
+    final viewHeight = framed
+        ? 480.0
+        : decorated
+        ? 330.0
+        : 230.0;
     final s = math.min(size.width / viewWidth, size.height / viewHeight);
     canvas.translate(size.width / 2, size.height / 2);
     canvas.scale(s);
@@ -629,10 +690,10 @@ class _HazeFacePainter extends CustomPainter {
     // level jumps phase and makes transitions jitter after longer sessions.
     final bob = math.sin(t * 1.15) * (.6 + pose.energy * .8);
     final breath = 1 + 0.004 * math.sin(t * 0.9) + pop * 0.05;
-    final sway = pose.tilt + math.sin(t * 0.6) * 0.006;
+    final sway = pose.tilt + gestureTilt + math.sin(t * 0.6) * 0.006;
     final shiver = math.sin(t * 8) * .45 * pose.shiver;
     canvas.save();
-    canvas.translate(200 + shiver, 240 + bob);
+    canvas.translate(200 + shiver, 240 + bob + gestureNod);
     canvas.rotate(sway);
     canvas.scale(breath);
     canvas.translate(-200, -240);
@@ -651,6 +712,7 @@ class _HazeFacePainter extends CustomPainter {
       eye: pose.right,
       center: Offset(266 + gaze.dx * 16, 212 + gaze.dy * 12),
     );
+    HazeCosmetics.accessory(canvas, look.accessory, eyeColor);
     _drawMouth(canvas);
     _drawAccents(canvas);
     canvas.restore();
@@ -704,10 +766,7 @@ class _HazeFacePainter extends CustomPainter {
       rect,
       Paint()
         ..shader = RadialGradient(
-          colors: [
-            eyeColor.withValues(alpha: 0.10),
-            Colors.transparent,
-          ],
+          colors: [eyeColor.withValues(alpha: 0.10), Colors.transparent],
         ).createShader(rect),
     );
   }
@@ -715,8 +774,11 @@ class _HazeFacePainter extends CustomPainter {
   void _drawCheeks(Canvas canvas) {
     if (pose.blush < 0.02) return;
     final paint = Paint()
-      ..color = Color.lerp(mouthColor, Colors.white, 0.45)!
-          .withValues(alpha: pose.blush * 0.6)
+      ..color = Color.lerp(
+        mouthColor,
+        Colors.white,
+        0.45,
+      )!.withValues(alpha: pose.blush * 0.6)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
     for (final x in const [92.0, 308.0]) {
       canvas.drawOval(
@@ -734,8 +796,19 @@ class _HazeFacePainter extends CustomPainter {
   }) {
     final bodyAlpha =
         (1 - eye.heart).clamp(0.0, 1.0) * (1 - eye.arc).clamp(0.0, 1.0);
-    final w = 90 * eye.width * blinkStretch;
-    final h = math.max(10.0, 116 * eye.open * blinkMul);
+    final w =
+        (look.style == HazeFaceStyle.orbit ? 100 : 90) *
+        eye.width *
+        blinkStretch;
+    final lift =
+        attention * .06 + emphasis * .025 + asymmetry * (isLeft ? .07 : -.045);
+    final h = math.max(
+      10.0,
+      (look.style == HazeFaceStyle.orbit ? 100 : 116) *
+          eye.open *
+          (1 + lift) *
+          blinkMul,
+    );
 
     if (bodyAlpha > 0.02) {
       final radius = ui.lerpDouble(
@@ -743,13 +816,12 @@ class _HazeFacePainter extends CustomPainter {
         math.min(w, h) * 0.5,
         eye.round,
       )!;
-      var path = Path()
-        ..addRRect(
-          RRect.fromRectAndRadius(
-            Rect.fromCenter(center: center, width: w, height: h),
-            Radius.circular(radius),
-          ),
-        );
+      var path = HazeCosmetics.eye(
+        look.style,
+        Rect.fromCenter(center: center, width: w, height: h),
+        radius,
+        isLeft,
+      );
 
       // Bottom lid: raising it turns the eye into a happy crescent (^ ^).
       if (eye.smile > 0.01) {
@@ -803,13 +875,17 @@ class _HazeFacePainter extends CustomPainter {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color.lerp(eyeColor, Colors.white, 0.30)!
+              Color.lerp(
+                eyeColor,
+                Colors.white,
+                0.30,
+              )!.withValues(alpha: bodyAlpha),
+              (look.style == HazeFaceStyle.aurora
+                      ? Color.lerp(eyeColor, const Color(0xFFCC9FFF), .72)!
+                      : eyeColor)
                   .withValues(alpha: bodyAlpha),
-              eyeColor.withValues(alpha: bodyAlpha),
             ],
-          ).createShader(
-            Rect.fromCenter(center: center, width: w, height: h),
-          ),
+          ).createShader(Rect.fromCenter(center: center, width: w, height: h)),
       );
 
       if (blinkMul > 0.35 && eye.open > 0.3) {
@@ -820,11 +896,23 @@ class _HazeFacePainter extends CustomPainter {
           center.dx - w * 0.20 + gaze.dx * 5,
           center.dy - h * 0.20 + gaze.dy * 5,
         );
-        canvas.drawCircle(
-          highlight,
-          w * 0.11,
-          Paint()..color = Colors.white.withValues(alpha: 0.9 * bodyAlpha),
-        );
+        if (look.style == HazeFaceStyle.pixel) {
+          canvas.drawRect(
+            Rect.fromCenter(center: highlight, width: w * .22, height: w * .22),
+            Paint()..color = Colors.white.withValues(alpha: .9 * bodyAlpha),
+          );
+        } else if (look.style == HazeFaceStyle.aurora) {
+          canvas.drawPath(
+            HazeCosmetics.star(highlight, w * .14),
+            Paint()..color = Colors.white.withValues(alpha: .9 * bodyAlpha),
+          );
+        } else {
+          canvas.drawCircle(
+            highlight,
+            w * 0.11,
+            Paint()..color = Colors.white.withValues(alpha: 0.9 * bodyAlpha),
+          );
+        }
         canvas.drawCircle(
           highlight.translate(w * 0.16, h * 0.14),
           w * 0.055,
@@ -842,7 +930,12 @@ class _HazeFacePainter extends CustomPainter {
         ..color = eyeColor.withValues(alpha: 0.95 * eye.arc);
       final arc = Path()
         ..moveTo(center.dx - 45, center.dy + 12)
-        ..quadraticBezierTo(center.dx, center.dy - 38, center.dx + 45, center.dy + 12);
+        ..quadraticBezierTo(
+          center.dx,
+          center.dy - 38,
+          center.dx + 45,
+          center.dy + 12,
+        );
       canvas.drawPath(
         arc,
         Paint()
@@ -868,17 +961,25 @@ class _HazeFacePainter extends CustomPainter {
       canvas.drawPath(
         heart,
         Paint()
-          ..shader = LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color.lerp(mouthColor, Colors.white, 0.30)!
-                  .withValues(alpha: eye.heart),
-              mouthColor.withValues(alpha: eye.heart),
-            ],
-          ).createShader(
-            Rect.fromCenter(center: center, width: sz * 2.6, height: sz * 2.4),
-          ),
+          ..shader =
+              LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.lerp(
+                    mouthColor,
+                    Colors.white,
+                    0.30,
+                  )!.withValues(alpha: eye.heart),
+                  mouthColor.withValues(alpha: eye.heart),
+                ],
+              ).createShader(
+                Rect.fromCenter(
+                  center: center,
+                  width: sz * 2.6,
+                  height: sz * 2.4,
+                ),
+              ),
       );
       canvas.drawCircle(
         center.translate(-sz * 0.4, -sz * 0.35),
@@ -892,27 +993,46 @@ class _HazeFacePainter extends CustomPainter {
     final c = Offset(200 + pose.smirk * 6 + gaze.dx * 6, 332 + gaze.dy * 6);
 
     if (speaking) {
-      // The real loudness of the audio when it plays through SoLoud;
-      // otherwise the pseudo-syllable envelope — two detuned sines make it
-      // read as speech rather than a metronome.
-      final a = (math.sin(t * 10.5) + 1) / 2;
-      final b = (math.sin(t * 23.7 + 1.3) + 1) / 2;
-      final open01 = voiceLevel > 0.001
-          ? voiceLevel.clamp(0.0, 1.0)
-          : (0.3 + 0.7 * a) * (0.5 + 0.5 * b);
-      final mh = 8 + open01 * 30;
-      final mw = 52 - open01 * 16;
-      final rect = RRect.fromRectAndRadius(
-        Rect.fromCenter(center: c, width: mw, height: mh),
-        Radius.circular(mh / 2),
-      );
-      canvas.drawRRect(
-        rect,
-        Paint()
-          ..color = mouthColor.withValues(alpha: 0.35)
+      // Preserve the mood's smile/frown as the contour opens to speech.
+      // Known silence draws a closed curve, never invented syllables.
+      final open = voiceLevel.clamp(0.0, 1.0);
+      final halfW =
+          (38 * pose.mouthWide.clamp(.65, 1.25)) *
+          (1 - .16 * open - .12 * pose.mouthO);
+      final curve = pose.mouthCurve * 22;
+      final left = c.translate(-halfW, -pose.mouthCurve * 7);
+      final right = c.translate(halfW, -pose.mouthCurve * 7 - pose.smirk * 4);
+      final path = Path()..moveTo(left.dx, left.dy);
+      if (open < .015) {
+        path.quadraticBezierTo(c.dx, c.dy + curve, right.dx, right.dy);
+      } else {
+        final height = open * 30;
+        path
+          ..quadraticBezierTo(
+            c.dx,
+            c.dy + curve - height * .35,
+            right.dx,
+            right.dy,
+          )
+          ..quadraticBezierTo(c.dx, c.dy + curve + height, left.dx, left.dy)
+          ..close();
+      }
+      final paint = Paint()
+        ..style = open < .015 ? PaintingStyle.stroke : PaintingStyle.fill
+        ..strokeWidth = 8.5
+        ..strokeCap = StrokeCap.round;
+      canvas.drawPath(
+        path,
+        paint
+          ..color = mouthColor.withValues(alpha: .30)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
       );
-      canvas.drawRRect(rect, Paint()..color = mouthColor.withValues(alpha: 0.95));
+      canvas.drawPath(
+        path,
+        paint
+          ..color = mouthColor.withValues(alpha: .95)
+          ..maskFilter = null,
+      );
       return;
     }
 
@@ -922,7 +1042,8 @@ class _HazeFacePainter extends CustomPainter {
     }
 
     final curveAlpha =
-        (1 - pose.mouthO).clamp(0.0, 1.0) * (1 - pose.mouthWave).clamp(0.0, 1.0);
+        (1 - pose.mouthO).clamp(0.0, 1.0) *
+        (1 - pose.mouthWave).clamp(0.0, 1.0);
     final halfW = 38.0 * pose.mouthWide;
 
     if (curveAlpha > 0.02) {
@@ -977,7 +1098,12 @@ class _HazeFacePainter extends CustomPainter {
       final wave = Path()
         ..moveTo(c.dx - halfW, c.dy + 2)
         ..quadraticBezierTo(c.dx - halfW * 0.5, c.dy - 9, c.dx, c.dy)
-        ..quadraticBezierTo(c.dx + halfW * 0.5, c.dy + 9, c.dx + halfW, c.dy - 2);
+        ..quadraticBezierTo(
+          c.dx + halfW * 0.5,
+          c.dy + 9,
+          c.dx + halfW,
+          c.dy - 2,
+        );
       canvas.drawPath(
         wave,
         Paint()
@@ -1065,7 +1191,12 @@ class _HazeFacePainter extends CustomPainter {
     const tearColor = Color(0xFFA8DCFF);
     final tear = Path()
       ..moveTo(c.dx, c.dy - s * 1.4)
-      ..quadraticBezierTo(c.dx + s * 0.9, c.dy - s * 0.25, c.dx + s * 0.85, c.dy + s * 0.3)
+      ..quadraticBezierTo(
+        c.dx + s * 0.9,
+        c.dy - s * 0.25,
+        c.dx + s * 0.85,
+        c.dy + s * 0.3,
+      )
       ..arcToPoint(
         Offset(c.dx - s * 0.85, c.dy + s * 0.3),
         radius: Radius.circular(s * 0.9),
@@ -1146,8 +1277,7 @@ class _HazeFacePainter extends CustomPainter {
         Offset(276 + i * 22.0, 118 - lift),
         6.5,
         Paint()
-          ..color =
-              eyeColor.withValues(alpha: 0.25 + 0.55 * math.max(0.0, ph)),
+          ..color = eyeColor.withValues(alpha: 0.25 + 0.55 * math.max(0.0, ph)),
       );
     }
   }

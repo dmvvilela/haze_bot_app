@@ -1,0 +1,131 @@
+{
+  "verifiedAt": "2026-11-02T00:25:39.435046+00:00",
+  "appId": "6747320369",
+  "bundleId": "com.d2vsolutions.hazeBotApp",
+  "version": "2.3.0",
+  "buildNumber": 7,
+  "versionId": "30821766-81ed-4502-8a15-ea296edda3c6",
+  "buildId": "db6e4b48-34d2-4ad5-9e87-35e738d05455",
+  "state": "WAITING_FOR_REVIEW",
+  "publiclyAvailable": false,
+  "releaseType": "AFTER_APPROVAL",
+  "phasedRelease": false,
+  "submission": {
+    "type": "reviewSubmissions",
+    "id": "80c892b0-1a52-4218-9bba-3fa116e6c4e6",
+    "attributes": {
+      "platform": "IOS",
+      "state": "WAITING_FOR_REVIEW",
+      "submittedDate": "2026-11-02T00:22:26.398Z"
+    },
+    "relationships": {
+      "items": {
+        "data": null
+      }
+    }
+  },
+  "submittedTogether": [
+    "iOS App 2.3.0 (7)",
+    "Haze Plus \u2014 Lifetime (6829523101)"
+  ],
+  "iap": {
+    "id": "6829523101",
+    "productId": "haze_plus_lifetime",
+    "type": "NON_CONSUMABLE",
+    "state": "WAITING_FOR_REVIEW",
+    "territories": [
+      "USA",
+      "BRA"
+    ],
+    "prices": {
+      "USD": "4.99",
+      "BRL": "19.90"
+    },
+    "reviewScreenshotComplete": true
+  },
+  "artifact": {
+    "version": "2.3.0",
+    "build": 7,
+    "bundleId": "com.d2vsolutions.hazeBotApp",
+    "sha256": "80014510d2443e77c98ce10510fe4a33c4664e1e839fb45751d04c6e45e9640d",
+    "signatureVerified": true,
+    "getTaskAllow": false,
+    "usesNonExemptEncryption": false
+  },
+  "privacy": {
+    "url": "https://danvilela.com/haze/privacy-policy",
+    "locales": [
+      "en-US",
+      "pt-BR"
+    ],
+    "declarationPublished": true,
+    "purchaseHistory": [
+      "APP_FUNCTIONALITY",
+      "ANALYTICS"
+    ],
+    "linkedToIdentity": false,
+    "tracking": false
+  },
+  "nativeVerification": {
+    "platform": "iOS simulator",
+    "entrypoint": "lib/main.dart",
+    "productLoaded": true,
+    "displayedPrice": "$4.99",
+    "restoreControlVisible": true,
+    "purchaseCompleted": false,
+    "restoreTransactionTested": false,
+    "screenshots": [
+      "build/haze-plus-proof/ios-plus-preview.png",
+      "build/haze-plus-proof/ios-plus-purchase-controls.png"
+    ]
+  },
+  "reviewProof": "build/haze-plus-proof/ios-two-items-submitted.png",
+  "apiStatus": {
+    "app": {
+      "id": "6747320369",
+      "bundleId": "com.d2vsolutions.hazeBotApp",
+      "name": "Haze Bot - Cute Robot Face Pet"
+    },
+    "summary": {
+      "health": "yellow",
+      "nextAction": "Wait for App Store review outcome.",
+      "blockers": []
+    },
+    "builds": {
+      "latest": {
+        "id": "db6e4b48-34d2-4ad5-9e87-35e738d05455",
+        "version": "2.3.0",
+        "buildNumber": "7",
+        "processingState": "VALID",
+        "uploadedDate": "2026-11-01T16:08:58-08:00",
+        "platform": "IOS"
+      }
+    },
+    "testflight": {},
+    "appstore": {
+      "versionId": "30821766-81ed-4502-8a15-ea296edda3c6",
+      "version": "2.3.0",
+      "state": "WAITING_FOR_REVIEW",
+      "platform": "IOS",
+      "createdDate": "2026-11-01T16:03:37-08:00"
+    },
+    "submission": {
+      "inFlight": true,
+      "blockingIssues": []
+    },
+    "review": {
+      "latestSubmissionId": "80c892b0-1a52-4218-9bba-3fa116e6c4e6",
+      "state": "WAITING_FOR_REVIEW",
+      "submittedDate": "2026-11-02T00:22:26.398Z",
+      "platform": "IOS"
+    },
+    "phasedRelease": {
+      "configured": true
+    },
+    "links": {
+      "appStoreConnect": "https://appstoreconnect.apple.com/apps/6747320369",
+      "testFlight": "https://appstoreconnect.apple.com/apps/6747320369/testflight/ios",
+      "review": "https://appstoreconnect.apple.com/apps/6747320369/appstore/review"
+    }
+  }
+}

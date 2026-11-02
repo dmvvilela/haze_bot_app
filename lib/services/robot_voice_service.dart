@@ -31,6 +31,7 @@ class RobotVoiceService {
   static const historyLength = 48;
 
   final ValueNotifier<double> level = ValueNotifier(0);
+  final ValueNotifier<bool> unmeteredSpeech = ValueNotifier(false);
   final List<double> levelHistory = List.filled(
     historyLength,
     0,
@@ -327,6 +328,7 @@ class RobotVoiceService {
       debugPrint('RobotVoice: recorder dispose failed: $e');
     }
     level.dispose();
+    unmeteredSpeech.dispose();
   }
 
   // ------------------------------------------------------------------ audio

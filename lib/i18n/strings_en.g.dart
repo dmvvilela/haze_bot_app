@@ -49,6 +49,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$ui$en ui = Translations$ui$en.internal(_root);
 	late final Translations$aurea$en aurea = Translations$aurea$en.internal(_root);
 	late final Translations$home$en home = Translations$home$en.internal(_root);
+	late final Translations$plus$en plus = Translations$plus$en.internal(_root);
 }
 
 // Path: app
@@ -534,6 +535,120 @@ class Translations$home$en {
 	];
 }
 
+// Path: plus
+class Translations$plus$en {
+	Translations$plus$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Haze Plus'
+	String get title => 'Haze Plus';
+
+	/// en: 'A little more you.'
+	String get headline => 'A little more you.';
+
+	/// en: 'Three new faces. Four playful accessories. One happy Haze.'
+	String get description => 'Three new faces. Four playful accessories. One happy Haze.';
+
+	/// en: 'One-time purchase · No subscription'
+	String get forever => 'One-time purchase · No subscription';
+
+	/// en: 'Haze Plus unlocked'
+	String get owned => 'Haze Plus unlocked';
+
+	/// en: 'Preview'
+	String get preview => 'Preview';
+
+	/// en: 'Tap Haze to try another expression'
+	String get preview_hint => 'Tap Haze to try another expression';
+
+	/// en: 'Choose a face'
+	String get styles_title => 'Choose a face';
+
+	List<String> get styles => [
+		'Classic',
+		'Orbit',
+		'Pixel',
+		'Aurora',
+	];
+
+	/// en: 'Add a little character'
+	String get accessories_title => 'Add a little character';
+
+	List<String> get accessories => [
+		'None',
+		'Glasses',
+		'Crown',
+		'Headphones',
+		'Comet',
+	];
+
+	/// en: 'Included'
+	String get included => 'Included';
+
+	/// en: 'Free'
+	String get free => 'Free';
+
+	/// en: 'Plus'
+	String get pack => 'Plus';
+
+	/// en: 'Unlock Plus · $price'
+	String buy({required Object price}) => 'Unlock Plus · ${price}';
+
+	/// en: 'Use this look'
+	String get apply => 'Use this look';
+
+	/// en: 'Your new look is ready!'
+	String get applied => 'Your new look is ready!';
+
+	/// en: 'Restore purchases'
+	String get restore => 'Restore purchases';
+
+	/// en: 'Try again'
+	String get retry => 'Try again';
+
+	/// en: 'Connecting to the store…'
+	String get checking => 'Connecting to the store…';
+
+	/// en: 'Please wait…'
+	String get working => 'Please wait…';
+
+	/// en: 'Purchases are unavailable right now. You can still preview every look.'
+	String get unavailable => 'Purchases are unavailable right now. You can still preview every look.';
+
+	/// en: 'That did not go through. Please try again or restore your purchase.'
+	String get failed => 'That did not go through. Please try again or restore your purchase.';
+
+	/// en: 'Your purchase is awaiting confirmation. Plus will unlock when the store confirms it.'
+	String get pending => 'Your purchase is awaiting confirmation. Plus will unlock when the store confirms it.';
+
+	/// en: 'Thank you! All three faces and four accessories are yours.'
+	String get unlocked => 'Thank you! All three faces and four accessories are yours.';
+
+	/// en: 'Your Haze Plus purchase has been restored.'
+	String get restored => 'Your Haze Plus purchase has been restored.';
+
+	/// en: 'No Haze Plus purchase was found for this store account.'
+	String get nothing_to_restore => 'No Haze Plus purchase was found for this store account.';
+
+	/// en: 'Your look could not be saved. Please try again.'
+	String get save_failed => 'Your look could not be saved. Please try again.';
+
+	/// en: 'Everything you already enjoy stays free.'
+	String get free_promise => 'Everything you already enjoy stays free.';
+
+	/// en: 'The original face, custom colors, voices, conversations, games, and labs are all still yours.'
+	String get free_detail => 'The original face, custom colors, voices, conversations, games, and labs are all still yours.';
+
+	/// en: 'Restore with the same Apple or Google account you used to buy. Purchases do not transfer between stores.'
+	String get restore_detail => 'Restore with the same Apple or Google account you used to buy. Purchases do not transfer between stores.';
+
+	/// en: 'Keep Classic · Free'
+	String get keep_classic => 'Keep Classic · Free';
+}
+
 // Path: lab.references
 class Translations$lab$references$en {
 	Translations$lab$references$en.internal(this._root);
@@ -1011,6 +1126,45 @@ extension on Translations {
 			'home.colorNames.5' => 'Red',
 			'home.colorNames.6' => 'Yellow',
 			'home.colorNames.7' => 'Pink',
+			'plus.title' => 'Haze Plus',
+			'plus.headline' => 'A little more you.',
+			'plus.description' => 'Three new faces. Four playful accessories. One happy Haze.',
+			'plus.forever' => 'One-time purchase · No subscription',
+			'plus.owned' => 'Haze Plus unlocked',
+			'plus.preview' => 'Preview',
+			'plus.preview_hint' => 'Tap Haze to try another expression',
+			'plus.styles_title' => 'Choose a face',
+			'plus.styles.0' => 'Classic',
+			'plus.styles.1' => 'Orbit',
+			'plus.styles.2' => 'Pixel',
+			'plus.styles.3' => 'Aurora',
+			'plus.accessories_title' => 'Add a little character',
+			'plus.accessories.0' => 'None',
+			'plus.accessories.1' => 'Glasses',
+			'plus.accessories.2' => 'Crown',
+			'plus.accessories.3' => 'Headphones',
+			'plus.accessories.4' => 'Comet',
+			'plus.included' => 'Included',
+			'plus.free' => 'Free',
+			'plus.pack' => 'Plus',
+			'plus.buy' => ({required Object price}) => 'Unlock Plus · ${price}',
+			'plus.apply' => 'Use this look',
+			'plus.applied' => 'Your new look is ready!',
+			'plus.restore' => 'Restore purchases',
+			'plus.retry' => 'Try again',
+			'plus.checking' => 'Connecting to the store…',
+			'plus.working' => 'Please wait…',
+			'plus.unavailable' => 'Purchases are unavailable right now. You can still preview every look.',
+			'plus.failed' => 'That did not go through. Please try again or restore your purchase.',
+			'plus.pending' => 'Your purchase is awaiting confirmation. Plus will unlock when the store confirms it.',
+			'plus.unlocked' => 'Thank you! All three faces and four accessories are yours.',
+			'plus.restored' => 'Your Haze Plus purchase has been restored.',
+			'plus.nothing_to_restore' => 'No Haze Plus purchase was found for this store account.',
+			'plus.save_failed' => 'Your look could not be saved. Please try again.',
+			'plus.free_promise' => 'Everything you already enjoy stays free.',
+			'plus.free_detail' => 'The original face, custom colors, voices, conversations, games, and labs are all still yours.',
+			'plus.restore_detail' => 'Restore with the same Apple or Google account you used to buy. Purchases do not transfer between stores.',
+			'plus.keep_classic' => 'Keep Classic · Free',
 			_ => null,
 		};
 	}

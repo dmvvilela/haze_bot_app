@@ -35,6 +35,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+/ios/build/
 
 # Mac-only voice asset production environment and generated auditions.
 .voice-studio/

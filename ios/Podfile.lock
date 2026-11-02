@@ -7,7 +7,7 @@ PODS:
   - connectivity_plus (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - flutter_gemma (1.10.0):
+  - flutter_gemma (1.11.3):
     - Flutter
   - flutter_soloud (0.0.1):
     - Flutter
@@ -19,8 +19,14 @@ PODS:
     - Flutter
   - package_info_plus (0.4.5):
     - Flutter
+  - purchases_flutter (10.18.1):
+    - Flutter
+    - PurchasesHybridCommon (= 19.15.0)
+  - PurchasesHybridCommon (19.15.0):
+    - RevenueCat (= 5.98.0)
   - record_ios (2.0.0):
     - Flutter
+  - RevenueCat (5.98.0)
   - sensors_plus (0.0.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
@@ -42,11 +48,17 @@ DEPENDENCIES:
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - large_file_handler (from `.symlinks/plugins/large_file_handler/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
+  - purchases_flutter (from `.symlinks/plugins/purchases_flutter/ios`)
   - record_ios (from `.symlinks/plugins/record_ios/ios`)
   - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
+
+SPEC REPOS:
+  trunk:
+    - PurchasesHybridCommon
+    - RevenueCat
 
 EXTERNAL SOURCES:
   audioplayers_darwin:
@@ -69,6 +81,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/large_file_handler/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
+  purchases_flutter:
+    :path: ".symlinks/plugins/purchases_flutter/ios"
   record_ios:
     :path: ".symlinks/plugins/record_ios/ios"
   sensors_plus:
@@ -85,13 +99,16 @@ SPEC CHECKSUMS:
   background_downloader: 50e91d979067b82081aba359d7d916b3ba5fadad
   connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
   Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
-  flutter_gemma: 5d95c11fee4236f1c82c2e4e6474e85d0c904f14
+  flutter_gemma: 5e7d941c6da535e3248b909e73e747279f1ddab8
   flutter_soloud: a49c4dfe436fd99e47f4777fa270c557f6190054
   flutter_tts: 35ac3c7d42412733e795ea96ad2d7e05d0a75113
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
   large_file_handler: 0a9dfa3e7c1f2eececae5d2d938ad31be10250ae
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
+  purchases_flutter: bce632274172e59844aa3ba697b90a139fe81978
+  PurchasesHybridCommon: 896c922f222ffde889a96568e02268b5ca9db85a
   record_ios: 390a30c7caaf8b5d0fb1cb1d2fd5064b48b4520c
+  RevenueCat: d2d6a98d8e1d53cc1c6362cc1fdfb64ca99b8735
   sensors_plus: b70a93b69dafdabd26ce4ac3f4d0529ab9acc4ca
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b

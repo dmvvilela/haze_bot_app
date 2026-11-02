@@ -1,0 +1,71 @@
+{
+  "verifiedOn": "2026-11-01",
+  "bundle": {
+    "versionCode": 7,
+    "sha1": "d0b6412997760192830bf36e7e66ecdd063fcd27",
+    "sha256": "1220a23bc3c7decf8d989f98bbda90921c62ac1b264af0b38fbc8ac59041f6ad"
+  },
+  "tracks": [
+    {
+      "track": "production",
+      "releases": [
+        {
+          "name": "2.2.0",
+          "versionCodes": [
+            "6"
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "track": "beta",
+      "releases": [
+        {
+          "name": "2.1.0",
+          "versionCodes": [
+            "5"
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "track": "alpha",
+      "releases": []
+    },
+    {
+      "track": "internal",
+      "releases": [
+        {
+          "name": "2.3.0 Haze Plus — draft",
+          "versionCodes": [
+            "7"
+          ],
+          "status": "draft"
+        },
+        {
+          "name": "1.0.0+1",
+          "versionCodes": [
+            "1"
+          ],
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "existingReleasesUnchanged": true,
+  "googleProductCreated": false,
+  "googleProductError": {
+    "code": 400,
+    "message": "Product \"haze_plus_lifetime\": Can't create product. To fix, request billing permission.",
+    "status": "INVALID_ARGUMENT"
+  },
+  "playConsoleBundle": {
+    "targetSdk": 36,
+    "minSdk": 24,
+    "billingPermission": true,
+    "supports16KbPages": true
+  },
+  "distributed": false
+}

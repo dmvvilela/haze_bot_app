@@ -1,0 +1,29 @@
+{
+  "url": "https://danvilela.com/haze/privacy-policy",
+  "liveHttpStatus": 200,
+  "languages": [
+    "en",
+    "pt"
+  ],
+  "websiteCommit": "88018fa",
+  "websiteDeployment": "https://vercel.com/danvilela/danvilela-sveltekit/8aRQhS9jdnE4Uu8koD1U1aEyuM8t",
+  "apple": {
+    "saved": true,
+    "submitted": true,
+    "locales": [
+      "en-US",
+      "pt-BR"
+    ]
+  },
+  "google": {
+    "saved": true,
+    "submitted": true,
+    "reason": "User explicitly approved restarting review with the new URL. Google accepted the restart; production, privacy URL, and Data Safety are together under Changes in review.",
+    "reviewRestartApproved": true,
+    "reviewRestarted": true,
+    "verifiedAt": "2026-11-02T00:30:55.217535+00:00",
+    "status": "submitted_quick_checks_before_review"
+  },
+  "previousUrl": "https://dmvvilela.github.io/haze_bot_app/privacy-policy",
+  "previousUrlStillAvailable": true
+}

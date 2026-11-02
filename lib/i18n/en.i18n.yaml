@@ -221,3 +221,37 @@ home:
     - Red
     - Yellow
     - Pink
+
+plus:
+  title: Haze Plus
+  headline: A little more you.
+  description: Three new faces. Four playful accessories. One happy Haze.
+  forever: One-time purchase · No subscription
+  owned: Haze Plus unlocked
+  preview: Preview
+  preview_hint: Tap Haze to try another expression
+  styles_title: Choose a face
+  styles: [Classic, Orbit, Pixel, Aurora]
+  accessories_title: Add a little character
+  accessories: [None, Glasses, Crown, Headphones, Comet]
+  included: Included
+  free: Free
+  pack: Plus
+  buy: "Unlock Plus · $price"
+  apply: Use this look
+  applied: Your new look is ready!
+  restore: Restore purchases
+  retry: Try again
+  checking: Connecting to the store…
+  working: Please wait…
+  unavailable: Purchases are unavailable right now. You can still preview every look.
+  failed: That did not go through. Please try again or restore your purchase.
+  pending: Your purchase is awaiting confirmation. Plus will unlock when the store confirms it.
+  unlocked: Thank you! All three faces and four accessories are yours.
+  restored: Your Haze Plus purchase has been restored.
+  nothing_to_restore: No Haze Plus purchase was found for this store account.
+  save_failed: Your look could not be saved. Please try again.
+  free_promise: Everything you already enjoy stays free.
+  free_detail: The original face, custom colors, voices, conversations, games, and labs are all still yours.
+  restore_detail: Restore with the same Apple or Google account you used to buy. Purchases do not transfer between stores.
+  keep_classic: Keep Classic · Free

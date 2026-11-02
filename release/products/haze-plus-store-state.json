@@ -1,0 +1,143 @@
+{
+  "verifiedOn": "2026-11-01",
+  "apple": {
+    "id": "6829523101",
+    "productId": "haze_plus_lifetime",
+    "type": "NON_CONSUMABLE",
+    "state": "WAITING_FOR_REVIEW",
+    "prices": [
+      {
+        "territory": "BRA",
+        "priceId": "eyJzIjoiNjgyOTUyMzEwMSIsInQiOiJCUkEiLCJwIjoiMTAwNzciLCJzZCI6MC4wLCJlZCI6MC4wfQ",
+        "pricePointId": "10077",
+        "customerPrice": "19.9",
+        "currency": "BRL",
+        "proceeds": "16.32",
+        "manual": true
+      },
+      {
+        "territory": "USA",
+        "priceId": "eyJzIjoiNjgyOTUyMzEwMSIsInQiOiJVU0EiLCJwIjoiMTAwNjIiLCJzZCI6MC4wLCJlZCI6MC4wfQ",
+        "pricePointId": "10062",
+        "customerPrice": "4.99",
+        "currency": "USD",
+        "proceeds": "4.24",
+        "manual": true
+      }
+    ],
+    "localizations": [
+      {
+        "name": "Haze Plus",
+        "locale": "pt-BR",
+        "description": "3 rostos + 4 acess\u00f3rios. Compra \u00fanica.",
+        "state": "WAITING_FOR_REVIEW"
+      },
+      {
+        "name": "Haze Plus",
+        "locale": "en-US",
+        "description": "3 face styles + 4 accessories. One-time purchase.",
+        "state": "WAITING_FOR_REVIEW"
+      }
+    ],
+    "submitted": true,
+    "version": "2.3.0",
+    "buildNumber": 7,
+    "versionId": "30821766-81ed-4502-8a15-ea296edda3c6",
+    "buildId": "db6e4b48-34d2-4ad5-9e87-35e738d05455",
+    "submissionId": "80c892b0-1a52-4218-9bba-3fa116e6c4e6",
+    "releaseType": "AFTER_APPROVAL",
+    "phasedRelease": false,
+    "publiclyAvailable": false,
+    "reviewScreenshotComplete": true,
+    "availability": [
+      "USA",
+      "BRA"
+    ],
+    "privacyPolicyUrl": "https://danvilela.com/haze/privacy-policy",
+    "purchaseTest": "not_completed",
+    "restoreTest": "not_completed",
+    "nativePriceLoaded": true,
+    "releaseEvidence": "release/products/haze-plus-ios-release-evidence.json"
+  },
+  "google": {
+    "created": true,
+    "productionVersionCode": "7",
+    "internalCompletedVersionCode": "7",
+    "draftUploadApproved": true,
+    "preparedBundle": {
+      "versionName": "2.3.0",
+      "versionCode": 7,
+      "targetSdk": 36,
+      "billingPermission": true,
+      "signatureVerified": true,
+      "path": "build/haze-plus-proof/haze-2.3.0+7.aab",
+      "sha256": "1220a23bc3c7decf8d989f98bbda90921c62ac1b264af0b38fbc8ac59041f6ad"
+    },
+    "draftUploaded": true,
+    "internalDraftVersionCode": null,
+    "betaCompletedVersionCode": "5",
+    "submittedForReview": true,
+    "distributed": true,
+    "productCreationRetriesAfterUpload": 2,
+    "playConsoleBillingPermissionVerified": true,
+    "playConsoleTargetSdk": 36,
+    "playConsoleSupports16KbPages": true,
+    "releaseReviewWarning": "1,840 fewer supported devices compared with previous internal build 1; build 7 minimum API 24 versus API 21.",
+    "trackEvidence": "release/products/haze-plus-internal-release-evidence.json",
+    "previousError": "Product \"haze_plus_lifetime\": Can't create product. To fix, request billing permission.",
+    "productId": "haze_plus_lifetime",
+    "purchaseOptionId": "lifetime",
+    "purchaseOptionState": "ACTIVE",
+    "internalReleaseApproved": true,
+    "otherTracksUnchanged": true,
+    "productEvidence": "release/products/haze-plus-google-active.json",
+    "billingBlockResolved": true,
+    "approvedPrices": {
+      "US": {
+        "currency": "USD",
+        "amount": "4.99"
+      },
+      "BR": {
+        "currency": "BRL",
+        "amount": "19.90"
+      }
+    },
+    "activationApproved": true,
+    "purchaseTest": "passed_license_test_no_charge",
+    "restoreTest": "passed_clean_install_and_explicit_restore",
+    "testPreparation": {
+      "existingLicenseTesterVerified": true,
+      "sameAccountInInternalTesters": true,
+      "testerConfigurationChanged": true,
+      "internalTestUrl": "https://play.google.com/apps/internaltest/4700845887214000676",
+      "connectedAndroidDevices": 1,
+      "purchaseCompleted": true,
+      "restoreCompleted": true,
+      "device": "Motorola Edge 40 Neo",
+      "playStoreInstalled": true,
+      "googleAccountSignedIn": true,
+      "hazeInstalled": true,
+      "internalTestersListLicenseEnabled": true,
+      "secondaryAccountEnrolledInInternalTest": true,
+      "installedViaGooglePlay": true,
+      "appDataPreserved": false,
+      "originalPlayAccountRestored": true,
+      "playStoreCacheCleared": true,
+      "hazeAppDataCleared": true,
+      "cleanInstallRestoreCompleted": true
+    },
+    "purchaseEvidence": "release/products/haze-plus-android-purchase-proof.json",
+    "testersUnchangedAtInternalRelease": true,
+    "lastConfirmedPublicProductionVersionCode": "6",
+    "productionReleaseApproved": true,
+    "productionPublishingState": "pre_review_checks_then_automatic_review_and_release",
+    "managedPublishing": false,
+    "productionEvidence": "release/products/haze-plus-production-release-evidence.json",
+    "privacyPolicyPublished": true,
+    "dataSafetyPurchaseHistorySubmitted": true,
+    "privacyPolicyUrl": "https://danvilela.com/haze/privacy-policy",
+    "privacyPolicyUrlSubmissionState": "submitted",
+    "privacyPolicyRestartApproval": "approved",
+    "privacyPolicyReviewRestarted": true
+  }
+}

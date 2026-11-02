@@ -47,6 +47,7 @@ class TranslationsPt extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$ui$pt ui = _Translations$ui$pt._(_root);
 	@override late final _Translations$aurea$pt aurea = _Translations$aurea$pt._(_root);
 	@override late final _Translations$home$pt home = _Translations$home$pt._(_root);
+	@override late final _Translations$plus$pt plus = _Translations$plus$pt._(_root);
 }
 
 // Path: app
@@ -275,6 +276,58 @@ class _Translations$home$pt extends Translations$home$en {
 		'Amarelo',
 		'Rosa',
 	];
+}
+
+// Path: plus
+class _Translations$plus$pt extends Translations$plus$en {
+	_Translations$plus$pt._(TranslationsPt root) : this._root = root, super.internal(root);
+
+	final TranslationsPt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Haze Plus';
+	@override String get headline => 'Um pouco mais você.';
+	@override String get description => 'Três novos rostos. Quatro acessórios divertidos. O mesmo Haze.';
+	@override String get forever => 'Compra única · Sem assinatura';
+	@override String get owned => 'Haze Plus desbloqueado';
+	@override String get preview => 'Prévia';
+	@override String get preview_hint => 'Toque no Haze para testar outra expressão';
+	@override String get styles_title => 'Escolha um rosto';
+	@override List<String> get styles => [
+		'Clássico',
+		'Órbita',
+		'Pixel',
+		'Aurora',
+	];
+	@override String get accessories_title => 'Um toque de personalidade';
+	@override List<String> get accessories => [
+		'Nenhum',
+		'Óculos',
+		'Coroa',
+		'Fones',
+		'Cometa',
+	];
+	@override String get included => 'Incluído';
+	@override String get free => 'Grátis';
+	@override String get pack => 'Plus';
+	@override String buy({required Object price}) => 'Desbloquear Plus · ${price}';
+	@override String get apply => 'Usar este visual';
+	@override String get applied => 'Seu novo visual está pronto!';
+	@override String get restore => 'Restaurar compras';
+	@override String get retry => 'Tentar novamente';
+	@override String get checking => 'Conectando à loja…';
+	@override String get working => 'Aguarde…';
+	@override String get unavailable => 'As compras estão indisponíveis no momento. Você ainda pode experimentar todos os visuais.';
+	@override String get failed => 'Não foi possível concluir. Tente novamente ou restaure sua compra.';
+	@override String get pending => 'Sua compra aguarda confirmação. O Plus será desbloqueado quando a loja confirmar.';
+	@override String get unlocked => 'Obrigado! Os três rostos e os quatro acessórios são seus.';
+	@override String get restored => 'Sua compra do Haze Plus foi restaurada.';
+	@override String get nothing_to_restore => 'Nenhuma compra do Haze Plus foi encontrada nesta conta da loja.';
+	@override String get save_failed => 'Não foi possível salvar seu visual. Tente novamente.';
+	@override String get free_promise => 'Tudo o que você já usa continua grátis.';
+	@override String get free_detail => 'O rosto original, cores personalizadas, vozes, conversas, jogos e laboratórios continuam sendo seus.';
+	@override String get restore_detail => 'Restaure com a mesma conta Apple ou Google usada na compra. As compras não são transferidas entre lojas.';
+	@override String get keep_classic => 'Manter Clássico · Grátis';
 }
 
 // Path: lab.references
@@ -661,6 +714,45 @@ extension on TranslationsPt {
 			'home.colorNames.5' => 'Vermelho',
 			'home.colorNames.6' => 'Amarelo',
 			'home.colorNames.7' => 'Rosa',
+			'plus.title' => 'Haze Plus',
+			'plus.headline' => 'Um pouco mais você.',
+			'plus.description' => 'Três novos rostos. Quatro acessórios divertidos. O mesmo Haze.',
+			'plus.forever' => 'Compra única · Sem assinatura',
+			'plus.owned' => 'Haze Plus desbloqueado',
+			'plus.preview' => 'Prévia',
+			'plus.preview_hint' => 'Toque no Haze para testar outra expressão',
+			'plus.styles_title' => 'Escolha um rosto',
+			'plus.styles.0' => 'Clássico',
+			'plus.styles.1' => 'Órbita',
+			'plus.styles.2' => 'Pixel',
+			'plus.styles.3' => 'Aurora',
+			'plus.accessories_title' => 'Um toque de personalidade',
+			'plus.accessories.0' => 'Nenhum',
+			'plus.accessories.1' => 'Óculos',
+			'plus.accessories.2' => 'Coroa',
+			'plus.accessories.3' => 'Fones',
+			'plus.accessories.4' => 'Cometa',
+			'plus.included' => 'Incluído',
+			'plus.free' => 'Grátis',
+			'plus.pack' => 'Plus',
+			'plus.buy' => ({required Object price}) => 'Desbloquear Plus · ${price}',
+			'plus.apply' => 'Usar este visual',
+			'plus.applied' => 'Seu novo visual está pronto!',
+			'plus.restore' => 'Restaurar compras',
+			'plus.retry' => 'Tentar novamente',
+			'plus.checking' => 'Conectando à loja…',
+			'plus.working' => 'Aguarde…',
+			'plus.unavailable' => 'As compras estão indisponíveis no momento. Você ainda pode experimentar todos os visuais.',
+			'plus.failed' => 'Não foi possível concluir. Tente novamente ou restaure sua compra.',
+			'plus.pending' => 'Sua compra aguarda confirmação. O Plus será desbloqueado quando a loja confirmar.',
+			'plus.unlocked' => 'Obrigado! Os três rostos e os quatro acessórios são seus.',
+			'plus.restored' => 'Sua compra do Haze Plus foi restaurada.',
+			'plus.nothing_to_restore' => 'Nenhuma compra do Haze Plus foi encontrada nesta conta da loja.',
+			'plus.save_failed' => 'Não foi possível salvar seu visual. Tente novamente.',
+			'plus.free_promise' => 'Tudo o que você já usa continua grátis.',
+			'plus.free_detail' => 'O rosto original, cores personalizadas, vozes, conversas, jogos e laboratórios continuam sendo seus.',
+			'plus.restore_detail' => 'Restaure com a mesma conta Apple ou Google usada na compra. As compras não são transferidas entre lojas.',
+			'plus.keep_classic' => 'Manter Clássico · Grátis',
 			_ => null,
 		};
 	}

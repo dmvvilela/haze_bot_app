@@ -1,0 +1,41 @@
+{
+  "verifiedOn": "2026-11-01",
+  "device": "Motorola Edge 40 Neo",
+  "appVersion": "2.3.0",
+  "versionCode": 7,
+  "installer": "com.android.vending",
+  "orderState": "PROCESSED",
+  "googlePurchase": {
+    "purchaseState": 0,
+    "acknowledgementState": 1,
+    "consumptionState": 0,
+    "purchaseType": 0,
+    "purchaseTimeMillis": "1793575676228",
+    "productId": null,
+    "regionCode": "BR",
+    "orderIdRedacted": true
+  },
+  "checkoutExplicitlyNoCharge": true,
+  "unlockConfirmed": true,
+  "coldRestartOwnershipConfirmed": true,
+  "restoreConfirmed": true,
+  "freshDataRestoreTested": true,
+  "queriedProductId": "haze_plus_lifetime",
+  "paidCosmeticsVerified": {
+    "face": "Pixel",
+    "accessory": "Crown",
+    "visibleOnMainScreen": true
+  },
+  "screenshots": {
+    "checkout": "build/haze-plus-proof/android-test-checkout.png",
+    "unlock": "build/haze-plus-proof/android-plus-unlocked.png",
+    "restore": "build/haze-plus-proof/android-plus-restored.png",
+    "paidLook": "build/haze-plus-proof/android-plus-paid-look.png",
+    "cleanInstallRestore": "build/haze-plus-proof/android-plus-clean-install-restored.png"
+  },
+  "cleanInstallRestoreConfirmed": true,
+  "cleanInstallMethod": "adb uninstall without keep-data; Google Play reinstall; pm clear before first launch",
+  "cleanInstallVersionCode": 7,
+  "cleanInstallInstaller": "com.android.vending",
+  "ownershipAutomaticallyRecoveredOnFreshLaunch": true
+}

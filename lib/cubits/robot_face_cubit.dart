@@ -20,6 +20,7 @@ import '../services/haze_mood.dart';
 import '../services/robot_voice_service.dart';
 import '../services/sound_service.dart';
 import '../services/timer_service.dart';
+import '../services/haze_plus_controller.dart';
 
 part 'robot_face_state.dart';
 part 'robot_face_cubit.freezed.dart';
@@ -57,6 +58,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   final TimerService _timerService = TimerService();
   final SoundService sounds = SoundService();
   final RobotVoiceService voice;
+  final HazePlusController plus;
   late final Future<void> _ttsReady;
   late final Future<void> _preferencesReady;
   int _speechRequest = 0;
@@ -77,11 +79,17 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
   String? _activeVoiceLocale;
   String? _activeVoiceId;
 
-  RobotFaceCubit({HazeBrain? brain, FlutterTts? tts, RobotVoiceService? voice})
-    : _brain = brain ?? HazeBrain(),
-      _flutterTts = tts ?? FlutterTts(),
-      voice = voice ?? RobotVoiceService(),
-      super(const RobotFaceState()) {
+  RobotFaceCubit({
+    HazeBrain? brain,
+    FlutterTts? tts,
+    RobotVoiceService? voice,
+    HazePlusController? plus,
+  }) : _brain = brain ?? HazeBrain(),
+       _flutterTts = tts ?? FlutterTts(),
+       voice = voice ?? RobotVoiceService(),
+       plus = plus ?? HazePlusController(),
+       super(const RobotFaceState()) {
+    unawaited(this.plus.initialize());
     _ttsReady = _initializeTts();
     _initializeTimer();
     if (FlutterGemma.hasActiveModel()) {
@@ -816,6 +824,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       await _flutterTts.stop();
       await voice.stopPlayback();
       if (!current()) return;
+      voice.unmeteredSpeech.value = false;
       await _applyTtsSettings();
       if (emotion != null || affect != null) {
         final (pitchFactor, rateFactor) = affect == null
@@ -850,6 +859,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
       if (!spoken) spoken = await _speakCaptured(line, isCurrent: current);
       if (!current()) return;
       if (!spoken) {
+        voice.unmeteredSpeech.value = true;
         final result = await _flutterTts.speak(line, focus: true);
         if (result != 1) {
           debugPrint('Haze TTS: speak returned $result');
@@ -858,7 +868,10 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
     } catch (e) {
       debugPrint('Haze TTS: failed to speak: $e');
     } finally {
-      if (current()) emit(state.copyWith(isSpeaking: false));
+      if (current()) {
+        voice.unmeteredSpeech.value = false;
+        emit(state.copyWith(isSpeaking: false));
+      }
     }
   }
 
@@ -1359,6 +1372,7 @@ class RobotFaceCubit extends Cubit<RobotFaceState> {
 
   @override
   Future<void> close() async {
+    plus.dispose();
     _speechRequest++;
     _idleTimer?.cancel();
     _dizzyTimer?.cancel();

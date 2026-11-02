@@ -1,0 +1,82 @@
+{
+  "verifiedOn": "2026-11-01",
+  "bundle": {
+    "versionCode": 7,
+    "sha1": "d0b6412997760192830bf36e7e66ecdd063fcd27",
+    "sha256": "1220a23bc3c7decf8d989f98bbda90921c62ac1b264af0b38fbc8ac59041f6ad"
+  },
+  "tracks": [
+    {
+      "track": "production",
+      "releases": [
+        {
+          "name": "2.2.0",
+          "versionCodes": [
+            "6"
+          ],
+          "releaseNotes": [
+            {
+              "language": "en-US",
+              "text": "Meet the refreshed Haze: explore compassion, courage and gratitude in Aurea Lab, enjoy smoother expressions and a softer companion voice, play the feelings game, and settle in with the focus timer. Includes improved speech playback and cleaner captions.\n"
+            },
+            {
+              "language": "pt-BR",
+              "text": "Conheça o novo Haze: explore compaixão, coragem e gratidão no Lab Aurea, aproveite expressões suaves e uma voz mais acolhedora, brinque com o jogo dos sentimentos e concentre-se com o timer. Inclui melhorias na fala e legendas mais limpas.\n"
+            }
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "track": "beta",
+      "releases": [
+        {
+          "name": "2.1.0",
+          "versionCodes": [
+            "5"
+          ],
+          "releaseNotes": [
+            {
+              "language": "en-US",
+              "text": "Haze finally has a voice of its own.\n\n• Character voices — pick how Haze sounds, now with Portuguese clips too\n• Shake your phone and Haze goes dizzy, eyes spinning\n• Leave it alone and it yawns and drifts off to sleep\n• The chat box stays open now, so you can just type to Haze\n• Smoother voice playback and audio fixes\n"
+            },
+            {
+              "language": "pt-BR",
+              "text": "O Haze agora tem voz própria.\n\n• Vozes de personagem — escolha como o Haze soa, agora em português\n• Chacoalhe o celular e o Haze fica tonto, com os olhos girando\n• Deixe quieto e ele boceja e cai no sono\n• A caixa de conversa fica sempre aberta para você digitar\n• Reprodução de voz mais estável e correções de áudio\n"
+            }
+          ],
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "track": "alpha"
+    },
+    {
+      "track": "internal",
+      "releases": [
+        {
+          "name": "2.3.0 Haze Plus — internal test",
+          "versionCodes": [
+            "7"
+          ],
+          "releaseNotes": [
+            {
+              "language": "en-US",
+              "text": "Haze Plus preparation: optional one-time face styles and accessories. Existing features remain free."
+            },
+            {
+              "language": "pt-BR",
+              "text": "Preparação do Haze Plus: novos rostos e acessórios opcionais com compra única. Os recursos atuais continuam grátis."
+            }
+          ],
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "otherTracksUnchanged": true,
+  "testersUnchanged": true,
+  "internalReleaseApproved": true
+}

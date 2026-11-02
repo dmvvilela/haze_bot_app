@@ -1,0 +1,50 @@
+{
+  "verifiedOn": "2026-11-01",
+  "versionName": "2.3.0",
+  "versionCode": 7,
+  "bundle": {
+    "versionCode": 7,
+    "sha1": "d0b6412997760192830bf36e7e66ecdd063fcd27",
+    "sha256": "1220a23bc3c7decf8d989f98bbda90921c62ac1b264af0b38fbc8ac59041f6ad"
+  },
+  "productionTrack": {
+    "track": "production",
+    "releases": [
+      {
+        "name": "2.3.0 Haze Plus \u2014 internal test",
+        "versionCodes": [
+          "7"
+        ],
+        "releaseNotes": [
+          {
+            "language": "pt-BR",
+            "text": "Conhe\u00e7a o Haze Plus: tr\u00eas novos rostos e quatro acess\u00f3rios em uma compra \u00fanica e opcional. Tudo o que voc\u00ea j\u00e1 usa continua gr\u00e1tis. Inclui rea\u00e7\u00f5es mais expressivas e anima\u00e7\u00f5es de fala mais suaves.\n"
+          },
+          {
+            "language": "en-US",
+            "text": "Meet Haze Plus: three new face styles and four accessories in one optional, one-time purchase. Everything you already enjoy stays free. Includes more expressive reactions and smoother speech animation.\n"
+          }
+        ],
+        "status": "completed"
+      }
+    ]
+  },
+  "otherTracksUnchanged": true,
+  "cleanInstallRestoreVerified": true,
+  "publicAvailability": "not_yet_public_google_pre_review_checks",
+  "privacyPolicyCommit": "6ee0e770206de4d4007e812dc0c17e826d5abdc0",
+  "dataSafetyPurchaseHistorySaved": true,
+  "consoleStatus": "Production, privacy URL, and Data Safety under Changes in review; quick checks running before automatic review",
+  "managedPublishing": false,
+  "fullRolloutSubmitted": true,
+  "productionPublicVersionAtSubmission": 6,
+  "consoleScreenshot": "build/haze-plus-proof/android-review-restarted-with-policy.png",
+  "privacyPolicyLiveVerified": true,
+  "dataSafetyPurchaseHistorySubmitted": true,
+  "dataSafetyGuidance": "https://www.revenuecat.com/docs/platform-resources/google-platform-resources/google-plays-data-safety",
+  "privacyPolicyUrl": "https://danvilela.com/haze/privacy-policy",
+  "privacyPolicyWebsiteCommit": "88018fa",
+  "privacyPolicyUrlSubmitted": true,
+  "reviewRestartApproved": true,
+  "reviewRestartVerifiedAt": "2026-11-02T00:30:55.217535+00:00"
+}

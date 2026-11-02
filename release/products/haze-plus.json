@@ -1,0 +1,35 @@
+{
+  "status": "android_and_ios_production_submitted",
+  "productId": "haze_plus_lifetime",
+  "referenceName": "Haze Plus \u2014 Lifetime",
+  "appleAppId": "6747320369",
+  "appleType": "NON_CONSUMABLE",
+  "googlePackageName": "com.d2vsolutions.haze_bot_app",
+  "googleType": "one_time_non_consumable",
+  "entitlement": "haze_plus",
+  "localizations": {
+    "en-US": {
+      "name": "Haze Plus",
+      "description": "3 face styles + 4 accessories. One-time purchase."
+    },
+    "pt-BR": {
+      "name": "Haze Plus",
+      "description": "3 rostos + 4 acess\u00f3rios. Compra \u00fanica."
+    }
+  },
+  "publish": true,
+  "submitForReview": true,
+  "existingFeaturesRemainFree": true,
+  "approvedPrices": {
+    "USA": {
+      "currency": "USD",
+      "amount": "4.99"
+    },
+    "BRA": {
+      "currency": "BRL",
+      "amount": "19.90"
+    }
+  },
+  "googleProductActive": true,
+  "publishScope": "Android build 7, Data Safety, and the new privacy policy URL are submitted together after a user-approved review restart. iOS 2.3.0 build 7 and Haze Plus were submitted together and are WAITING_FOR_REVIEW. Both release automatically after approval."
+}

@@ -65,6 +65,8 @@ dependencies:
   record: ^7.1.1
   sensors_plus: ^7.1.0
   url_launcher: ^6.3.2
+  # v11 requires an unpublished CocoaPods dependency; keep the last verified iOS-compatible release.
+  purchases_flutter: 10.18.1
 dev_dependencies:
   flutter_driver:
     sdk: flutter

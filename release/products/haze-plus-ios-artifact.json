@@ -1,0 +1,9 @@
+{
+  "version": "2.3.0",
+  "build": 7,
+  "bundleId": "com.d2vsolutions.hazeBotApp",
+  "sha256": "80014510d2443e77c98ce10510fe4a33c4664e1e839fb45751d04c6e45e9640d",
+  "signatureVerified": true,
+  "getTaskAllow": false,
+  "usesNonExemptEncryption": false
+}

@@ -1,0 +1,48 @@
+{
+  "packageName": "com.d2vsolutions.haze_bot_app",
+  "productId": "haze_plus_lifetime",
+  "listings": [
+    {
+      "languageCode": "en-US",
+      "title": "Haze Plus",
+      "description": "3 face styles + 4 accessories. One-time purchase."
+    },
+    {
+      "languageCode": "pt-BR",
+      "title": "Haze Plus",
+      "description": "3 rostos + 4 acessórios. Compra única."
+    }
+  ],
+  "purchaseOptions": [
+    {
+      "purchaseOptionId": "lifetime",
+      "state": "DRAFT",
+      "buyOption": {
+        "legacyCompatible": true
+      },
+      "regionalPricingAndAvailabilityConfigs": [
+        {
+          "regionCode": "BR",
+          "price": {
+            "currencyCode": "BRL",
+            "units": "19",
+            "nanos": 900000000
+          },
+          "availability": "AVAILABLE"
+        },
+        {
+          "regionCode": "US",
+          "price": {
+            "currencyCode": "USD",
+            "units": "4",
+            "nanos": 990000000
+          },
+          "availability": "AVAILABLE"
+        }
+      ]
+    }
+  ],
+  "regionsVersion": {
+    "version": "2026/01"
+  }
+}

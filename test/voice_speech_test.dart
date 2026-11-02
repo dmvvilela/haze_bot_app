@@ -118,13 +118,16 @@ void main() {
       holdSpeech = true;
       final first = robot.previewVoice();
       await until(() => spoken.length == 1);
+      expect(robot.voice.unmeteredSpeech.value, isTrue);
       final second = robot.previewVoice();
       await until(() => spoken.length == 2);
       await first;
       expect(robot.state.isSpeaking, isTrue);
+      expect(robot.voice.unmeteredSpeech.value, isTrue);
       pending!.complete(1);
       await second;
       expect(robot.state.isSpeaking, isFalse);
+      expect(robot.voice.unmeteredSpeech.value, isFalse);
     },
   );
 }

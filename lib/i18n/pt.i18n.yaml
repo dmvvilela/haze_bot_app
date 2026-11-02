@@ -221,3 +221,37 @@ home:
     - Vermelho
     - Amarelo
     - Rosa
+
+plus:
+  title: Haze Plus
+  headline: Um pouco mais você.
+  description: Três novos rostos. Quatro acessórios divertidos. O mesmo Haze.
+  forever: Compra única · Sem assinatura
+  owned: Haze Plus desbloqueado
+  preview: Prévia
+  preview_hint: Toque no Haze para testar outra expressão
+  styles_title: Escolha um rosto
+  styles: [Clássico, Órbita, Pixel, Aurora]
+  accessories_title: Um toque de personalidade
+  accessories: [Nenhum, Óculos, Coroa, Fones, Cometa]
+  included: Incluído
+  free: Grátis
+  pack: Plus
+  buy: "Desbloquear Plus · $price"
+  apply: Usar este visual
+  applied: Seu novo visual está pronto!
+  restore: Restaurar compras
+  retry: Tentar novamente
+  checking: Conectando à loja…
+  working: Aguarde…
+  unavailable: As compras estão indisponíveis no momento. Você ainda pode experimentar todos os visuais.
+  failed: Não foi possível concluir. Tente novamente ou restaure sua compra.
+  pending: Sua compra aguarda confirmação. O Plus será desbloqueado quando a loja confirmar.
+  unlocked: Obrigado! Os três rostos e os quatro acessórios são seus.
+  restored: Sua compra do Haze Plus foi restaurada.
+  nothing_to_restore: Nenhuma compra do Haze Plus foi encontrada nesta conta da loja.
+  save_failed: Não foi possível salvar seu visual. Tente novamente.
+  free_promise: Tudo o que você já usa continua grátis.
+  free_detail: O rosto original, cores personalizadas, vozes, conversas, jogos e laboratórios continuam sendo seus.
+  restore_detail: Restaure com a mesma conta Apple ou Google usada na compra. As compras não são transferidas entre lojas.
+  keep_classic: Manter Clássico · Grátis
