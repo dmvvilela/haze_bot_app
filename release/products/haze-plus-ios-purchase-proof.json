@@ -6,7 +6,7 @@
   "bundleId": "com.d2vsolutions.hazeBotApp",
   "appVersion": "2.3.0",
   "buildNumber": 7,
-  "distribution": "development-signed build",
+  "distribution": "initial installation source not independently verified; clean restore verified with TestFlight",
   "builtByDeveloper": true,
   "productId": "haze_plus_lifetime",
   "entitlementId": "haze_plus",
@@ -28,8 +28,8 @@
   "restoreMessage": "Your Haze Plus purchase has been restored.",
   "coldRestartOwnershipConfirmed": true,
   "coldRestartMethod": "devicectl process launch --terminate-existing",
-  "freshDataRestoreTested": false,
-  "cleanInstallRestoreTested": false,
+  "freshDataRestoreTested": true,
+  "cleanInstallRestoreTested": true,
   "paidCosmeticsVerified": {
     "face": "Orbit",
     "accessory": "Headphones",
@@ -41,5 +41,44 @@
     "unlock": "build/haze-plus-proof/ios-physical-purchase-unlocked.png",
     "restore": "build/haze-plus-proof/ios-physical-restore-success.png",
     "coldRestart": "build/haze-plus-proof/ios-physical-cold-restart.png"
+  },
+  "distributionVerificationNote": "builtByDeveloper is also true for the verified TestFlight installation and is not sufficient to identify the original install source.",
+  "cleanInstallRestore": {
+    "verifiedAt": "2026-11-02T02:30:24.231706+00:00",
+    "verifiedOnLocal": "2026-11-01",
+    "distribution": "TestFlight",
+    "appVersion": "2.3.0",
+    "buildNumber": 7,
+    "method": "Full devicectl uninstall, then TestFlight install from the existing internal tester group",
+    "uninstallSucceeded": true,
+    "testFlightInstallObserved": true,
+    "deviceBuildIdentityVerified": true,
+    "localCosmeticSelectionReset": true,
+    "ownershipAutomaticallyRecoveredOnFreshLaunch": false,
+    "initiallyLocked": true,
+    "explicitRestoreConfirmed": true,
+    "restoreMessage": "Your Haze Plus purchase has been restored.",
+    "existingPurchaseRecoveredWithoutRepurchase": true,
+    "restoredCosmeticsApplied": {
+      "face": "Orbit",
+      "accessory": "Headphones",
+      "visibleOnMainScreen": true
+    },
+    "revenueCatEntitlementActive": true,
+    "revenueCatEntitlementDuration": "unlimited",
+    "revenueCatNewAnonymousIdAliasedToOriginalPurchaser": true,
+    "accountType": "regular Apple account used by TestFlight sandbox",
+    "developmentBuildAttempt": {
+      "result": "no_purchase_found",
+      "sameDevice": true,
+      "purchaseAccountType": "regular Apple account",
+      "cause": "Not conclusively diagnosed; restore succeeded after clean installation through TestFlight."
+    },
+    "screenshots": {
+      "testFlightInstalled": "build/haze-plus-proof/ios-testflight-installed-build7.png",
+      "beforeRestore": "build/haze-plus-proof/ios-testflight-clean-before-restore.png",
+      "restored": "build/haze-plus-proof/ios-testflight-clean-restore-success.png",
+      "restoredLook": "build/haze-plus-proof/ios-testflight-clean-restored-look.png"
+    }
   }
 }

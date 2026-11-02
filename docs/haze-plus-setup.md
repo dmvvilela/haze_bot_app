@@ -151,8 +151,9 @@ is `release/products/haze-plus-google-draft.json`.
    refund/revocation. Android purchase, cold restart, explicit restore, and
    clean-install restore on the same store account passed.
    iOS sandbox purchase, explicit restore, paid cosmetics, and cold restart
-   passed on a physical iPhone 16 Pro Max. iOS clean-install restore,
-   cancellation, pending approval, and refund/revocation remain untested.
+   passed on a physical iPhone 16 Pro Max. Clean-install restore also passed
+   using TestFlight 2.3.0 (7). Cancellation, pending approval, and
+   refund/revocation remain untested.
 7. The bilingual privacy policy is live at
    https://danvilela.com/haze/privacy-policy (website commit `88018fa`).
    Apple English and Portuguese privacy URLs were updated and submitted.
@@ -190,14 +191,34 @@ purchase-history privacy declaration was published, and the native
 purchase-controls screenshot completed upload.
 
 On November 1 at 22:56 BRT, a physical iPhone 16 Pro Max completed an Apple
-sandbox purchase at R$19.90 using development-signed Haze 2.3.0 (7). Apple
+sandbox purchase at R$19.90 using Haze 2.3.0 (7). Apple
 confirmed success, and RevenueCat recorded `NON_RENEWING_PURCHASE` in
 `SANDBOX` for `haze_plus_lifetime`, granting active `haze_plus` with unlimited
 duration. The app applied Orbit and Headphones. Explicit Restore Purchases
 showed "Your Haze Plus purchase has been restored." A full process restart
-preserved ownership and the selected cosmetics. This was not a clean-install
-restore or a TestFlight binary test. Sanitized evidence is in
+preserved ownership and the selected cosmetics. The original installation
+source was not independently verified; `builtByDeveloper` alone cannot
+distinguish it, because the later verified TestFlight installation reports
+that flag too. Sanitized evidence is in
 `release/products/haze-plus-ios-purchase-proof.json`.
+
+## iOS clean-install restore verification
+
+On November 1 at 23:28 BRT, clean-install restore passed on the physical
+iPhone 16 Pro Max using TestFlight 2.3.0 (7). Haze was fully uninstalled,
+then installed from the existing internal TestFlight group. The fresh app
+had default cosmetics and Plus locked. Tapping Restore Purchases displayed
+"Your Haze Plus purchase has been restored," unlocked all Plus cosmetics,
+and allowed Orbit with Headphones to be applied to the main face.
+RevenueCat showed the original unlimited-duration entitlement and a new
+anonymous customer ID aliased to the original purchaser. No repeat purchase
+was made.
+
+The first attempt used a locally signed development build and returned no
+purchase. The user confirmed the original purchase used their regular Apple
+account. The subsequent clean TestFlight installation recovered it. The
+exact cause of the development-build result was not conclusively diagnosed;
+it is retained in the evidence rather than counted as a passing attempt.
 
 ## Store notification verification
 

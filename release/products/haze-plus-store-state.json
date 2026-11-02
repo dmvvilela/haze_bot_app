@@ -55,14 +55,16 @@
     ],
     "privacyPolicyUrl": "https://danvilela.com/haze/privacy-policy",
     "purchaseTest": "passed_physical_device_sandbox",
-    "restoreTest": "passed_explicit_restore_and_cold_restart",
+    "restoreTest": "passed_testflight_clean_install_explicit_restore",
     "nativePriceLoaded": true,
     "releaseEvidence": "release/products/haze-plus-ios-release-evidence.json",
     "serverNotifications": {
       "production": "configured_delivery_test_passed",
       "sandbox": "configured_delivery_test_passed"
     },
-    "purchaseEvidence": "release/products/haze-plus-ios-purchase-proof.json"
+    "purchaseEvidence": "release/products/haze-plus-ios-purchase-proof.json",
+    "cleanInstallRestoreTested": true,
+    "cleanInstallRestoreDistribution": "TestFlight 2.3.0 (7)"
   },
   "google": {
     "created": true,

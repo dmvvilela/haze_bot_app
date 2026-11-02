@@ -79,12 +79,16 @@
       "build/haze-plus-proof/ios-plus-purchase-controls.png",
       "build/haze-plus-proof/ios-physical-purchase-unlocked.png",
       "build/haze-plus-proof/ios-physical-restore-success.png",
-      "build/haze-plus-proof/ios-physical-cold-restart.png"
+      "build/haze-plus-proof/ios-physical-cold-restart.png",
+      "build/haze-plus-proof/ios-testflight-clean-before-restore.png",
+      "build/haze-plus-proof/ios-testflight-clean-restore-success.png",
+      "build/haze-plus-proof/ios-testflight-clean-restored-look.png"
     ],
-    "distribution": "development-signed build 2.3.0 (7)",
+    "distribution": "TestFlight 2.3.0 (7) verified for clean-install restore",
     "coldRestartOwnershipConfirmed": true,
-    "cleanInstallRestoreTested": false,
-    "purchaseEvidence": "release/products/haze-plus-ios-purchase-proof.json"
+    "cleanInstallRestoreTested": true,
+    "purchaseEvidence": "release/products/haze-plus-ios-purchase-proof.json",
+    "cleanInstallRestoreConfirmed": true
   },
   "reviewProof": "build/haze-plus-proof/ios-two-items-submitted.png",
   "apiStatus": {
