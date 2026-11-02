@@ -1,0 +1,45 @@
+{
+  "verifiedOn": "2026-11-01",
+  "verifiedAt": "2026-11-02T02:03:15.134890+00:00",
+  "device": "iPhone 16 Pro Max",
+  "platform": "physical iOS device",
+  "bundleId": "com.d2vsolutions.hazeBotApp",
+  "appVersion": "2.3.0",
+  "buildNumber": 7,
+  "distribution": "development-signed build",
+  "builtByDeveloper": true,
+  "productId": "haze_plus_lifetime",
+  "entitlementId": "haze_plus",
+  "environment": "SANDBOX",
+  "store": "APP_STORE",
+  "purchaseType": "NON_RENEWING_PURCHASE",
+  "purchaseCompleted": true,
+  "appleSuccessDialogObserved": true,
+  "revenueCatPurchaseConfirmed": true,
+  "revenueCatEntitlementActive": true,
+  "entitlementExpiration": null,
+  "sandboxPrice": {
+    "currency": "BRL",
+    "amount": 19.9
+  },
+  "purchasedAtUtc": "2026-11-02T01:56:35Z",
+  "unlockConfirmed": true,
+  "explicitRestoreConfirmed": true,
+  "restoreMessage": "Your Haze Plus purchase has been restored.",
+  "coldRestartOwnershipConfirmed": true,
+  "coldRestartMethod": "devicectl process launch --terminate-existing",
+  "freshDataRestoreTested": false,
+  "cleanInstallRestoreTested": false,
+  "paidCosmeticsVerified": {
+    "face": "Orbit",
+    "accessory": "Headphones",
+    "visibleOnMainScreen": true,
+    "persistedAfterColdRestart": true
+  },
+  "privateCustomerAndTransactionIdsOmitted": true,
+  "screenshots": {
+    "unlock": "build/haze-plus-proof/ios-physical-purchase-unlocked.png",
+    "restore": "build/haze-plus-proof/ios-physical-restore-success.png",
+    "coldRestart": "build/haze-plus-proof/ios-physical-cold-restart.png"
+  }
+}

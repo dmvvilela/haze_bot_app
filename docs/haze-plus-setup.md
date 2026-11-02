@@ -150,8 +150,9 @@ is `release/products/haze-plus-google-draft.json`.
 6. Remaining native Android tests: cancellation, pending approval, and
    refund/revocation. Android purchase, cold restart, explicit restore, and
    clean-install restore on the same store account passed.
-   All native iOS transaction tests remain outstanding. Dart fakes are not
-   store proof.
+   iOS sandbox purchase, explicit restore, paid cosmetics, and cold restart
+   passed on a physical iPhone 16 Pro Max. iOS clean-install restore,
+   cancellation, pending approval, and refund/revocation remain untested.
 7. The bilingual privacy policy is live at
    https://danvilela.com/haze/privacy-policy (website commit `88018fa`).
    Apple English and Portuguese privacy URLs were updated and submitted.
@@ -184,10 +185,19 @@ containing iOS 2.3.0 (7) and Haze Plus — Lifetime. Submission ID:
 This is not confirmation of public availability.
 
 The signed production IPA passed signature validation. The native iOS app
-loaded the real $4.99 store price and displayed Restore Purchases. No iOS
-purchase or restore transaction was completed; Android test success does not
-prove iOS transaction behavior. The Apple purchase-history privacy declaration
-was published, and the native purchase-controls screenshot completed upload.
+loaded the real $4.99 store price and displayed Restore Purchases. The Apple
+purchase-history privacy declaration was published, and the native
+purchase-controls screenshot completed upload.
+
+On November 1 at 22:56 BRT, a physical iPhone 16 Pro Max completed an Apple
+sandbox purchase at R$19.90 using development-signed Haze 2.3.0 (7). Apple
+confirmed success, and RevenueCat recorded `NON_RENEWING_PURCHASE` in
+`SANDBOX` for `haze_plus_lifetime`, granting active `haze_plus` with unlimited
+duration. The app applied Orbit and Headphones. Explicit Restore Purchases
+showed "Your Haze Plus purchase has been restored." A full process restart
+preserved ownership and the selected cosmetics. This was not a clean-install
+restore or a TestFlight binary test. Sanitized evidence is in
+`release/products/haze-plus-ios-purchase-proof.json`.
 
 ## Store notification verification
 
@@ -244,7 +254,8 @@ and iOS simulator builds passed with SDK 10.18.1. Haze launched and initialized
 on the iPhone simulator. The actual Plus screen was exercised in the browser
 preview, including Portuguese, style/accessory selection, and applying a
 simulated owned look. Android real license-test purchase and restore passed
-on November 1 as documented above; native iOS purchases remain untested.
+on November 1 as documented above. Physical iOS sandbox purchase, explicit
+restore, and cold restart also passed on November 1.
 
 `flutter run -d web-server -t tool/plus_preview.dart --web-port 8745`
 opens the real Plus screen with a developer-only store adapter.

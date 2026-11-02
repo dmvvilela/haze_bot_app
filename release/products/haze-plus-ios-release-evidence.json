@@ -67,17 +67,24 @@
     "tracking": false
   },
   "nativeVerification": {
-    "platform": "iOS simulator",
+    "platform": "physical iPhone 16 Pro Max",
     "entrypoint": "lib/main.dart",
     "productLoaded": true,
     "displayedPrice": "$4.99",
     "restoreControlVisible": true,
-    "purchaseCompleted": false,
-    "restoreTransactionTested": false,
+    "purchaseCompleted": true,
+    "restoreTransactionTested": true,
     "screenshots": [
       "build/haze-plus-proof/ios-plus-preview.png",
-      "build/haze-plus-proof/ios-plus-purchase-controls.png"
-    ]
+      "build/haze-plus-proof/ios-plus-purchase-controls.png",
+      "build/haze-plus-proof/ios-physical-purchase-unlocked.png",
+      "build/haze-plus-proof/ios-physical-restore-success.png",
+      "build/haze-plus-proof/ios-physical-cold-restart.png"
+    ],
+    "distribution": "development-signed build 2.3.0 (7)",
+    "coldRestartOwnershipConfirmed": true,
+    "cleanInstallRestoreTested": false,
+    "purchaseEvidence": "release/products/haze-plus-ios-purchase-proof.json"
   },
   "reviewProof": "build/haze-plus-proof/ios-two-items-submitted.png",
   "apiStatus": {
